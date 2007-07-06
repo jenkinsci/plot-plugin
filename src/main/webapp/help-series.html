@@ -1,0 +1,19 @@
+<div>
+  Mandatory. Specifies the path to the Java property file (key=value pairs), relative to
+  <a href='ws/'>the workspace root</a>, that
+  contains the data value for this data series.  The file must
+  contain a <code>YVALUE</code> property and may optionally
+  contain a <code>URL</code> property. If present, the URL will be 
+  opened when the data point on the plot is clicked.
+  <p>
+  The specification of this file can use wildcards like <code>build/report/*/report.properties</code>
+  but only the first file resolved by the wildcard will be used.
+  See <a href='http://ant.apache.org/manual/CoreTypes/fileset.html'>
+  the @includes of Ant fileset</a> for the exact format.
+  <p>
+  For example, a properties file might look like:
+  <pre>
+  YVALUE=3.342
+  URL=http://foo.bar/
+  </pre>
+</div>
