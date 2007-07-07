@@ -5,6 +5,7 @@
 package hudson.plugins.plot;
 
 import hudson.FilePath;
+import hudson.model.AbstractProject;
 import hudson.model.Build;
 import hudson.model.Project;
 import hudson.model.Run;
@@ -89,7 +90,7 @@ public class Plot implements Comparable {
      * to the project is needed to retrieve and save the CSV file
      * that is stored in the project's root directory.
      */
-    private transient Project project;
+    private transient AbstractProject project;
 	
 	/** All plots share the same JFreeChart drawing supplier object. */
 	private static transient final DrawingSupplier supplier = new DefaultDrawingSupplier(
