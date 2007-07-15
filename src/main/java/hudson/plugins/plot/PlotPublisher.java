@@ -195,7 +195,7 @@ public class PlotPublisher extends Publisher {
             return "Plot build data";
         }
         public String getHelpFile() {
-            return "/plugin/plot/help.html";
+            return "/publisher/PlotPublisher/help";
         }
         /**
          * Called when the user saves the project configuration.
