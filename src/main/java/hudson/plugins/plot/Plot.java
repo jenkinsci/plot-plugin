@@ -364,8 +364,10 @@ public class Plot implements Comparable {
     		// data hasn't changed so don't regenerate the plot
     		return;
     	}
-    	if (csvFile.lastModified() > csvLastModification) {
-    		// data has changed so reload
+    	if (rawPlotData == null || 
+    		csvFile.lastModified() > csvLastModification) 
+    	{
+    		// data has changed or has not been loaded so load it now
     		loadPlotData();
     	}
     	//LOGGER.info("Generating plot " + getCsvFileName());

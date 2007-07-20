@@ -78,7 +78,7 @@ public class PlotAction implements Action, StaplerProxy {
     	String[] groups = getOriginalGroups();
     	if (groups != null && groups.length == 1) {
     		return new PlotReport(project, groups[0], 
-        			publisher.getPlots(groups[0]));
+        			publisher.getPlots(getUrlGroup(groups[0])));
     	} else {
     		return this;
     	}
