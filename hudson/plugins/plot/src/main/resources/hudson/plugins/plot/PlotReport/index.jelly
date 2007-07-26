@@ -1,0 +1,39 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:c="chart">
+  
+  <d:taglib uri="chart">
+    <d:tag name="chart">
+      <div id="${id}" style="margin-top: 2em">
+        <div align="right" style="width:750px">
+          <a href="#top"><img src="${rootURL}/images/24x24/up.gif"/>top</a>
+        </div>
+        <img src="getPlot?index=${index}&amp;width=750&amp;height=450" width="750" height="450" lazymap="getPlotMap?index=${index}" />
+      </div>
+    </d:tag>
+    <d:tag name="individualChart">
+      <c:chart id="${id}" index="${index}" />
+    </d:tag>
+  </d:taglib>
+
+  <l:layout title="${it.group}">
+    <st:include it="${it.project}" page="sidepanel.jelly" />
+    <l:main-panel>
+      <h1><img src="${rootURL}/images/32x32/graph.gif"/>${it.group}</h1>
+      <div>
+        <script>
+          function jump(menu){
+            window.location.hash = menu.value;
+          }
+        </script>
+        Jump to <select name="choice" onChange="jump(this)">
+          <j:forEach var="plotJump" items="${it.plots}" varStatus="loopStat">
+            <option value="#${plotJump.csvFileName}">Plot ${loopStat.count}: ${plotJump.title}</option>
+          </j:forEach>
+        </select>
+      </div>
+
+      <j:forEach var="plot" items="${it.plots}" varStatus="loopStat2">
+        <c:individualChart id="${plot.csvFileName}" index="${loopStat2.index}" />
+      </j:forEach>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

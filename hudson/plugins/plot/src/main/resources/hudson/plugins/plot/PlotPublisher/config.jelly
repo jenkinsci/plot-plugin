@@ -1,0 +1,57 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:entry title="" description="A new plot definition">
+      <f:repeatable var="plot" items="${instance.getPlots()}">
+        <div align="left">
+          <f:repeatableDeleteButton value="Delete Plot"/>
+        </div>
+        <table width="100%">
+          <f:block>
+            <input name="plotParam.csvFileName" type="hidden" value="${plot.csvFileName}" />
+          </f:block>
+          <f:entry title="Plot group" help="/plugin/plot/help-group.html">
+            <f:textbox name="plotParam.group" value="${plot.group}" />
+          </f:entry>
+          <f:entry title="Plot title" help="/plugin/plot/help-title.html">
+            <f:textbox name="plotParam.title" value="${plot.title}" />
+          </f:entry>
+          <f:entry title="Number of builds to include" help="/plugin/plot/help-numbuilds.html">
+            <input class="validated" type="text" name="plotParam.numBuilds" style="width:20em" value="${plot.numBuilds}"
+             checkUrl="'${rootURL}/publisher/PlotPublisher/checkNumBuilds?value='+escape(this.value)" />
+          </f:entry>
+          <f:entry title="Plot y-axis label" help="/plugin/plot/help-yaxis.html">
+            <f:textbox name="plotParam.yaxis" value="${plot.yaxis}" />
+          </f:entry>
+          <f:nested>
+	          <f:entry title="" description="A new data series definition">
+	            <f:repeatable var="series" items="${plot.getSeries()}" minimum="1">
+	              <table width="100%" bgcolor="#EEEEEE">
+	                <f:entry title="Data series file" help="/plugin/plot/help-series.html">
+	                  <f:textbox name="seriesParam.file" value="${series.file}" 
+	                    checkUrl="'${rootURL}/publisher/PlotPublisher/checkSeriesFile?job=${it.fullName}&amp;value='+escape(this.value)"/>
+	                </f:entry>
+	                <f:entry title="Data series legend label" help="/plugin/plot/help-legend.html">
+	                  <f:textbox name="seriesParam.label" value="${series.label}" />
+	                </f:entry>
+	                <f:entry title="">
+	                  <div align="right">
+	                    <f:repeatableDeleteButton value="Delete Data Series"/>
+	                  </div>
+	                </f:entry>
+	              </table>
+	              <table width="100%"><tr><td></td></tr></table>
+	            </f:repeatable>
+	          </f:entry>
+          </f:nested>
+          <f:block>
+            <input name="seriesParam.file" type="hidden" value="PLOT_SEPARATOR" />
+            <input name="seriesParam.label" type="hidden" value="PLOT_SEPARATOR" />
+          </f:block>
+          <f:entry title="">
+            <f:block>
+              <hr/>
+            </f:block>
+          </f:entry>
+        </table>
+      </f:repeatable>
+    </f:entry>
+</j:jelly>

@@ -1,0 +1,28 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <l:layout title="${it.getProject().getDisplayName()} plots">
+    <st:include it="${it.project}" page="sidepanel.jelly" />
+    <l:main-panel>
+      <h1>Plot Groups</h1>
+
+      <j:choose>
+        <j:when test="${it.hasPlots()}">
+          <p>
+            This project contains groups of plots.
+          </p>
+          <table>
+            <j:forEach var="group" items="${it.getOriginalGroups()}">
+              <t:summary icon="graph.gif" href="${it.getUrlGroup(group)}/">
+                ${group}
+              </t:summary>
+            </j:forEach>
+          </table>
+        </j:when>
+        <j:otherwise>
+          <p>
+            This project has no plots yet.
+          </p>
+        </j:otherwise>
+      </j:choose>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>
