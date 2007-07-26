@@ -10,7 +10,7 @@
   <artifactId>plot</artifactId>
   <packaging>hpi</packaging>
   <name>Hudson Plot plugin</name>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <dependencies>
         <dependency>
             <groupId>jfree</groupId>
@@ -23,8 +23,4 @@
             <version>1.7</version>
         </dependency>
     </dependencies>
-
-  <scm>
-    <tag>plot-1_1</tag>
-  </scm>
 </project>
