@@ -11,6 +11,8 @@
   <packaging>hpi</packaging>
   <name>Hudson Plot plugin</name>
   <version>1.2-SNAPSHOT</version>
+  <url>http://hudson.gotdns.com/wiki/display/HUDSON/Plot+Plugin</url>
+  
   <dependencies>
         <dependency>
             <groupId>jfree</groupId>
