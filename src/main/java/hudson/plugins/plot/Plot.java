@@ -69,14 +69,14 @@ import au.com.bytecode.opencsv.CSVWriter;
  * @author Nigel Daley
  */
 public class Plot implements Comparable {
-	private static transient final Logger LOGGER = Logger.getLogger(Plot.class.getName());
-	private static transient final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d");
-	
-	/**
-	 * Effectively a 2-dimensional array, where each row is the 
-	 * data for one data series of an individual build;  the columns
-	 * are: series y-value, series label, build number, optional URL
-	 */
+    private static transient final Logger LOGGER = Logger.getLogger(Plot.class.getName());
+    private static transient final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d");
+    
+    /**
+     * Effectively a 2-dimensional array, where each row is the 
+     * data for one data series of an individual build;  the columns
+     * are: series y-value, series label, build number, optional URL
+     */
     private transient ArrayList<String[]> rawPlotData;
     
     /**
@@ -91,9 +91,9 @@ public class Plot implements Comparable {
      * that is stored in the project's root directory.
      */
     private transient AbstractProject project;
-	
-	/** All plots share the same JFreeChart drawing supplier object. */
-	private static transient final DrawingSupplier supplier = new DefaultDrawingSupplier(
+    
+    /** All plots share the same JFreeChart drawing supplier object. */
+    private static transient final DrawingSupplier supplier = new DefaultDrawingSupplier(
             DefaultDrawingSupplier.DEFAULT_PAINT_SEQUENCE,
             DefaultDrawingSupplier.DEFAULT_OUTLINE_PAINT_SEQUENCE,
             DefaultDrawingSupplier.DEFAULT_STROKE_SEQUENCE,
@@ -102,15 +102,15 @@ public class Plot implements Comparable {
             new Shape[] { new Polygon(new int[] {3, 0, -3, 0},
                     new int[] {0, 4, 0, -4}, 4) }
     );
-	
-	/** The default plot width. */
-	private static transient final int DEFAULT_WIDTH = 750;
-	
-	/** The default plot height. */
-	private static transient final int DEFAULT_HEIGHT = 450;
     
-    /** The date of the last change to the CSV file. */
-    private long csvLastModification;
+    /** The default plot width. */
+    private static transient final int DEFAULT_WIDTH = 750;
+    
+    /** The default plot height. */
+    private static transient final int DEFAULT_HEIGHT = 450;
+    
+    /** The default number of builds on plot (all). */
+    private static transient final String DEFAULT_NUMBUILDS = "";
     
     /** The width of the plot. */
     private transient int width;
@@ -118,9 +118,21 @@ public class Plot implements Comparable {
     /** The height of the plot. */
     private transient int height;
     
+    /** The right-most build number on the plot. */
+    private transient int rightBuildNum;
+    
+    /** Whether or not the plot has a legend. */
+    private transient boolean hasLegend = true;
+    
+    /** Number of builds back to show on this plot from url. */
+    public transient String urlNumBuilds = null;
+    
+    /** Title of plot from url. */
+    public transient String urlTitle = null;
+    
     /** Title of plot. Mandatory. */
     public String title;
-
+    
     /** Y-axis label. Optional. */
     public String yaxis;
 
@@ -142,13 +154,16 @@ public class Plot implements Comparable {
      */
     public String csvFileName;
     
+    /** The date of the last change to the CSV file. */
+    private long csvLastModification;
+    
     /**
      * Creates a new plot with the given paramenters.  If numBuilds
      * is the empty string, then all builds will be included. Must
      * not be zero.
      */
     public Plot(String title, String yaxis, Series[] series,
-    		String group, String numBuilds, String csvFileName) 
+            String group, String numBuilds, String csvFileName) 
     {
         this.title = title;
         this.yaxis = yaxis;
@@ -161,22 +176,21 @@ public class Plot implements Comparable {
     // needed for serialization
     public Plot() {}
 
-	public int compareTo(Object o) {
-		return title.compareTo(((Plot)o).getTitle());
-	}
-	
-	public String toString() {
-		return "TITLE("+title+
-			"),YAXIS("+yaxis+
-			"),NUMSERIES("+series.length+
-			"),GROUP("+group+
-			"),NUMBUILDS("+numBuilds+
-			"),FILENAME("+csvFileName+")";
-	}
-	
-    public String getTitle() {
-        return title;
+    public int compareTo(Object o) {
+        return title.compareTo(((Plot)o).getConfiguredTitle());
     }
+    
+    public String toString() {
+        return "TITLE("+getTitle()+
+            "),YAXIS("+yaxis+
+            "),NUMSERIES("+series.length+
+            "),GROUP("+group+
+            "),NUMBUILDS("+getNumBuilds()+
+            "),RIGHTBUILDNUM("+getRightBuildNum()+
+            "),HASLEGEND("+hasLegend()+
+            "),FILENAME("+csvFileName+")";
+    }
+    
     public String getYaxis() {
         return yaxis;
     }
@@ -184,18 +198,94 @@ public class Plot implements Comparable {
         return series;
     }
     public String getGroup() {
-    	return group;
-    }
-    public String getNumBuilds() {
-    	return numBuilds;
-    }
-    public boolean hasLegend() {
-    	return true;
+        return group;
     }
     public String getCsvFileName() {
-    	return csvFileName;
+        return csvFileName;
+    }
+    
+    /**
+     * Sets the title for the plot from the "title" parameter
+     * in the given StaplerRequest.
+     */
+    private void setTitle(StaplerRequest req) {
+        urlTitle = req.getParameter("title");
+    }
+    public String getTitle() {
+        if (urlTitle != null) {
+            return urlTitle;
+        }
+        return title;
+    }
+    public String getConfiguredTitle() {
+        return title;
+    }
+    
+    /**
+     * Sets the number of builds to plot from the "numbuilds" parameter
+     * in the given StaplerRequest.  If the parameter doesn't exist
+     * or isn't an integer then a default is used.
+     */
+    private void setHasLegend(StaplerRequest req) {
+        String legend = req.getParameter("legend");
+        if (legend == null) {
+            hasLegend = true;
+        } else {
+            try {
+                hasLegend = Boolean.parseBoolean(legend);
+            } catch (NumberFormatException nfe) {
+                hasLegend = true;
+            }
+        }
+    }
+    public boolean hasLegend() {
+        return hasLegend;
+    }
+        
+    /**
+     * Sets the number of builds to plot from the "numbuilds" parameter
+     * in the given StaplerRequest.  If the parameter doesn't exist
+     * or isn't an integer then a default is used.
+     */
+    private void setNumBuilds(StaplerRequest req) {
+        urlNumBuilds = req.getParameter("numbuilds");
+        if (urlNumBuilds != null) {
+            try {
+                int tmp = Integer.parseInt(urlNumBuilds);
+            } catch (NumberFormatException nfe) {
+                urlNumBuilds = null;
+            }
+        }
+    }
+    public String getNumBuilds() {
+        if (urlNumBuilds != null) {
+            return urlNumBuilds;
+        }
+        return numBuilds;
     }
 
+    /**
+     * Sets the right-most build number shown on the plot from
+     * the "rightbuildnum" parameter in the given StaplerRequest.
+     * If the parameter doesn't exist or isn't an integer then 
+     * a default is used.
+     */
+    private void setRightBuildNum(StaplerRequest req) {
+        String build = req.getParameter("rightbuildnum");
+        if (build == null) {
+            rightBuildNum = Integer.MAX_VALUE;
+        } else {
+            try {
+                rightBuildNum = Integer.parseInt(build);
+            } catch (NumberFormatException nfe) {
+                rightBuildNum = Integer.MAX_VALUE;
+            }
+        }
+    }
+    private int getRightBuildNum() {
+        return rightBuildNum;
+    }
+    
     /**
      * Sets the plot width from the "width" parameter in the
      * given StaplerRequest.  If the parameter doesn't exist
@@ -204,20 +294,20 @@ public class Plot implements Comparable {
     private void setWidth(StaplerRequest req) {
         String w = req.getParameter("width");
         if (w == null) {
-        	width = DEFAULT_WIDTH;
+            width = DEFAULT_WIDTH;
         } else {
-        	try {
-        		width = Integer.parseInt(w);
-        	} catch (NumberFormatException nfe) {
-        		width = DEFAULT_WIDTH;
-        	}
+            try {
+                width = Integer.parseInt(w);
+            } catch (NumberFormatException nfe) {
+                width = DEFAULT_WIDTH;
+            }
         }
     }
     private int getWidth() {
-    	return width;
+        return width;
     }
     private int getHeight() {
-    	return height;
+        return height;
     }
     /**
      * Sets the plot height from the "height" parameter in the
@@ -227,13 +317,13 @@ public class Plot implements Comparable {
     private void setHeight(StaplerRequest req) {
         String h = req.getParameter("height");
         if (h == null) {
-        	height = DEFAULT_HEIGHT;
+            height = DEFAULT_HEIGHT;
         } else {
-        	try {
-        		height = Integer.parseInt(h);
-        	} catch (NumberFormatException nfe) {
-        		height = DEFAULT_HEIGHT;
-        	}
+            try {
+                height = Integer.parseInt(h);
+            } catch (NumberFormatException nfe) {
+                height = DEFAULT_HEIGHT;
+            }
         }
     }
     
@@ -246,7 +336,7 @@ public class Plot implements Comparable {
      * @param project the project
      */
     public void setProject(Project project) {
-    	this.project = project;
+        this.project = project;
     }
     
     /**
@@ -266,6 +356,10 @@ public class Plot implements Comparable {
         }
         setWidth(req);
         setHeight(req);
+        setNumBuilds(req);
+        setRightBuildNum(req);
+        setHasLegend(req);
+        setTitle(req);
         // need to force regenerate the plot incase build 
         // descriptions (used for tool tips) have changed 
         generatePlot(true); 
@@ -290,6 +384,10 @@ public class Plot implements Comparable {
         }
         setWidth(req);
         setHeight(req);
+        setNumBuilds(req);
+        setRightBuildNum(req);
+        setHasLegend(req);
+        setTitle(req);
         generatePlot(false);
         ChartRenderingInfo info = new ChartRenderingInfo();
         plot.createBufferedImage(getWidth(),getHeight(),info);
@@ -306,8 +404,8 @@ public class Plot implements Comparable {
      * @param logger
      */
     public void addBuild(Build build, PrintStream logger) {
-    	if (project == null) project = build.getProject();
-    	// load the existing plot data from disk
+        if (project == null) project = build.getProject();
+        // load the existing plot data from disk
         loadPlotData();
         // extract the data for each data series
         for (Series series : getSeries()) {
@@ -333,13 +431,13 @@ public class Plot implements Comparable {
      *        even if the on-disk data hasn't changed
      */
     private void generatePlot(boolean forceGenerate) {
-    	class Label implements Comparable<Label> {
+        class Label implements Comparable<Label> {
             private Integer buildNum;
             private String buildDate;
             public Label(String buildNum, String buildTime) {
                 this.buildNum = Integer.parseInt(buildNum);
                 this.buildDate = dateFormat.format(
-                		new Date(Long.parseLong(buildTime)));
+                        new Date(Long.parseLong(buildTime)));
             }
             public int compareTo(Label that) {
                 return this.buildNum-that.buildNum;
@@ -356,48 +454,57 @@ public class Plot implements Comparable {
             }
         }
         //LOGGER.info("Determining if we should generate plot " + getCsvFileName());
-    	File csvFile = new File(project.getRootDir(),getCsvFileName());
-    	if (csvFile.lastModified() == csvLastModification &&
-    		plot != null &&
-    		!forceGenerate) 
-    	{
-    		// data hasn't changed so don't regenerate the plot
-    		return;
-    	}
-    	if (rawPlotData == null || 
-    		csvFile.lastModified() > csvLastModification) 
-    	{
-    		// data has changed or has not been loaded so load it now
-    		loadPlotData();
-    	}
-    	//LOGGER.info("Generating plot " + getCsvFileName());
-    	csvLastModification = csvFile.lastModified();
-    	PlotCategoryDataset dataset = 
-        	new PlotCategoryDataset();
-        for (String[] record : rawPlotData) {
-        	// record: series y-value, series label, build number, build date, url
-        	Number value = null;
-        	try {
-        		value = Integer.valueOf(record[0]);
-        	} catch (NumberFormatException nfe) {
-        		try {
-        		    value = Double.valueOf(record[0]);
-        		} catch (NumberFormatException nfe2) {
-        			continue; // skip this record all together
-        		}
-        	}
-            String series = record[1];
-        	Label xlabel = new Label(record[2],record[3]);
-        	String url = null;
-        	if (record.length >= 5) url = record[4]; 
-        	dataset.setValue(value,url,series,xlabel);
+        File csvFile = new File(project.getRootDir(),getCsvFileName());
+        if (csvFile.lastModified() == csvLastModification &&
+            plot != null &&
+            !forceGenerate) 
+        {
+            // data hasn't changed so don't regenerate the plot
+            return;
         }
-    	int numBuilds;
-    	try {
-    		numBuilds = Integer.parseInt(getNumBuilds());
-    	} catch (NumberFormatException nfe) {
-    		numBuilds = Integer.MAX_VALUE;
-    	}
+        if (rawPlotData == null || 
+            csvFile.lastModified() > csvLastModification) 
+        {
+            // data has changed or has not been loaded so load it now
+            loadPlotData();
+        }
+        //LOGGER.info("Generating plot " + getCsvFileName());
+        csvLastModification = csvFile.lastModified();
+        PlotCategoryDataset dataset = 
+            new PlotCategoryDataset();
+        for (String[] record : rawPlotData) {
+            // record: series y-value, series label, build number, build date, url
+            int buildNum;
+            try {
+                buildNum = Integer.valueOf(record[2]);
+                if (buildNum > getRightBuildNum()) {
+                    continue; // skip this record
+                }
+            } catch (NumberFormatException nfe) {
+                  continue; // skip this record all together
+            }
+            Number value = null;
+            try {
+                value = Integer.valueOf(record[0]);
+            } catch (NumberFormatException nfe) {
+                try {
+                    value = Double.valueOf(record[0]);
+                } catch (NumberFormatException nfe2) {
+                    continue; // skip this record all together
+                }
+            }
+            String series = record[1];
+            Label xlabel = new Label(record[2],record[3]);
+            String url = null;
+            if (record.length >= 5) url = record[4]; 
+            dataset.setValue(value,url,series,xlabel);
+        }
+        int numBuilds;
+        try {
+            numBuilds = Integer.parseInt(getNumBuilds());
+        } catch (NumberFormatException nfe) {
+            numBuilds = Integer.MAX_VALUE;
+        }
         dataset.clipDataset(numBuilds);
         plot = ChartFactory.createLineChart(
                 getTitle(),null,getYaxis(),dataset,
@@ -413,19 +520,19 @@ public class Plot implements Comparable {
         domainAxis.setUpperMargin(0.03);
         domainAxis.setCategoryMargin(0.0);
         for (Object category : dataset.getColumnKeys()) {
-        	Run r = project.getBuildByNumber(((Label)category).buildNum);
-        	String tip = null;
-        	if (r != null) {
-        		tip = r.getTruncatedDescription();
-        		if (tip != null) {
-        			tip = tip.replaceAll("<p> *|<br> *", ", ");
-        			//LOGGER.info("DESCRIPTION:"+tip);
-        		}
-        	}
-        	domainAxis.addCategoryLabelToolTip((Comparable)category, tip);
+            Run r = project.getBuildByNumber(((Label)category).buildNum);
+            String tip = null;
+            if (r != null) {
+                tip = r.getTruncatedDescription();
+                if (tip != null) {
+                    tip = tip.replaceAll("<p> *|<br> *", ", ");
+                    //LOGGER.info("DESCRIPTION:"+tip);
+                }
+            }
+            domainAxis.addCategoryLabelToolTip((Comparable)category, tip);
         }
         LineAndShapeRenderer renderer = 
-        	(LineAndShapeRenderer) categoryPlot.getRenderer();
+            (LineAndShapeRenderer) categoryPlot.getRenderer();
         Color[] LINE_GRAPH = new Color[] {
             new Color(0xCC0000), // red
             new Color(0x3465a4), // blue
@@ -441,7 +548,7 @@ public class Plot implements Comparable {
         renderer.setShapesVisible(true);
         renderer.setStroke(new BasicStroke(2.0f));
         renderer.setToolTipGenerator(new StandardCategoryToolTipGenerator(
-        		"Build {1}: {2}",NumberFormat.getInstance()));
+                "Build {1}: {2}",NumberFormat.getInstance()));
         renderer.setItemURLGenerator(new PointURLGenerator());
     }
     
@@ -492,7 +599,7 @@ public class Plot implements Comparable {
         try {
             writer = new CSVWriter(new FileWriter(plotFile));
             // write 2 header lines
-            String[] header1 = new String[] {"Title",this.getTitle()};
+            String[] header1 = new String[] {"Title",this.getConfiguredTitle()};
             String[] header2 = new String[] {"Value","Series Label","Build Number","Build Date","URL"};
             writer.writeNext(header1);
             writer.writeNext(header2);
@@ -526,10 +633,10 @@ public class Plot implements Comparable {
         InputStream in = null;
         FilePath[] seriesFiles = null;
         try {
-        	seriesFiles = workspaceRootDir.list(series.getFile());
+            seriesFiles = workspaceRootDir.list(series.getFile());
         } catch (Exception e) {
-        	logger.println("Exception trying to retrieve series files: " + e);
-        	return null;
+            logger.println("Exception trying to retrieve series files: " + e);
+            return null;
         }
         if (seriesFiles != null && seriesFiles.length < 1) {
             logger.println("No plot data file found: " + series.getFile());
