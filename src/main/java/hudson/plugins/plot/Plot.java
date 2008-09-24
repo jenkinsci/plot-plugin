@@ -177,7 +177,7 @@ public class Plot implements Comparable {
     public Plot() {}
 
     public int compareTo(Object o) {
-        return title.compareTo(((Plot)o).getConfiguredTitle());
+        return title.compareTo(((Plot)o).getTitle());
     }
     
     public String toString() {
@@ -211,13 +211,13 @@ public class Plot implements Comparable {
     private void setTitle(StaplerRequest req) {
         urlTitle = req.getParameter("title");
     }
-    public String getTitle() {
+    public String getURLTitle() {
         if (urlTitle != null) {
             return urlTitle;
         }
         return title;
     }
-    public String getConfiguredTitle() {
+    public String getTitle() {
         return title;
     }
     
@@ -257,10 +257,13 @@ public class Plot implements Comparable {
             }
         }
     }
-    public String getNumBuilds() {
+    public String getURLNumBuilds() {
         if (urlNumBuilds != null) {
             return urlNumBuilds;
         }
+        return numBuilds;
+    }
+    public String getNumBuilds() {
         return numBuilds;
     }
 
@@ -501,13 +504,13 @@ public class Plot implements Comparable {
         }
         int numBuilds;
         try {
-            numBuilds = Integer.parseInt(getNumBuilds());
+            numBuilds = Integer.parseInt(getURLNumBuilds());
         } catch (NumberFormatException nfe) {
             numBuilds = Integer.MAX_VALUE;
         }
         dataset.clipDataset(numBuilds);
         plot = ChartFactory.createLineChart(
-                getTitle(),null,getYaxis(),dataset,
+                getURLTitle(),null,getYaxis(),dataset,
                 PlotOrientation.VERTICAL,hasLegend(),true,false);
         CategoryPlot categoryPlot = (CategoryPlot) plot.getPlot();
         categoryPlot.setDomainGridlinePaint(Color.black);
@@ -599,7 +602,7 @@ public class Plot implements Comparable {
         try {
             writer = new CSVWriter(new FileWriter(plotFile));
             // write 2 header lines
-            String[] header1 = new String[] {"Title",this.getConfiguredTitle()};
+            String[] header1 = new String[] {"Title",this.getTitle()};
             String[] header2 = new String[] {"Value","Series Label","Build Number","Build Date","URL"};
             writer.writeNext(header1);
             writer.writeNext(header2);
