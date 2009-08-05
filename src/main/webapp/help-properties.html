@@ -1,0 +1,25 @@
+<!-- 
+/*
+ * Copyright (c) 2008-2009 Yahoo! Inc.  All rights reserved.
+ * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+ */
+ -->
+<div>
+  Required to load the plot data from a properties file.
+  One plotting option must be selected.
+  <p>
+  The file must contain a <code>YVALUE</code> property and may optionally contain a 
+  <code>URL</code> property. If present, the URL will be opened when the data point on the plot is clicked.
+  </p>
+  <p>
+  The specification of this file can use wildcards like <code>build/report/*/report.properties</code>
+  but only the first file resolved by the wildcard will be used.
+  See <a href='http://ant.apache.org/manual/CoreTypes/fileset.html'>
+  the @includes of Ant fileset</a> for the exact format.
+  <p>
+  For example, a properties file might look like:
+  <pre>
+  YVALUE=3.342
+  URL=http://foo.bar/
+  </pre>
+</div>

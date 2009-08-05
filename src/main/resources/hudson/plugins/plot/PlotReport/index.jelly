@@ -1,3 +1,9 @@
+<!-- 
+/*
+ * Copyright (c) 2008-2009 Yahoo! Inc.  All rights reserved.
+ * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+ */
+ -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:c="chart">
   
   <d:taglib uri="chart">
@@ -6,6 +12,26 @@
         <div align="right" style="width:750px">
           <a href="#top"><img src="${rootURL}/images/24x24/up.gif"/>top</a>
         </div>
+        <j:if test="${it.getDisplayTableFlag(index)}">
+          <div>
+          <p>
+          <table border="1">
+          <j:forEach var="tuple" items="${it.getTable(index)}" varStatus="loopStat3">
+            <tr>
+            <j:forEach var="col" items="${tuple}">
+              <j:if test="${loopStat3.index==0}">
+                <th> ${col} </th>
+              </j:if>
+              <j:if test="${loopStat3.index>0}">
+                <td> ${col} </td>
+              </j:if>
+            </j:forEach>
+            </tr>
+          </j:forEach>
+          </table>
+          </p>
+          </div>
+        </j:if>
         <img src="getPlot?index=${index}&amp;width=750&amp;height=450" width="750" height="450" lazymap="getPlotMap?index=${index}" />
       </div>
     </d:tag>
@@ -30,7 +56,7 @@
           </j:forEach>
         </select>
       </div>
-
+      
       <j:forEach var="plot" items="${it.plots}" varStatus="loopStat2">
         <c:individualChart id="${plot.csvFileName}" index="${loopStat2.index}" />
       </j:forEach>

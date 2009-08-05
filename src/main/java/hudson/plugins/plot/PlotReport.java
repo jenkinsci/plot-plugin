@@ -6,13 +6,19 @@ package hudson.plugins.plot;
 
 import hudson.model.Project;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.ArrayList;
 
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * Represents a plot report for a single group of plots.
@@ -77,6 +83,49 @@ public class PlotReport {
 			LOGGER.log(Level.INFO,"Exception plotting graph",ioe);
 		}
 	}
+
+	// called from PlotReport/index.jelly
+	public boolean getDisplayTableFlag(int i) {
+		Plot plot = getPlot(""+i);
+
+		if (plot.getSeries()!=null) {
+    	    Series series = plot.getSeries()[0];
+    	    String displayFlag = series.getDisplayTableFlag();
+    	    if (displayFlag!=null && displayFlag.equals("true")) {
+    	    	return true;
+    	    }
+    	}
+    	return false;
+	}
+	
+	// called from PlotReport/index.jelly
+    public ArrayList getTable(int i) {
+    	ArrayList tableData = new ArrayList<String[]>();
+    	
+    	Plot plot = getPlot(""+i);
+    	
+        // load existing csv file
+        File tableFile = new File(project.getRootDir(), "table_"+plot.getCsvFileName());
+        if (!tableFile.exists()) {
+            return tableData;
+        }
+        CSVReader reader = null;
+        try {
+            reader = new CSVReader(new FileReader(tableFile));
+            tableData = (ArrayList)reader.readAll();
+        } catch (IOException ioe) {
+            //ignore
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ignore) {
+                    //ignore
+                }
+            }
+        }
+    	return tableData;
+    }
 	
     private Plot getPlot(String i) {
     	try {

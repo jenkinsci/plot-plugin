@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.  
- * Copyrights licensed under the MIT License.
+ * Copyright (c) 2007-2009 Yahoo! Inc.  All rights reserved.
+ * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
+
 package hudson.plugins.plot;
 
-import hudson.FilePath;
 import hudson.model.AbstractProject;
 import hudson.model.Build;
 import hudson.model.Project;
@@ -20,13 +20,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.jfree.chart.ChartFactory;
@@ -69,7 +67,7 @@ import au.com.bytecode.opencsv.CSVWriter;
  * @author Nigel Daley
  */
 public class Plot implements Comparable {
-    private static transient final Logger LOGGER = Logger.getLogger(Plot.class.getName());
+	private static transient final Logger LOGGER = Logger.getLogger(Plot.class.getName());
     private static transient final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d");
     
     /**
@@ -90,7 +88,7 @@ public class Plot implements Comparable {
      * to the project is needed to retrieve and save the CSV file
      * that is stored in the project's root directory.
      */
-    private transient AbstractProject project;
+	private transient AbstractProject project;
     
     /** All plots share the same JFreeChart drawing supplier object. */
     private static transient final DrawingSupplier supplier = new DefaultDrawingSupplier(
@@ -110,7 +108,7 @@ public class Plot implements Comparable {
     private static transient final int DEFAULT_HEIGHT = 450;
     
     /** The default number of builds on plot (all). */
-    private static transient final String DEFAULT_NUMBUILDS = "";
+	private static transient final String DEFAULT_NUMBUILDS = "";
     
     /** The width of the plot. */
     private transient int width;
@@ -151,6 +149,7 @@ public class Plot implements Comparable {
     /**
      * The name of the CSV file that persists the plots data.
      * The CSV file is stored in the projects root directory.
+     * This is different from the source csv file that can be used as a source for the plot.
      */
     public String csvFileName;
     
@@ -251,7 +250,8 @@ public class Plot implements Comparable {
         urlNumBuilds = req.getParameter("numbuilds");
         if (urlNumBuilds != null) {
             try {
-                int tmp = Integer.parseInt(urlNumBuilds);
+            	// simply try and parse the string to see if it's a valid number, throw away the result.
+                Integer.parseInt(urlNumBuilds);
             } catch (NumberFormatException nfe) {
                 urlNumBuilds = null;
             }
@@ -408,23 +408,40 @@ public class Plot implements Comparable {
      */
     public void addBuild(Build build, PrintStream logger) {
         if (project == null) project = build.getProject();
+        
         // load the existing plot data from disk
         loadPlotData();
         // extract the data for each data series
         for (Series series : getSeries()) {
-            Properties seriesData = loadSeriesData(series,project.getWorkspace(),logger);
+        	if (series == null)
+                continue;
+        	PlotPoint[] seriesData = series.loadSeries(project.getWorkspace(),logger);
             if (seriesData != null) {
-                rawPlotData.add(new String[] {
-                    seriesData.getProperty("YVALUE"),
-                    series.getLabel(),
-                    build.getNumber() + "", // convert to a string
-                    build.getTimestamp().getTimeInMillis() + "",
-                    seriesData.getProperty("URL")
-                });
+        		for (PlotPoint point : seriesData) {
+        			if (point == null)
+        				continue;
+
+        			rawPlotData.add(new String[] {
+        				point.getYvalue(),
+        				point.getLabel(),
+        				build.getNumber() + "", // convert to a string
+        				build.getTimestamp().getTimeInMillis() + "",
+        				point.getUrl()
+    				});
+        		}
             }
         }
+        
         // save the updated plot data to disk
         savePlotData();
+        
+        // currently only support for csv type
+        if ( getSeries()!=null ) {
+        	Series series = getSeries()[0];
+        	if ( "csv".equals(series.getFileType()) ) {
+        		saveTableData(build.getNumber(), series.getFile());
+        	}
+        }
     }
 
     /**
@@ -534,20 +551,14 @@ public class Plot implements Comparable {
             }
             domainAxis.addCategoryLabelToolTip((Comparable)category, tip);
         }
-        LineAndShapeRenderer renderer = 
-            (LineAndShapeRenderer) categoryPlot.getRenderer();
-        Color[] LINE_GRAPH = new Color[] {
-            new Color(0xCC0000), // red
-            new Color(0x3465a4), // blue
-            new Color(0x73d216), // green
-            new Color(0xedd400), // yellow
-            new Color(0x8a2be2), // purple
-            new Color(0xd2691e), // brown
-            new Color(0xee82ee), // pink
-            new Color(0x000000)  // black
-        };
-        int n=0;
-        for (Color c : LINE_GRAPH) renderer.setSeriesPaint(n++,c);
+
+        LineAndShapeRenderer renderer = (LineAndShapeRenderer) categoryPlot.getRenderer();
+		int numColors = dataset.getRowCount();
+		for (int i = 0; i < numColors; i++) {
+			renderer.setSeriesPaint(i, new Color(Color.HSBtoRGB(
+					(1f / numColors) * i, 1f, 1f)));
+		}
+        
         renderer.setShapesVisible(true);
         renderer.setStroke(new BasicStroke(2.0f));
         renderer.setToolTipGenerator(new StandardCategoryToolTipGenerator(
@@ -623,47 +634,79 @@ public class Plot implements Comparable {
         }
     }
 
-    /**
-     * Retrieves the plot data for one series after a build from the workspace.
-     * 
-     * @param series the series to retrieve from the workspace
-     * @param workspaceRootDir the root directory of the workspace
-     * @param logger the logger to use
-     * @return a properties object that contains the retrieved series data
-     *         from the workspace
-     */
-    private Properties loadSeriesData(Series series, FilePath workspaceRootDir, PrintStream logger) {
-        InputStream in = null;
-        FilePath[] seriesFiles = null;
-        try {
-            seriesFiles = workspaceRootDir.list(series.getFile());
-        } catch (Exception e) {
-            logger.println("Exception trying to retrieve series files: " + e);
-            return null;
-        }
-        if (seriesFiles != null && seriesFiles.length < 1) {
-            logger.println("No plot data file found: " + series.getFile());
-            return null;
-        }
-        try {
-            in = seriesFiles[0].read();
-            logger.println("Saving plot series data from: " + seriesFiles[0]);
-            Properties data = new Properties();
-            data.load(in);
-            return data;
-        } catch (Exception e) {
-            logger.println("Exception reading plot series data from: " + seriesFiles[0]);
-            return null;
-        } finally {
-            if (in != null) {
+    private void saveTableData(int buildNum, String fileName) {
+    	ArrayList rawTableData = new ArrayList();
+
+    	File tableFile = new File(project.getRootDir(), "table_"+getCsvFileName());
+    	File rawCSVFile = new File(project.getWorkspace() + File.separator + fileName);
+    	CSVReader existingTableReader = null;
+    	CSVReader newTupleReader = null;
+    	CSVWriter newTableWriter = null;
+    	try {
+    		newTupleReader = new CSVReader(new FileReader(rawCSVFile));
+
+    		// new header including build #
+    		String [] header = newTupleReader.readNext();
+    		String [] headerIncBuild = new String [header.length+1];
+    		headerIncBuild[0] = "build #";
+    		System.arraycopy(header, 0, headerIncBuild, 1, header.length);
+    		
+    		// add a new tuple
+    		String [] tuple = newTupleReader.readNext();
+    		String [] tupleIncBuild = new String [tuple.length+1];
+    		tupleIncBuild[0] = ""+ buildNum;
+    		System.arraycopy(tuple, 0, tupleIncBuild, 1, tuple.length);
+    		rawTableData.add (tupleIncBuild);
+
+    		// load existing data
+    		if (tableFile.exists()) {
+    			existingTableReader = new CSVReader(new FileReader(tableFile));
+        		// skip header
+        		existingTableReader.readNext();
+        		
+                int numBuilds;
                 try {
-                    in.close();
+                    numBuilds = Integer.parseInt(getNumBuilds());
+                } catch (NumberFormatException nfe) {
+                    numBuilds = Integer.MAX_VALUE;
+                }
+                
+        		String [] nextLine;
+        		int count = 0;                
+        		while ((nextLine = existingTableReader.readNext()) != null && count++ < numBuilds-1) {
+                    rawTableData.add(nextLine);
+        		}
+    		}
+    		
+    		// write to CSV file 
+    		newTableWriter = new CSVWriter(new FileWriter(tableFile));
+    		newTableWriter.writeNext(headerIncBuild);
+            newTableWriter.writeAll(rawTableData);
+    	} catch (IOException ioe) {
+            //ignore
+        } finally {
+            if (existingTableReader != null) {
+                try {
+                    existingTableReader.close();
+                } catch (IOException ignore) {
+                    //ignore
+                }
+            }
+            if (newTupleReader != null) {
+                try {
+                    newTupleReader.close();
+                } catch (IOException ignore) {
+                    //ignore
+                }
+            }
+            if (newTableWriter != null) {
+                try {
+                    newTableWriter.close();
                 } catch (IOException ignore) {
                     //ignore
                 }
             }
         }
     }
-
 }
 

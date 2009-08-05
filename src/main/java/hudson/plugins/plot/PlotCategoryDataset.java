@@ -20,6 +20,8 @@ import org.jfree.data.general.AbstractDataset;
  * @author Nigel Daley
  */
 public class PlotCategoryDataset extends AbstractDataset implements CategoryDataset {
+	private static final long serialVersionUID = 9215482265757674967L;
+
 	private static final Logger LOGGER = Logger.getLogger(PlotCategoryDataset.class.getName());
 	
 	class DataElement {

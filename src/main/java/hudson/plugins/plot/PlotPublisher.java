@@ -1,9 +1,11 @@
 /*
- * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.  
- * Copyrights licensed under the MIT License.
+ * Copyright (c) 2007-2009 Yahoo! Inc.  All rights reserved.
+ * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
+
 package hudson.plugins.plot;
 
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Action;
 import hudson.model.Build;
@@ -11,8 +13,9 @@ import hudson.model.BuildListener;
 import hudson.model.Descriptor;
 import hudson.model.Project;
 import hudson.tasks.Publisher;
-import hudson.util.FormFieldValidator;
+import hudson.util.FormValidation;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -21,12 +24,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * Records the plot data for builds.
@@ -210,20 +214,42 @@ public class PlotPublisher extends Publisher {
             String[] numBuilds = req.getParameterValues("plotParam.numBuilds");
         	String[] seriesFiles = req.getParameterValues("seriesParam.file");
         	String[] seriesLabels = req.getParameterValues("seriesParam.label");
-            if (seriesFiles != null) {
+        	String[] separators = req.getParameterValues("seriesParam.separator");
+        	
+        	LOGGER.log(Level.INFO, "Loading series");
+        	if (seriesFiles != null) {
             	//LOGGER.info(fileNames.length+","+titles.length+","+yaxises.length+","+
             	//	groups.length+","+numBuilds.length+","+seriesFiles.length+","+
-            	//	seriesLabels.length);
+            	//	seriesLabels.length+","+seriesFileTypes.length);
                 int len = fileNames.length;
+                // seriesCounter includes PLOT_SEPARATOR
+                // idCounter doesn't, and indexes the radioButton ids.
                 int seriesCounter = 0;
+                int idCounter = 0;
                 for (int i=0; i<len; i++) {
                 	List<Series> seriesList = new ArrayList<Series>();
                 	while ( seriesCounter < seriesFiles.length &&
-                		    ! seriesFiles[seriesCounter].equals("PLOT_SEPARATOR")) 
+                		    ! "true".equals(separators[seriesCounter]))
+                		    
                 	{
-                    	seriesList.add(new Series(seriesFiles[seriesCounter],
-                    							  seriesLabels[seriesCounter]));
+                    	LOGGER.log(Level.INFO, "Loading series " + seriesFiles[seriesCounter]);
+                		Series series;
+						try {
+							series = SeriesFactory.createSeries(idCounter, seriesFiles[seriesCounter], seriesLabels[seriesCounter], req);
+	                		if (series != null) {
+								seriesList.add(series);
+							} else {
+								if (LOGGER.isLoggable(Level.INFO))
+									LOGGER.log(Level.INFO,"Null series for id:" + idCounter + " series: " + seriesCounter+ " " + seriesFiles[seriesCounter] + " " + seriesLabels[seriesCounter]);
+							}
+						} catch (ServletException e) {
+							if (LOGGER.isLoggable(Level.INFO))
+								LOGGER.log(Level.INFO,"Error configuring series for id:" + idCounter + " series: " + seriesCounter+ " " + seriesFiles[seriesCounter] + " " + seriesLabels[seriesCounter],e);
+							throw new FormException(e, "Error configuring series");
+						}
+                		
                     	seriesCounter++;
+                    	idCounter++;
                     }
                 	seriesCounter++; //skip past separator
                 	if (fileNames[i] == null || fileNames[i].trim().equals("")) {
@@ -252,46 +278,39 @@ public class PlotPublisher extends Publisher {
         /**
          * Checks if the series file is valid.
          */
-        public void doCheckSeriesFile(StaplerRequest req, StaplerResponse rsp) 
-        	throws IOException, ServletException 
+        public FormValidation doCheckSeriesFile(@QueryParameter String value) 
         {
-            new FormFieldValidator(req,rsp,false) {
-                public void check() throws IOException, ServletException {
-                    String file = request.getParameter("value");
-                    if (file == null || "".equals(file)) {
-                    	error("File must be specified");
-                    	return;
-                    }
+            try {
+                if (value == null || "".equals(value)) {
+                	return FormValidation.error("File must be specified");
                 }
-            }.process();
-            new FormFieldValidator.WorkspaceFileMask(req,rsp).process();
+				return (new FilePath(new File(value)).exists())?FormValidation.ok():FormValidation.error(value + " does not exist");
+			} catch (InterruptedException e) {
+				return FormValidation.error(value + " does not exist");
+			} catch (IOException e) {
+				return FormValidation.error(value + " does not exist");
+			}
         }
         
         /**
          * Checks if the number of builds is valid.
          */
-        public void doCheckNumBuilds(StaplerRequest req, StaplerResponse rsp) 
-        	throws IOException, ServletException 
+        public FormValidation doCheckNumBuilds(@QueryParameter String value) 
         {
-            new FormFieldValidator(req,rsp,false) {
-                public void check() throws IOException, ServletException {
-                    try {
-                    	String numBuilds = request.getParameter("value");
-                    	if ("".equals(numBuilds)) {
-                    		ok();
-                    	} else {
-                    		int num = Integer.parseInt(numBuilds);
-                    		if (num == 0) {
-                    			error("Must be greater than 0");
-                    		} else {
-                    			ok();
-                    		}
-                    	}
-                    } catch (NumberFormatException nfe) {
-                        error("Not a valid integer number");
-                    }
-                }
-            }.process();
+            if (value == null || "".equals(value)) {
+            	return FormValidation.ok();
+            }
+
+            try {
+        		int num = Integer.parseInt(value);
+        		if (num == 0) {
+        			return FormValidation.error("Must be greater than 0");
+        		} else {
+        			return FormValidation.ok();
+        		}
+            } catch (NumberFormatException nfe) {
+            	return FormValidation.error("Not a valid integer number");
+            }
         }
     }
 }
