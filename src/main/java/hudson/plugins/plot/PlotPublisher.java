@@ -163,6 +163,7 @@ public class PlotPublisher extends Publisher {
     /**
      * Called by Hudson.
      */
+    @Override
     public Action getProjectAction(Project project) {
         return new PlotAction(project, this);
     }
@@ -170,6 +171,7 @@ public class PlotPublisher extends Publisher {
     /**
      * Called by Hudson.
      */
+    @Override
     public Descriptor<Publisher> getDescriptor() {
         return DESCRIPTOR;
     }
@@ -177,6 +179,7 @@ public class PlotPublisher extends Publisher {
     /**
      * Called by Hudson when a build is finishing.
      */
+    @Override
     public boolean perform(Build build, Launcher launcher, 
     		BuildListener listener) throws IOException, InterruptedException 
     {
@@ -195,15 +198,15 @@ public class PlotPublisher extends Publisher {
         public DescriptorImpl() {
             super(PlotPublisher.class);
         }
+
         public String getDisplayName() {
             return "Plot build data";
         }
-        public String getHelpFile() {
-            return "/publisher/PlotPublisher/help";
-        }
+
         /**
          * Called when the user saves the project configuration.
          */
+        @Override
         public Publisher newInstance(StaplerRequest req) throws FormException {
         	Random r = new Random();
             PlotPublisher publisher = new PlotPublisher();
@@ -212,6 +215,8 @@ public class PlotPublisher extends Publisher {
             String[] yaxises = req.getParameterValues("plotParam.yaxis");
             String[] groups = req.getParameterValues("plotParam.group");
             String[] numBuilds = req.getParameterValues("plotParam.numBuilds");
+        	String[] styles = req.getParameterValues("plotParam.style");
+        	String[] useDescr = req.getParameterValues("plotParam.useDescr");
         	String[] seriesFiles = req.getParameterValues("seriesParam.file");
         	String[] seriesLabels = req.getParameterValues("seriesParam.label");
         	String[] separators = req.getParameterValues("seriesParam.separator");
@@ -221,16 +226,14 @@ public class PlotPublisher extends Publisher {
             	//LOGGER.info(fileNames.length+","+titles.length+","+yaxises.length+","+
             	//	groups.length+","+numBuilds.length+","+seriesFiles.length+","+
             	//	seriesLabels.length+","+seriesFileTypes.length);
-                int len = fileNames.length;
                 // seriesCounter includes PLOT_SEPARATOR
                 // idCounter doesn't, and indexes the radioButton ids.
                 int seriesCounter = 0;
                 int idCounter = 0;
-                for (int i=0; i<len; i++) {
+                for (int i = 0; i < fileNames.length; i++) {
                 	List<Series> seriesList = new ArrayList<Series>();
-                	while ( seriesCounter < seriesFiles.length &&
+                	while (seriesCounter < seriesFiles.length &&
                 		    ! "true".equals(separators[seriesCounter]))
-                		    
                 	{
                     	LOGGER.log(Level.INFO, "Loading series " + seriesFiles[seriesCounter]);
                 		Series series;
@@ -251,7 +254,7 @@ public class PlotPublisher extends Publisher {
                     	seriesCounter++;
                     	idCounter++;
                     }
-                	seriesCounter++; //skip past separator
+                	seriesCounter++; // skip past separator
                 	if (fileNames[i] == null || fileNames[i].trim().equals("")) {
                 		fileNames[i] = Math.abs(r.nextInt()) + ".csv";
                 	}
@@ -267,7 +270,9 @@ public class PlotPublisher extends Publisher {
                     		seriesList.toArray(new Series[] {}),
                     		groups[i],
                     		builds,
-                    		fileNames[i]);
+                    		fileNames[i],
+                            styles[i],
+                            useDescr != null && useDescr[i] != null);
                     //LOGGER.info("new Plot():" + plot.toString());
                     publisher.addPlot(plot);
                 }

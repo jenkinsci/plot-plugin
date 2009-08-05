@@ -25,8 +25,8 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
 	private static final Logger LOGGER = Logger.getLogger(PlotCategoryDataset.class.getName());
 	
 	class DataElement {
-		public Number number;
-		public String url;
+		public final Number number;
+		public final String url;
 		public DataElement(Number n, String u) {
 			this.number = n; 
 			this.url = u; 
@@ -47,8 +47,6 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
 	
 	/**
 	 * Creates a new empty instance.
-	 * 
-
 	 */
 	public PlotCategoryDataset() {
 		this.rowKeys = new ArrayList<Comparable>();
@@ -140,9 +138,8 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
 	// KeyedValues2D interface method
 	public List getColumnKeys() {
 		int firstIndex = Math.max(0, columnKeys.size() - maxColumns);
-		int lastIndex = Math.max(0, columnKeys.size() - 1);
-		List retVal = columnKeys.subList(firstIndex, lastIndex);
-		return retVal;
+		int lastIndex = Math.max(0, columnKeys.size());
+		return columnKeys.subList(firstIndex, lastIndex);
 	}
 	
 	// KeyedValues2D interface method
@@ -199,7 +196,7 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
 			rowIndex = rowKeys.size() - 1;
 			data.add(new HashMap<Comparable,DataElement>());
 		}
-		if (! columnKeys.contains(columnKey)) {
+		if (!columnKeys.contains(columnKey)) {
 			boolean added = false;
 			for (int i = 0; i < columnKeys.size(); i++) {
 				Comparable key = columnKeys.get(i);
