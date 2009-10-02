@@ -5,6 +5,7 @@
 
 package hudson.plugins.plot;
 
+import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Build;
 import hudson.model.Project;
@@ -445,7 +446,7 @@ public class Plot implements Comparable {
         for (Series series : getSeries()) {
         	if (series == null)
                 continue;
-        	PlotPoint[] seriesData = series.loadSeries(project.getWorkspace(),logger);
+        	PlotPoint[] seriesData = series.loadSeries(build.getWorkspace(),logger);
             if (seriesData != null) {
         		for (PlotPoint point : seriesData) {
         			if (point == null)
@@ -469,7 +470,7 @@ public class Plot implements Comparable {
         if (getSeries() != null) {
         	Series series = getSeries()[0];
         	if ("csv".equals(series.getFileType())) {
-        		saveTableData(build.getNumber(), series.getFile());
+        		saveTableData(build, series.getFile());
         	}
         }
     }
@@ -734,11 +735,11 @@ public class Plot implements Comparable {
         }
     }
 
-    private void saveTableData(int buildNum, String fileName) {
+    private void saveTableData(AbstractBuild<?,?> build, String fileName) {
     	ArrayList rawTableData = new ArrayList();
 
     	File tableFile = new File(project.getRootDir(), "table_"+getCsvFileName());
-    	File rawCSVFile = new File(project.getWorkspace() + File.separator + fileName);
+    	File rawCSVFile = new File(build.getWorkspace() + File.separator + fileName);
     	CSVReader existingTableReader = null;
     	CSVReader newTupleReader = null;
     	CSVWriter newTableWriter = null;
@@ -754,7 +755,7 @@ public class Plot implements Comparable {
     		// add a new tuple
     		String [] tuple = newTupleReader.readNext();
     		String [] tupleIncBuild = new String [tuple.length+1];
-    		tupleIncBuild[0] = ""+ buildNum;
+    		tupleIncBuild[0] = ""+ build.getNumber();
     		System.arraycopy(tuple, 0, tupleIncBuild, 1, tuple.length);
     		rawTableData.add (tupleIncBuild);
 

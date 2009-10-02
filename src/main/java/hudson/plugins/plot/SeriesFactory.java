@@ -46,7 +46,7 @@ public class SeriesFactory {
 		 */
 		String[] setting = req.getParameterValues(seriesRadioButtons[seriesCounter]);
 		
-		if (setting == null || setting.length<=0 || "".equals(setting) || "PLOT_SEPARATOR".equals(setting[0]))
+		if (setting == null || setting.length<=0 || "".equals(setting[0]) || "PLOT_SEPARATOR".equals(setting[0]))
 			return null;
 		
 		if ("properties".equals(setting[0]))

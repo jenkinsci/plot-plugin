@@ -5,14 +5,19 @@
 
 package hudson.plugins.plot;
 
+import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Build;
 import hudson.model.BuildListener;
-import hudson.model.Descriptor;
 import hudson.model.Project;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
+import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
 
 import java.io.File;
@@ -29,6 +34,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -37,7 +43,7 @@ import org.kohsuke.stapler.StaplerRequest;
  *
  * @author Nigel Daley
  */
-public class PlotPublisher extends Publisher {
+public class PlotPublisher extends Recorder {
 	private static final Logger LOGGER = Logger.getLogger(PlotPublisher.class.getName());
 	
     /**
@@ -164,15 +170,19 @@ public class PlotPublisher extends Publisher {
      * Called by Hudson.
      */
     @Override
-    public Action getProjectAction(Project project) {
-        return new PlotAction(project, this);
+    public Action getProjectAction(AbstractProject<?,?> project) {
+        return project instanceof Project ? new PlotAction((Project)project, this) : null;
+    }
+
+    public BuildStepMonitor getRequiredMonitorService() {
+        return BuildStepMonitor.BUILD;
     }
     
     /**
      * Called by Hudson.
      */
     @Override
-    public Descriptor<Publisher> getDescriptor() {
+    public BuildStepDescriptor<Publisher> getDescriptor() {
         return DESCRIPTOR;
     }
     
@@ -180,21 +190,24 @@ public class PlotPublisher extends Publisher {
      * Called by Hudson when a build is finishing.
      */
     @Override
-    public boolean perform(Build build, Launcher launcher, 
+    public boolean perform(AbstractBuild<?,?> build, Launcher launcher,
     		BuildListener listener) throws IOException, InterruptedException 
     {
+        // Should always be a Build due to isApplicable below
+        if (!(build instanceof Build)) return true;
         listener.getLogger().println("Recording plot data");
         // add the build to each plot
         for (Plot plot : getPlots()) {
-            plot.addBuild(build,listener.getLogger());
+            plot.addBuild((Build)build,listener.getLogger());
         }
         // misconfigured plots will not fail a build so always return true
         return true;
     }
 
-    public static final Descriptor<Publisher> DESCRIPTOR = new DescriptorImpl();
+    @Extension
+    public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
     
-    public static class DescriptorImpl extends Descriptor<Publisher> {
+    public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
         public DescriptorImpl() {
             super(PlotPublisher.class);
         }
@@ -203,11 +216,16 @@ public class PlotPublisher extends Publisher {
             return "Plot build data";
         }
 
+        @Override
+        public boolean isApplicable(Class<? extends AbstractProject> jobType) {
+            return jobType.isAssignableFrom(Project.class);
+         }
+
         /**
          * Called when the user saves the project configuration.
          */
         @Override
-        public Publisher newInstance(StaplerRequest req) throws FormException {
+        public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
         	Random r = new Random();
             PlotPublisher publisher = new PlotPublisher();
             String[] fileNames = req.getParameterValues("plotParam.csvFileName");
