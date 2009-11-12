@@ -24,5 +24,24 @@
             <artifactId>opencsv</artifactId>
             <version>1.7</version>
         </dependency>
-    </dependencies>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- tell mvn eclipse:eclipse to leave out xml-apis. 
+           (xml-apis.jar has an old version of the DOM.  
+           Eclipse tends to get the classpath order wrong)
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>xml-apis:xml-apis</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
