@@ -12,7 +12,14 @@
   <name>Plot plugin</name>
   <version>1.3-SNAPSHOT</version>
   <url>http://wiki.hudson-ci.org/display/HUDSON/Plot+Plugin</url>
-  
+
+  <developers>
+    <developer>
+      <id>nidaley</id>
+      <name>Nigel Daley</name>
+    </developer>
+  </developers>
+
   <dependencies>
         <dependency>
             <groupId>jfree</groupId>
