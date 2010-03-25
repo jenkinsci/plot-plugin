@@ -22,9 +22,8 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 
-import org.kohsuke.stapler.StaplerRequest;
-
 import au.com.bytecode.opencsv.CSVReader;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Represents a plot data series configuration from an CSV file.
@@ -74,62 +73,7 @@ public class CSVSeries extends Series {
 	 */
 	private String url;
 	
-	private String displayTableFlag;
-
-	
-	public static CSVSeries createSeriesFromStapler(String file, String label, StaplerRequest req, String radioButtonId) throws ServletException
-	{
-		String exclusionValues = null;
-		String exclusionType = null;
-		InclusionFlag inclusionFlag = InclusionFlag.OFF;
-		String url = null;
-		String displayTableFlag = null;
-		String[] temp;
-
-    	if (LOGGER.isLoggable(defaultLogLevel))
-    		LOGGER.log(defaultLogLevel,"RadioButtonID " + radioButtonId);
-
-		temp = req.getParameterValues(radioButtonId+".url");
-		if (temp != null && temp.length > 0)
-			url = temp[0];
-
-    	if (LOGGER.isLoggable(defaultLogLevel))
-    		LOGGER.log(defaultLogLevel,"url " + url);
-
-    	temp = req.getParameterValues(radioButtonId+".exclusionFlag");
-		if (temp != null && temp.length > 0)
-			exclusionType = temp[0];
-
-    	if (LOGGER.isLoggable(defaultLogLevel))
-    		LOGGER.log(defaultLogLevel,"Exclusion type " + exclusionType);
-
-		temp = req.getParameterValues(radioButtonId+".exclusionValues");
-		if (exclusionType != null && temp != null && temp.length > 0)
-			exclusionValues = temp[0];
-
-    	if (LOGGER.isLoggable(defaultLogLevel))
-    		LOGGER.log(defaultLogLevel,"Exclusion values " + exclusionValues);
-
-		if (exclusionType != null) {
-			try {
-				inclusionFlag = InclusionFlag.valueOf(exclusionType);
-			} catch (RuntimeException e) {
-				inclusionFlag = InclusionFlag.OFF;
-		    	exclusionValues = null;
-            	if (LOGGER.isLoggable(defaultLogLevel))
-            		LOGGER.log(defaultLogLevel,"Unable to parse " + exclusionType,e);
-			}
-    	}
-		
-		temp = req.getParameterValues(radioButtonId+".displayTableFlag");
-		if (temp != null && temp.length > 0) {
-			if (temp[0].equals("on")) {
-				displayTableFlag = "true";
-			}
-		}
-		
-		return new CSVSeries(file, label, url, inclusionFlag, exclusionValues, displayTableFlag);
-	}
+	private boolean displayTableFlag;
 
 	/**
 	 * 
@@ -139,69 +83,39 @@ public class CSVSeries extends Series {
 	 * @param radioButtonId ID used to find the parameters specific to this instance.
 	 * @throws ServletException
 	 */
-	public CSVSeries(String file, String label, String url, InclusionFlag inclusionFlag, String exclusionValues, String displayTableFlag)
-	{
-    	super(file, label, "csv");
+    @DataBoundConstructor
+    public CSVSeries(String file, String url, String inclusionFlag, String exclusionValues, boolean displayTableFlag)
+    {
+    	super(file, "", "csv");
     	
     	this.url = url;
 
     	if (exclusionValues == null)
 		{
-			inclusionFlag = InclusionFlag.OFF;
+			this.inclusionFlag = InclusionFlag.OFF;
 			return;
 		}
 
-    	this.inclusionFlag = inclusionFlag;
+    	this.inclusionFlag = InclusionFlag.valueOf(inclusionFlag);
     	this.exclusionValues = exclusionValues;
     	this.displayTableFlag = displayTableFlag;
 
     	loadExclusionSet();
     }
 
-    /**
-     * This is used for saving state of radio buttons in subclasses.
-     * CSVSeries uses this for the Exclusion flag.
-     * @param test
-     * @return
-     */
-	@Override
-    public boolean test(String test)
-    {
-    	InclusionFlag testFlag;
-		try {
-			testFlag = InclusionFlag.valueOf(test.toUpperCase());
-
-			// shortcut off.
-			if (testFlag==InclusionFlag.OFF && inclusionFlag==null)
-				return true;
-			
-	    	return (testFlag)==inclusionFlag;
-		} catch (RuntimeException e) {
-			// ignore bad settings.
-		}
-		
-		return false;
+    public String getInclusionFlag() {
+        return inclusionFlag.toString();
     }
 
-    /**
-     * There has to be a cleaner way of doing this, such as casting Series to CSVSeries in the jelly.
-     * @return ""
-     */
-	@Override
-    public String getValue(String name)
-    {
-		if ("excluded".equals(name))
-			return exclusionValues;
+    public String getExclusionValues() {
+        return exclusionValues;
+    }
 
-		if ("url".equals(name))
-			return url;
-		
-		return "";
+    public String getUrl() {
+        return url;
     }
 	
-	@Override
-    public String getDisplayTableFlag()
-    {
+    public boolean getDisplayTableFlag() {
     	return displayTableFlag;
     }
 

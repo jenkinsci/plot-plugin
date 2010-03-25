@@ -5,65 +5,56 @@
 
 package hudson.plugins.plot;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.servlet.ServletException;
-
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * This class creates a Series class based on the data source
  * 
- * @author areese
- *
+ * @author areese, Alan.Harder@sun.com
  */
 public class SeriesFactory {
-	private static final Logger LOGGER = Logger.getLogger(SeriesFactory.class.getName());
+    //private static final Logger LOGGER = Logger.getLogger(SeriesFactory.class.getName());
 
-	/**
-	 * Using file and label and the Stapler request, create a subclass of series that can process the type selected.
-	 * @param file file to load.
-	 * @param label
-	 * @param req Stapler request so subclasses can pull in settings.
-	 * @return series that is used for the data source that was picked.
-	 * @throws ServletException 
-	 */
-	public static Series createSeries(int seriesCounter, String file, String label, StaplerRequest req) throws ServletException
-	{
-		// The list of radio buttons for each series configuring the type.
-		String[] seriesRadioButtons = req.getParameterValues("seriesParam.rbId");
-		
-		LOGGER.log(Level.INFO,"button: " + seriesCounter + " " + seriesRadioButtons);
+    /**
+     * Using file and label and the Stapler request, create a subclass of series that can process the type selected.
+     * @param formData JSON data for series
+     */
+    public static Series createSeries(JSONObject formData, StaplerRequest req) {
+        String file = formData.getString("file");
+        formData = formData.getJSONObject("fileType");
+        formData.put("file", file);
+        String type = formData.getString("value");
+        Class<? extends Series> typeClass = null;
 
-		for (String s: seriesRadioButtons)
-		{
-			LOGGER.log(Level.INFO,"Series: " + s);
-		}
-		
-		/*
-		 * Only one of these should be checked, since they are radio buttons each is set to on.
-		 */
-		String[] setting = req.getParameterValues(seriesRadioButtons[seriesCounter]);
-		
-		if (setting == null || setting.length<=0 || "".equals(setting[0]) || "PLOT_SEPARATOR".equals(setting[0]))
-			return null;
-		
-		if ("properties".equals(setting[0]))
-		{
-			return new PropertiesSeries(file,label);
-		}
-		
-		if ("csv".equals(setting[0]))
-		{
-			return CSVSeries.createSeriesFromStapler(file, label, req, seriesRadioButtons[seriesCounter]);
-		}
+        if ("properties".equals(type)) typeClass = PropertiesSeries.class;
+        else if ("csv".equals(type))   typeClass = CSVSeries.class;
+        else if ("xml".equals(type))   typeClass = XMLSeries.class;
 
-		if ("xml".equals(setting[0]))
-		{
-			return new XMLSeries(file, label, req, seriesRadioButtons[seriesCounter]);
-		}
+        return typeClass!=null ? req.bindJSON(typeClass, formData) : null;
+    }
 
-		return null;
-	}
+    public static Series[] createSeriesList(Object data, StaplerRequest req) {
+        JSONArray list = getArray(data);
+        Series[] result = new Series[list.size()];
+        int i = 0;
+        for (Object series : list) {
+            result[i++] = createSeries((JSONObject)series, req);
+        }
+        return result;
+    }
+
+    /**
+     * Get data as JSONArray (wrap single JSONObject in array if needed).
+     */
+    public static JSONArray getArray(Object data) {
+        JSONArray result;
+        if (data instanceof JSONArray) result = (JSONArray)data;
+        else {
+            result = new JSONArray();
+            if (data != null) result.add(data);
+        }
+        return result;
+    }
 };

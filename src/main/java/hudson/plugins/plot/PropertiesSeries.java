@@ -12,12 +12,14 @@ import java.io.PrintStream;
 import java.util.Properties;
 
 import hudson.FilePath;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * @author Allen Reese
  *
  */
 public class PropertiesSeries extends Series {
+    @DataBoundConstructor
     public PropertiesSeries(String file, String label) {
     	super(file, label, "properties");
     }

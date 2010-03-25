@@ -20,7 +20,6 @@ import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -33,8 +32,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+import net.sf.json.JSONArray;
 
 import net.sf.json.JSONObject;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -226,114 +227,25 @@ public class PlotPublisher extends Recorder {
          */
         @Override
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-        	Random r = new Random();
             PlotPublisher publisher = new PlotPublisher();
-            String[] fileNames = req.getParameterValues("plotParam.csvFileName");
-            String[] titles = req.getParameterValues("plotParam.title");
-            String[] yaxises = req.getParameterValues("plotParam.yaxis");
-            String[] groups = req.getParameterValues("plotParam.group");
-            String[] numBuilds = req.getParameterValues("plotParam.numBuilds");
-        	String[] styles = req.getParameterValues("plotParam.style");
-        	String[] useDescr = req.getParameterValues("plotParam.useDescr");
-        	String[] seriesFiles = req.getParameterValues("seriesParam.file");
-        	String[] seriesLabels = req.getParameterValues("seriesParam.label");
-        	String[] separators = req.getParameterValues("seriesParam.separator");
-        	
-        	LOGGER.log(Level.INFO, "Loading series");
-        	if (seriesFiles != null) {
-            	//LOGGER.info(fileNames.length+","+titles.length+","+yaxises.length+","+
-            	//	groups.length+","+numBuilds.length+","+seriesFiles.length+","+
-            	//	seriesLabels.length+","+seriesFileTypes.length);
-                // seriesCounter includes PLOT_SEPARATOR
-                // idCounter doesn't, and indexes the radioButton ids.
-                int seriesCounter = 0;
-                int idCounter = 0;
-                for (int i = 0; i < fileNames.length; i++) {
-                	List<Series> seriesList = new ArrayList<Series>();
-                	while (seriesCounter < seriesFiles.length &&
-                		    ! "true".equals(separators[seriesCounter]))
-                	{
-                    	LOGGER.log(Level.INFO, "Loading series " + seriesFiles[seriesCounter]);
-                		Series series;
-						try {
-							series = SeriesFactory.createSeries(idCounter, seriesFiles[seriesCounter], seriesLabels[seriesCounter], req);
-	                		if (series != null) {
-								seriesList.add(series);
-							} else {
-								if (LOGGER.isLoggable(Level.INFO))
-									LOGGER.log(Level.INFO,"Null series for id:" + idCounter + " series: " + seriesCounter+ " " + seriesFiles[seriesCounter] + " " + seriesLabels[seriesCounter]);
-							}
-						} catch (ServletException e) {
-							if (LOGGER.isLoggable(Level.INFO))
-								LOGGER.log(Level.INFO,"Error configuring series for id:" + idCounter + " series: " + seriesCounter+ " " + seriesFiles[seriesCounter] + " " + seriesLabels[seriesCounter],e);
-							throw new FormException(e, "Error configuring series");
-						}
-                		
-                    	seriesCounter++;
-                    	idCounter++;
-                    }
-                	seriesCounter++; // skip past separator
-                	if (fileNames[i] == null || fileNames[i].trim().equals("")) {
-                		fileNames[i] = Math.abs(r.nextInt()) + ".csv";
-                	}
-                	String builds;
-                	try {
-                		builds = Integer.parseInt(numBuilds[i]) + "";
-                	} catch (NumberFormatException nfe) {
-                		builds = "";
-                	}
-                    Plot plot = new Plot(
-                    		titles[i],
-                    		yaxises[i],
-                    		seriesList.toArray(new Series[] {}),
-                    		groups[i],
-                    		builds,
-                    		fileNames[i],
-                            styles[i],
-                            useDescr != null && useDescr[i] != null);
-                    //LOGGER.info("new Plot():" + plot.toString());
-                    publisher.addPlot(plot);
-                }
+            for (Object data : SeriesFactory.getArray(formData.get("plots"))) {
+                publisher.addPlot(bindPlot((JSONObject)data, req));
             }
             return publisher;
+        }
+
+        private static Plot bindPlot(JSONObject data, StaplerRequest req) {
+            Plot p = req.bindJSON(Plot.class, data);
+            p.series = SeriesFactory.createSeriesList(data.get("series"), req);
+            return p;
         }
 
         /**
          * Checks if the series file is valid.
          */
-        public FormValidation doCheckSeriesFile(@QueryParameter String value) 
-        {
-            try {
-                if (value == null || "".equals(value)) {
-                	return FormValidation.error("File must be specified");
-                }
-				return (new FilePath(new File(value)).exists())?FormValidation.ok():FormValidation.error(value + " does not exist");
-			} catch (InterruptedException e) {
-				return FormValidation.error(value + " does not exist");
-			} catch (IOException e) {
-				return FormValidation.error(value + " does not exist");
-			}
-        }
-        
-        /**
-         * Checks if the number of builds is valid.
-         */
-        public FormValidation doCheckNumBuilds(@QueryParameter String value) 
-        {
-            if (value == null || "".equals(value)) {
-            	return FormValidation.ok();
-            }
-
-            try {
-        		int num = Integer.parseInt(value);
-        		if (num == 0) {
-        			return FormValidation.error("Must be greater than 0");
-        		} else {
-        			return FormValidation.ok();
-        		}
-            } catch (NumberFormatException nfe) {
-            	return FormValidation.error("Not a valid integer number");
-            }
+        public FormValidation doCheckSeriesFile(@AncestorInPath AbstractProject project,
+                                                @QueryParameter String value) throws IOException {
+            return FilePath.validateFileMask(project.getSomeWorkspace(),value);
         }
     }
 }

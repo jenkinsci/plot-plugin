@@ -28,7 +28,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -54,7 +54,7 @@ public class XMLSeries extends Series {
 	static {
 		HashMap<String, QName> tempMap = new HashMap<String, QName>();
 		tempMap.put("BOOLEAN", XPathConstants.BOOLEAN);
-		tempMap.put("BOOLEAN", XPathConstants.NODE);
+		tempMap.put("NODE", XPathConstants.NODE);
 		tempMap.put("NODESET", XPathConstants.NODESET);
 		tempMap.put("NUMBER", XPathConstants.NUMBER);
 		tempMap.put("STRING", XPathConstants.STRING);
@@ -79,7 +79,7 @@ public class XMLSeries extends Series {
 	/**
 	 * Actual nodeType
 	 */
-	private QName nodeType;
+	private transient QName nodeType;
 
 	/**
 	 * 
@@ -89,92 +89,32 @@ public class XMLSeries extends Series {
 	 * @param radioButtonId ID used to find the parameters specific to this instance.
 	 * @throws ServletException
 	 */
-	public XMLSeries(String file, String label, StaplerRequest req, String radioButtonId) throws ServletException {
-    	super(file, label, "xml");
+    @DataBoundConstructor
+    public XMLSeries(String file, String xpath, String nodeType, String url) {
+    	super(file, "", "xml");
 
-		String[] temp;
-
-    	if (LOGGER.isLoggable(defaultLogLevel))
-    		LOGGER.log(defaultLogLevel,"RadioButtonID " + radioButtonId);
-
-		temp = req.getParameterValues(radioButtonId+".url");
-		if (temp != null && temp.length > 0)
-			url = temp[0];
-
-    	if (LOGGER.isLoggable(defaultLogLevel))
-    		LOGGER.log(defaultLogLevel,"url " + url);
-
-    	temp = req.getParameterValues(radioButtonId+".xpath");
-		if (temp != null && temp.length > 0)
-			xpathString = temp[0];
-
-    	if (LOGGER.isLoggable(defaultLogLevel))
-    		LOGGER.log(defaultLogLevel,"XPath " + xpathString);
-
-    	temp = req.getParameterValues(radioButtonId+".nodeType");
-		if (temp != null && temp.length > 0) {
-			nodeTypeString = temp[0].toUpperCase();
-	    	nodeType = qnameMap.get(nodeTypeString);
-		}
-
-    	if (LOGGER.isLoggable(defaultLogLevel))
-    		LOGGER.log(defaultLogLevel,"NodeType " + nodeTypeString);
-	}
-
-    /**
-     * This is used for saving state of radio buttons in subclasses.
-     * BUG: This is sucky find a better way to do this.
-     * @param test
-     * @return
-     */
-	@Override
-    public boolean test(String test)
-    {
-		if (test == null || nodeTypeString == null || "".equals(nodeTypeString))
-			return false;
-		
-		test = test.toUpperCase();
-		
-    	if (LOGGER.isLoggable(defaultLogLevel))
-    		LOGGER.log(defaultLogLevel,"testing NodeType " + nodeTypeString + " vs " + test);
-
-    	if (qnameMap.containsKey(test) && nodeTypeString.equals(test))
-    	{
-        	if (LOGGER.isLoggable(defaultLogLevel))
-        		LOGGER.log(defaultLogLevel,"true NodeType " + nodeTypeString + " vs " + test);
-			return true;
-    	}
-		
-		return false;
+	this.xpathString = xpath;
+        this.nodeTypeString = nodeType;
+	this.nodeType = qnameMap.get(nodeType);
+	this.url = url;
     }
 
-    /**
-     * There has to be a cleaner way of doing this, such as casting Series to CSVSeries in the jelly.
-     * @return ""
-     */
-	@Override
-    public String getValue(String name)
-    {
-		if ("xpath".equals(name))
-		{
-    		LOGGER.log(defaultLogLevel,"xpath: " + xpathString);
-			return xpathString;
-		}
-		
-		if ("nodetype".equals(name))
-		{
-    		LOGGER.log(defaultLogLevel,"nodetype: " + nodeTypeString);
-			return nodeTypeString;
-		}
-		
-		if ("url".equals(name))
-		{
-    		LOGGER.log(defaultLogLevel,"url: " + url);
-			return url;
-		}
+    private Object readResolve() {
+        // Set nodeType when deserialized
+        nodeType = qnameMap.get(nodeTypeString);
+        return this;
+    }
 
-		LOGGER.log(defaultLogLevel,"empty: " + name);
-		return "";
+    public String getXpath() {
+        return xpathString;
+    }
+
+    public String getNodeType() {
+        return nodeTypeString;
+    }
+
+    public String getUrl() {
+        return url;
     }
 
     /**
@@ -338,9 +278,7 @@ public class XMLSeries extends Series {
 	 */
 	private void addValueToList(List<PlotPoint> list, String label, Object nodeValue)
 	{
-		String value = null;
-
-		value = nodeToString(nodeValue);
+		String value = nodeToString(nodeValue);
 		if (value != null) {
 			if (LOGGER.isLoggable(defaultLogLevel))
 				LOGGER.log(defaultLogLevel, "Adding node: " + label + " value: " + value);

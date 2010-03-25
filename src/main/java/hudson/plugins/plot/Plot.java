@@ -26,6 +26,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import org.jfree.chart.ChartFactory;
@@ -39,13 +40,14 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.DefaultDrawingSupplier;
 import org.jfree.chart.plot.DrawingSupplier;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.AbstractCategoryItemRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
-import org.jfree.chart.renderer.category.AbstractCategoryItemRenderer;
 
 /**
  * Represents the configuration for a single plot.  A plot can
@@ -179,14 +181,18 @@ public class Plot implements Comparable {
      * is the empty string, then all builds will be included. Must
      * not be zero.
      */
-    public Plot(String title, String yaxis, Series[] series,
+    @DataBoundConstructor
+    public Plot(String title, String yaxis,
             String group, String numBuilds, String csvFileName, String style, boolean useDescr)
     {
         this.title = title;
         this.yaxis = yaxis;
-        this.series = series;
         this.group = group;
         this.numBuilds = numBuilds;
+        if (csvFileName == null || csvFileName.trim().length()==0) {
+            //TODO: check project dir to ensure uniqueness instead of just random
+            csvFileName = Math.abs(new Random().nextInt()) + ".csv";
+        }
         this.csvFileName = csvFileName;
         this.style = style;
         this.useDescr = useDescr;

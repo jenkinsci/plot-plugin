@@ -25,9 +25,9 @@ public class SeriesTestCase extends HudsonTestCase {
 		// verify the properties was created correctly
 		assertNotNull(series);
 		
-		assertTrue ("File name is not configured correctly: " + series.file + " vs. " + file, series.file.equals(file));
-		assertTrue ("Label is not configured correctly: " + series.label + " vs. " + label, series.label.equals(label));
-		assertTrue ("Type is not configured correctly: " + series.fileType + " vs. properties", series.fileType.equals(type));
+		assertEquals("File name is not configured correctly", file, series.file);
+		assertEquals("Label is not configured correctly", label, series.label);
+		assertEquals("Type is not configured correctly", type, series.fileType);
 	}
 	
 	public void testPlotPoints(PlotPoint[] points,int expected)

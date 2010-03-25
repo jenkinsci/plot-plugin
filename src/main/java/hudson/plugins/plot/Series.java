@@ -19,30 +19,21 @@ public class Series {
     /**
      * Relative path to the data series property file. Mandatory.
      */
-    public String file;
+    protected String file;
 
     /**
      * Data series legend label. Optional.
      */
-    public String label;
+    protected String label;
 
     /**
      * Data series type. Mandatory.
      * This can be csv, xml, or properties file.
      * This should be an enum, but I am not sure how to support that with stapler at the moment 
      */
-    public String fileType;
+    protected String fileType;
     
-    public Series() {
-        this.file = null; 
-		this.label = "missing";
-        this.fileType = "properties";
-    }
-
-    /**
-     * @stapler-constructor
-     */
-    public Series(String file, String label, String fileType) {
+    protected Series(String file, String label, String fileType) {
         this.file = file; 
 
         // TODO: look into this, what do we do if there is no label?
@@ -64,50 +55,6 @@ public class Series {
     }
     
     /**
-     * This is used by the radio buttons to test if they should be checked.
-     * returns true if properties is the fileType, and the fileType string is unset.
-     * @param fileType String filetype from the radio button to check.
-     * @return true if the radio button should be selected
-     */
-    public boolean isFileType(String fileType)
-    {
-    	if (this.fileType==null) {
-    		if ("properties".equalsIgnoreCase(fileType)) {
-    			return true;
-    		}
-    		return false;
-    	}
-    	return this.fileType.equalsIgnoreCase(fileType);
-    }
-    
-    /**
-     * This is used for saving state of radio buttons in subclasses.
-     * Series always returns false.
-     * There has to be a cleaner way of doing this, such as casting Series to CSVSeries in the jelly.
-     * @param test
-     * @return false
-     */
-    public boolean test(String test)
-    {
-    	return false;
-    }
-    
-    /**
-     * Still not happy, but rather than getExcludedValues(), pretend to be a map.
-     * There has to be a cleaner way of doing this, such as casting Series to CSVSeries in the jelly.
-     * @return String value of name.
-     */
-    public String getValue(String name)
-    {
-    	return "";
-    }
-    
-    public String getDisplayTableFlag()
-    {
-    	return "false";
-    }
-
-    /**
      * Retrieves the plot data for one series after a build from the workspace.
      * 
      * @param workspaceRootDir the root directory of the workspace
@@ -117,6 +64,11 @@ public class Series {
     public PlotPoint[] loadSeries(FilePath workspaceRootDir, PrintStream logger)
     {
     	return null;
+    }
+
+    // Convert data from before version 1.3
+    private Object readResolve() {
+        return (fileType == null) ? new PropertiesSeries(file, label) : this;
     }
 }
 

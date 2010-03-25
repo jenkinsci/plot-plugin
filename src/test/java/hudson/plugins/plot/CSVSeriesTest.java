@@ -52,11 +52,11 @@ public class CSVSeriesTest extends SeriesTestCase {
 		}
 		
 		// Create a new CSV series.
-		CSVSeries series = new CSVSeries(files[0], labels[0], null, CSVSeries.InclusionFlag.OFF, "", "displayTable");
+		CSVSeries series = new CSVSeries(files[0], null, "OFF", "", false);
 	
 		LOGGER.info("Created series " + series.toString());
 		// test the basic subclass properties.
-		testSeries(series, files[0], labels[0], "csv");
+		testSeries(series, files[0], "", "csv");
 		
 		// load the series.
 		PlotPoint[] points = series.loadSeries(workspaceRootDir, System.out);

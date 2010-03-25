@@ -50,7 +50,7 @@
             window.location.hash = menu.value;
           }
         </script>
-        Jump to <select name="choice" onChange="jump(this)">
+        ${%Jump to} <select name="choice" onChange="jump(this)">
           <j:forEach var="plotJump" items="${it.plots}" varStatus="loopStat">
             <option value="#${plotJump.csvFileName}">Plot ${loopStat.count}: ${plotJump.title}</option>
           </j:forEach>

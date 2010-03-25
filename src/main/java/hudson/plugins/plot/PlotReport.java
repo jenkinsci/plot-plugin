@@ -85,14 +85,11 @@ public class PlotReport {
 
 	// called from PlotReport/index.jelly
 	public boolean getDisplayTableFlag(int i) {
-		Plot plot = getPlot(""+i);
+		Plot plot = getPlot(Integer.toString(i));
 
 		if (plot.getSeries()!=null) {
     	    Series series = plot.getSeries()[0];
-    	    String displayFlag = series.getDisplayTableFlag();
-    	    if (displayFlag!=null && displayFlag.equals("true")) {
-    	    	return true;
-    	    }
+    	    return (series instanceof CSVSeries) && ((CSVSeries)series).getDisplayTableFlag();
     	}
     	return false;
 	}

@@ -5,197 +5,162 @@
  */
  -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <f:block xmlns:local="local">
-    <j:set var="groups" value="${descriptor.allGroups}"/>
-    <d:taglib uri="local">
-      <f:entry title="" description="A new plot definition">
-        <f:repeatable var="plot" items="${instance.getPlots()}">
-          <div align="left">
-            <f:repeatableDeleteButton value="Delete Plot"/>
-          </div>
-          <table width="100%">
+  <f:entry>
+    <f:repeatable var="plot" items="${instance.plots}" name="plots" add="${%Add Plot}" minimum="1">
+      <div align="left">
+        <f:repeatableDeleteButton value="${%Delete Plot}"/>
+      </div>
+      <input name="csvFileName" type="hidden" value="${plot.csvFileName}" />
+      <table width="100%">
+        <f:entry title="${%Plot group}" help="/plugin/plot/help-group.html">
+          <f:textbox name="group" value="${plot.group}" clazz="required" />
+        </f:entry>
+        <f:entry title="${%Plot title}" help="/plugin/plot/help-title.html">
+          <f:textbox name="title" value="${plot.title}" />
+        </f:entry>
+        <f:entry title="${%Number of builds to include}" help="/plugin/plot/help-numbuilds.html">
+          <input class="positive-number" type="text" name="numBuilds"
+                 style="width:20em" value="${plot.numBuilds}" />
+        </f:entry>
+        <f:entry title="${%Plot y-axis label}" help="/plugin/plot/help-yaxis.html">
+          <f:textbox name="yaxis" value="${plot.yaxis}" />
+        </f:entry>
+        <f:entry title="${%Plot style}" help="/plugin/plot/help-style.html">
+          <select name="style">
+            <f:option value="area" selected="${plot.style=='area'}">${%Area}</f:option>
+            <f:option value="bar" selected="${plot.style=='bar'}">${%Bar}</f:option>
+            <f:option value="bar3d" selected="${plot.style=='bar3d'}">${%Bar 3D}</f:option>
+            <f:option value="line" selected="${plot.style=='line' || plot.style=='' || plot.style==null}">${%Line}</f:option>
+            <f:option value="line3d" selected="${plot.style=='line3d'}">${%Line 3D}</f:option>
+            <f:option value="stackedArea" selected="${plot.style=='stackedArea'}">${%Stacked Area}</f:option>
+            <f:option value="stackedbar" selected="${plot.style=='stackedbar'}">${%Stacked Bar}</f:option>
+            <f:option value="stackedbar3d" selected="${plot.style=='stackedbar3d'}">${%Stacked Bar 3D}</f:option>
+            <f:option value="waterfall" selected="${plot.style=='waterfall'}">${%Waterfall}</f:option>
+          </select>
+        </f:entry>
+        <f:entry title="${%Build Descriptions as labels}" help="/plugin/plot/help-useDescr.html">
+          <f:checkbox name="useDescr" checked="${plot.useDescr}" />
+        </f:entry>
 
-            <f:block>
-              <input name="plotParam.csvFileName" type="hidden" value="${plot.csvFileName}" />
-            </f:block>
-            <f:entry title="Plot group" help="/plugin/plot/help-group.html">
-              <f:textbox name="plotParam.group" value="${plot.group}" />
-            </f:entry>
-            <f:entry title="Plot title" help="/plugin/plot/help-title.html">
-              <f:textbox name="plotParam.title" value="${plot.title}" />
-            </f:entry>
-            <f:entry title="Number of builds to include" help="/plugin/plot/help-numbuilds.html">
-              <input class="validated" type="text" name="plotParam.numBuilds" style="width:20em" value="${plot.numBuilds}"
-               checkUrl="'${rootURL}/publisher/PlotPublisher/checkNumBuilds?value='+escape(this.value)" />
-            </f:entry>
-            <f:entry title="Plot y-axis label" help="/plugin/plot/help-yaxis.html">
-              <f:textbox name="plotParam.yaxis" value="${plot.yaxis}" />
-            </f:entry>
-            <f:entry title="Plot style" help="/plugin/plot/help-style.html">
-              <select name="plotParam.style">
-                <f:option value="area" selected="${plot.style=='area'}">Area</f:option>
-                <f:option value="bar" selected="${plot.style=='bar'}">Bar</f:option>
-                <f:option value="bar3d" selected="${plot.style=='bar3d'}">Bar 3D</f:option>
-                <f:option value="line" selected="${plot.style=='line' || plot.style=='' || plot.style==null}">Line</f:option>
-                <f:option value="line3d" selected="${plot.style=='line3d'}">Line 3D</f:option>
-                <f:option value="stackedArea" selected="${plot.style=='stackedArea'}">Stacked Area</f:option>
-                <f:option value="stackedbar" selected="${plot.style=='stackedbar'}">Stacked Bar</f:option>
-                <f:option value="stackedbar3d" selected="${plot.style=='stackedbar3d'}">Stacked Bar 3D</f:option>
-                <f:option value="waterfall" selected="${plot.style=='waterfall'}">Waterfall</f:option>
-              </select>
-            </f:entry>
-            <f:entry title="Build Descriptions as labels" help="/plugin/plot/help-useDescr.html">
-              <f:checkbox name="plotParam.useDescr" checked="${plot.useDescr}" />
-            </f:entry>
-            <f:nested>
-              <f:entry title="" description="A new data series definition">
-                <f:repeatable var="series" items="${plot.getSeries()}" minimum="1">
-
-                  <input name="seriesParam.separator" type="hidden" value="false" />
-                  <table width="100%" bgcolor="#EEEEEE">
-
-                    <tr/>
-
-                    <!-- We need to change the name here so that radioBlock works.
-                      The problem is that inside the double repeatable block the radio button names need to be the same, but outside they
-                      need to change or you get funny button behaviour.
-
-                      The radioId property is used to fix a problem I discovered above.  The radio buttons need unique ids, which I discovered helps
-                      with all of the repeated block controlled properties.  Inside the code, I leverage this radio id to look for the values I've set.
-                      There may be a better way....
-                    -->
-                    <j:set target="${requestScope}" property="radioId" value="${plot.csvFileName}_${rb_id+1}" />
-                    <f:block>
-                      <input name="seriesParam.rbId" type="hidden" value="${radioId}" />
-                    </f:block>
-
-                    <f:entry title="Data series file" help="/plugin/plot/help-series.html">
-                      <f:textbox name="seriesParam.file" value="${series.file}"
-                                 checkUrl="'${rootURL}/publisher/PlotPublisher/checkSeriesFile?job=${it.fullName}&amp;value='+escape(this.value)"/>
-                    </f:entry>
-
-                    <!--  We need this so we can get to the radio buttons. -->
-                    <f:radioBlock name="${radioId}" value="properties" title="Load data from properties file" help="/plugin/plot/help-properties.html" checked='${h.defaulted(series.isFileType("properties"),true)}'>
-                    <!-- Only property files have a legend label, csv pulls it from the column name, xml is TBD. -->
-                      <f:entry title="Data series legend label" help="/plugin/plot/help-legend.html">
-                        <f:textbox name="seriesParam.label" value="${series.label}" />
-                      </f:entry>
-                    </f:radioBlock>
-
-                    <f:radioBlock name="${radioId}" value="csv" title="Load data from csv file" help="/plugin/plot/help-csv.html"  checked='${series.isFileType("CSV")}'>
-                      <f:nested title="CSV nested">
-                        <div>
-                          <table>
-                            <tr>
-                              <td></td>
-                              <th align="left">Include all columns</th>
-                              <th align="left">Include columns by name</th>
-                              <th align="left">Exclude columns by name</th>
-                              <th align="left">Include columns by index</th>
-                              <th align="left">Exclude columns by index</th>
-                            </tr>
-                            <tr>
-                              <td></td>
-                              <td>
-                                <f:radio name="${radioId}.exclusionFlag" value="OFF" title="" checked='${series.test("OFF")}' />
-                              </td>
-                              <td>
-                                <f:radio name="${radioId}.exclusionFlag" value="INCLUDE_BY_STRING" title="" checked='${series.test("INCLUDE_BY_STRING")}' />
-                              </td>
-                              <td>
-                                <f:radio name="${radioId}.exclusionFlag" value="EXCLUDE_BY_STRING" title="" checked='${series.test("EXCLUDE_BY_STRING")}' />
-                              </td>
-                              <td>
-                                <f:radio name="${radioId}.exclusionFlag" value="INCLUDE_BY_COLUMN" title="" checked='${series.test("INCLUDE_BY_COLUMN")}' />
-                              </td>
-                              <td>
-                                <f:radio name="${radioId}.exclusionFlag" value="EXCLUDE_BY_COLUMN" title="" checked='${series.test("EXCLUDE_BY_COLUMN")}' />
-                              </td>
-                            </tr>
-                          </table>
-                        </div>
-                        <f:entry title="CSV Exclusion values" help="/plugin/plot/help-csv-exclusions.html">
-                          <f:textbox name="${radioId}.exclusionValues" value='${series.getValue("excluded")}'  />
-                        </f:entry>
-
-                        <f:entry title="URL" help="/plugin/plot/help-csv-url.html">
-                           <f:textbox name="${radioId}.url" value="${series.getUrl()}"  />
-                        </f:entry>
-
-                        <f:entry title="Display original csv above plot" help="/plugin/plot/help-csv-table.html">
-                          <f:checkbox name="${radioId}.displayTableFlag" checked="${series.getDisplayTableFlag()}" />
-                        </f:entry>
-
-                      </f:nested>
-                    </f:radioBlock>
-
-                    <f:radioBlock name="${radioId}" value="xml" title="Load data from xml file using xpath" help="/plugin/plot/help-xml.html"  checked='${series.isFileType("XML")}'>
-                      <f:nested title="XML nested">
-                        <div>
-                          <table>
-                            <tr>
-                              <td align="center">XPath Result type:</td>
-                              <th align="center">Nodeset</th>
-                              <th align="center">String</th>
-                              <th align="center">Boolean</th>
-                              <th align="center">Number</th>
-                              <th align="center">Node</th>
-                            </tr>
-                            <tr>
-                              <td></td>
-                              <td>
-                                <f:radio name="${radioId}.nodeType" value="NODESET" title="" checked='${series.test("NODESET")}' />
-                              </td>
-                              <td>
-                                <f:radio name="${radioId}.nodeType" value="STRING" title="" checked='${series.test("STRING")}' />
-                              </td>
-                              <td>
-                                <f:radio name="${radioId}.nodeType" value="BOOLEAN" title="" checked='${series.test("BOOLEAN")}' />
-                              </td>
-                              <td>
-                                <f:radio name="${radioId}.nodeType" value="NUMBER" title="" checked='${series.test("NUMBER")}' />
-                              </td>
-                              <td>
-                                <f:radio name="${radioId}.nodeType" value="NODE" title="" checked='${series.test("NODE")}' />
-                              </td>
-                            </tr>
-                          </table>
-                        </div>
-                        <f:entry title="XPath Expression" help="/plugin/plot/help-xml-xpath.html">
-                          <f:textbox name="${radioId}.xpath" value='${series.getValue("xpath")}'  />
-                        </f:entry>
-
-                        <f:entry title="URL" help="/plugin/plot/help-xml-url.html">
-                          <f:textbox name="${radioId}.url" value="${series.getUrl()}"  />
-                        </f:entry>
-
-                      </f:nested>
-                    </f:radioBlock>
-
-                    <f:entry title="">
-                      <div align="right">
-                        <f:repeatableDeleteButton value="Delete Data Series"/>
-                      </div>
-                    </f:entry>
-                  </table>
-                  <table width="100%"><tr><td></td></tr></table>
-                </f:repeatable>
+        <f:entry title="" description="${%A new data series definition}">
+          <f:repeatable var="series" items="${plot.series}" minimum="1">
+            <table width="100%" bgcolor="#EEEEEE">
+              <f:entry title="${%Data series file}" help="/plugin/plot/help-series.html">
+                <f:textbox name="file" value="${series.file}"
+                           checkUrl="'descriptorByName/hudson.plugins.plot.PlotPublisher/checkSeriesFile?value='+toValue(this)" />
               </f:entry>
-            </f:nested>
-            <f:block>
-              <input name="seriesParam.separator" type="hidden" value="true" />
-              <input name="seriesParam.file" type="hidden" value="PLOT_SEPARATOR" />
-              <input name="seriesParam.label" type="hidden" value="PLOT_SEPARATOR" />
-            </f:block>
-            <f:entry title="">
-              <f:block>
-                <hr/>
-              </f:block>
-            </f:entry>
 
-          </table>
-        </f:repeatable>
-      </f:entry>
-    </d:taglib>
-  </f:block>
+              <f:radioBlock name="fileType" value="properties" title="${%Load data from properties file}" help="/plugin/plot/help-properties.html" checked="${series.fileType=='properties' or series.fileType==null}">
+                <!-- Only property files have a legend label, csv pulls it from the column name, xml is TBD. -->
+                <f:entry title="${%Data series legend label}" help="/plugin/plot/help-legend.html">
+                  <f:textbox name="label" value="${series.label}" />
+                </f:entry>
+              </f:radioBlock>
+
+              <f:radioBlock name="fileType" value="csv" title="${%Load data from csv file}" help="/plugin/plot/help-csv.html" checked="${series.fileType=='csv'}">
+                <f:nested>
+                  <div>
+                    <table>
+                      <tr>
+                        <td></td>
+                        <th align="left">${%Include all columns}</th>
+                        <th align="left">${%Include columns by name}</th>
+                        <th align="left">${%Exclude columns by name}</th>
+                        <th align="left">${%Include columns by index}</th>
+                        <th align="left">${%Exclude columns by index}</th>
+                      </tr>
+                      <tr>
+                        <td></td>
+                        <td>
+                          <f:radio name="inclusionFlag" value="OFF" checked="${series.inclusionFlag=='OFF' or series.inclusionFlag==null}" />
+                        </td>
+                        <td>
+                          <f:radio name="inclusionFlag" value="INCLUDE_BY_STRING" checked="${series.inclusionFlag=='INCLUDE_BY_STRING'}" />
+                        </td>
+                        <td>
+                          <f:radio name="inclusionFlag" value="EXCLUDE_BY_STRING" checked="${series.inclusionFlag=='EXCLUDE_BY_STRING'}" />
+                        </td>
+                        <td>
+                          <f:radio name="inclusionFlag" value="INCLUDE_BY_COLUMN" checked="${series.inclusionFlag=='INCLUDE_BY_COLUMN'}" />
+                        </td>
+                        <td>
+                          <f:radio name="inclusionFlag" value="EXCLUDE_BY_COLUMN" checked="${series.inclusionFlag=='EXCLUDE_BY_COLUMN'}" />
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                  <f:entry title="${%CSV Exclusion values}" help="/plugin/plot/help-csv-exclusions.html">
+                    <f:textbox name="exclusionValues" value="${series.exclusionValues}" />
+                  </f:entry>
+
+                  <f:entry title="${%URL}" help="/plugin/plot/help-csv-url.html">
+                     <f:textbox name="url" value="${series.url}" />
+                  </f:entry>
+
+                  <f:entry title="Display original csv above plot" help="/plugin/plot/help-csv-table.html">
+                    <f:checkbox name="displayTableFlag" checked="${series.displayTableFlag}" />
+                  </f:entry>
+
+                </f:nested>
+              </f:radioBlock>
+
+              <f:radioBlock name="fileType" value="xml" title="${%Load data from xml file using xpath}" help="/plugin/plot/help-xml.html" checked="${series.fileType=='xml'}">
+                <f:nested title="XML nested">
+                  <div>
+                    <table>
+                      <tr>
+                        <td align="center">${%XPath Result type:}</td>
+                        <th align="center">${%Nodeset}</th>
+                        <th align="center">${%Node}</th>
+                        <th align="center">${%String}</th>
+                        <th align="center">${%Boolean}</th>
+                        <th align="center">${%Number}</th>
+                      </tr>
+                      <tr>
+                        <td></td>
+                        <td>
+                          <f:radio name="nodeType" value="NODESET" checked="${series.nodeType=='NODESET' or series.nodeType==null}" />
+                        </td>
+                        <td>
+                          <f:radio name="nodeType" value="NODE" checked="${series.nodeType=='NODE'}" />
+                        </td>
+                        <td>
+                          <f:radio name="nodeType" value="STRING" checked="${series.nodeType=='STRING'}" />
+                        </td>
+                        <td>
+                          <f:radio name="nodeType" value="BOOLEAN" checked="${series.nodeType=='BOOLEAN'}" />
+                        </td>
+                        <td>
+                          <f:radio name="nodeType" value="NUMBER" checked="${series.nodeType=='NUMBER'}" />
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                  <f:entry title="${%XPath Expression}" help="/plugin/plot/help-xml-xpath.html">
+                    <f:textbox name="xpath" value="${series.xpath}" />
+                  </f:entry>
+
+                  <f:entry title="${%URL}" help="/plugin/plot/help-xml-url.html">
+                    <f:textbox name="url" value="${series.url}" />
+                  </f:entry>
+                </f:nested>
+              </f:radioBlock>
+
+              <f:entry>
+                <div align="right">
+                  <f:repeatableDeleteButton value="${%Delete Data Series}"/>
+                </div>
+              </f:entry>
+            </table>
+          </f:repeatable>
+        </f:entry>
+
+        <f:entry>
+          <f:block>
+            <hr/>
+          </f:block>
+        </f:entry>
+      </table>
+    </f:repeatable>
+  </f:entry>
 </j:jelly>
