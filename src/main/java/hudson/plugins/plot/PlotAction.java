@@ -35,7 +35,7 @@ public class PlotAction implements Action, StaplerProxy {
     }
 
     public String getDisplayName() {
-        return "Plots";
+        return Messages.Plot_Action_DisplayName();
     }
 
     public String getIconFileName() {
@@ -43,7 +43,7 @@ public class PlotAction implements Action, StaplerProxy {
     }
 
     public String getUrlName() {
-        return "plot";
+        return Messages.Plot_UrlName();
     }
 
     // called from PlotAction/index.jelly
@@ -66,8 +66,8 @@ public class PlotAction implements Action, StaplerProxy {
     		StaplerResponse rsp) throws IOException 
     {
     	return new PlotReport(project, 
-    			publisher.urlGroupToOriginalGroup(group), 
-    			publisher.getPlots(group));
+                       publisher.urlGroupToOriginalGroup(getUrlGroup(group)),
+                       publisher.getPlots(getUrlGroup(group)));
     }
     
     /**

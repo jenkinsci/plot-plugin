@@ -576,7 +576,7 @@ public class Plot implements Comparable {
         categoryPlot.setDomainGridlinePaint(Color.black);
         categoryPlot.setRangeGridlinePaint(Color.black);
         categoryPlot.setDrawingSupplier(Plot.supplier);
-        CategoryAxis domainAxis = new ShiftedCategoryAxis("Build");
+        CategoryAxis domainAxis = new ShiftedCategoryAxis(Messages.Plot_Build());
         categoryPlot.setDomainAxis(domainAxis);
         domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
         domainAxis.setLowerMargin(0.0);
@@ -600,7 +600,7 @@ public class Plot implements Comparable {
 		}        
         renderer.setStroke(new BasicStroke(2.0f));
         renderer.setToolTipGenerator(new StandardCategoryToolTipGenerator(
-                "Build {1}: {2}", NumberFormat.getInstance()));
+                Messages.Plot_Build() + " {1}: {2}", NumberFormat.getInstance()));
         renderer.setItemURLGenerator(new PointURLGenerator());
         if (renderer instanceof LineAndShapeRenderer) {
             LineAndShapeRenderer lasRenderer = (LineAndShapeRenderer) renderer;
@@ -720,8 +720,12 @@ public class Plot implements Comparable {
         try {
             writer = new CSVWriter(new FileWriter(plotFile));
             // write 2 header lines
-            String[] header1 = new String[] {"Title",this.getTitle()};
-            String[] header2 = new String[] {"Value","Series Label","Build Number","Build Date","URL"};
+            String[] header1 = new String[] {Messages.Plot_Title(),this.getTitle()};
+            String[] header2 = new String[] {Messages.Plot_Value(),
+                                             Messages.Plot_SeriesLabel(),
+                                             Messages.Plot_BuildNumber(),
+                                             Messages.Plot_BuildDate(),
+                                             Messages.Plot_URL()};
             writer.writeNext(header1);
             writer.writeNext(header2);
             // write each entry of rawPlotData to a new line in the CSV file
@@ -755,7 +759,7 @@ public class Plot implements Comparable {
     		// new header including build #
     		String [] header = newTupleReader.readNext();
     		String [] headerIncBuild = new String [header.length+1];
-    		headerIncBuild[0] = "build #";
+                headerIncBuild[0] = Messages.Plot_build() + " #";
     		System.arraycopy(header, 0, headerIncBuild, 1, header.length);
     		
     		// add a new tuple

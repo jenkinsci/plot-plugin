@@ -38,7 +38,7 @@ public class Series {
 
         // TODO: look into this, what do we do if there is no label?
         if (label == null)
-			label = "missing";
+			label = Messages.Plot_Missing();
         
         this.label = label;
         this.fileType = fileType;

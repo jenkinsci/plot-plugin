@@ -97,7 +97,7 @@
                      <f:textbox name="url" value="${series.url}" />
                   </f:entry>
 
-                  <f:entry title="Display original csv above plot" help="/plugin/plot/help-csv-table.html">
+                  <f:entry title="${%Display original csv above plot}" help="/plugin/plot/help-csv-table.html">
                     <f:checkbox name="displayTableFlag" checked="${series.displayTableFlag}" />
                   </f:entry>
 

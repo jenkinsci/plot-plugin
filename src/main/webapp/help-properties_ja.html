@@ -1,0 +1,25 @@
+<!-- 
+/*
+ * Copyright (c) 2008-2009 Yahoo! Inc.  All rights reserved.
+ * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+ */
+ -->
+<div>
+  必須: プロットデータを読み込むプロパティファイルを指定します。<br />
+  プロットオプションを一つ選択してください。<br />
+  <p>
+  このファイルには、必ず<code>YVALUE</code>プロパティを含めてください。
+  また、必要に応じて<code>URL</code>プロパティを含めることもできます。
+  URLプロパティを記述した場合、プロット上でデータポイントをクリックして、対応するURLを開くことができます。
+  </p>
+  <p>
+  データ系列ファイルの指定時に、ワイルドカードを使用できます(例 <code>build/report/*/report.properties</code>)
+  ただし、ワイルドカードに最初にマッチしたファイルのみが使用されます。
+  正式な書式については、<a href="http://ant.apache.org/manual/Types/fileset.html">includes属性(Antのファイルセット)</a>を参考にしてください。
+  <p>
+  プロパティファイルの内容例:
+  <pre>
+  YVALUE=3.342
+  URL=http://foo.bar/
+  </pre>
+</div>

@@ -128,7 +128,7 @@ public class PlotPublisher extends Recorder {
         // update the plot list
         plots.add(plot);
         // update the group-to-plot map
-        String urlGroup = originalGroupToUrlGroup(plot.getGroup());
+        String urlGroup = originalGroupToUrlEncodedGroup(plot.getGroup());
         if (groupMap.containsKey(urlGroup)) {
             ArrayList<Plot> list = groupMap.get(urlGroup);
             list.add(plot);
@@ -206,7 +206,7 @@ public class PlotPublisher extends Recorder {
         }
 
         public String getDisplayName() {
-            return "Plot build data";
+            return Messages.Plot_Publisher_DisplayName();
         }
 
         @Override

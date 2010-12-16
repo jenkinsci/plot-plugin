@@ -1,0 +1,40 @@
+<!-- 
+/*
+ * Copyright (c) 2008-2009 Yahoo! Inc.  All rights reserved.
+ * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+ */
+ -->
+<div>
+この設定ではグラフからカラムを選択/除外する方法を制御します。
+ラジオボタンでこのフィールドの解釈を制御します。
+ラジオボタンを選択した場合は、カンマ区切りの値のリストを記述する必要があります。
+(ただし、&quot;全てのカラムを使用する&quot;を除く)
+
+<br>
+  <table>
+  <tr>
+  	<th>設定</th><th>結果</th>
+  </tr>
+  <tr>
+  <td>全てのカラムを使用</td><td>このフィールドは無視されます。</td>
+  </tr>
+  <tr>
+  <td>使用するカラム名を指定</td><td>プロットで使用するカラム名をカンマ区切りのリストで指定</td>
+  </tr>
+  <tr>
+  <td>除外するカラム名を指定</td><td>プロットから除外するカラム名をカンマ区切りのリストで指定</td>
+  </tr>
+  <tr>
+  <td>使用するカラム番号を指定</td><td>プロットで使用するカラム番号をカンマ区切りのリストで指定</td>
+  </tr>
+  <tr>
+  <td>除外するカラム番号を指定</td><td>プロットから除外するカラム番号をカンマ区切りのリストで指定</td>
+  </tr>
+  </table>
+  CSVの内容例:
+  <pre>
+	Avg,Median,90,min,max,samples,errors,error %
+	528.75,201,1172,2,17732,97560,360,0.37%
+  </pre>
+  <i>除外するカラム名を指定</i>を選択する場合は、<i>max,samples,errors,error %</i>などと入力します。
+</div>
