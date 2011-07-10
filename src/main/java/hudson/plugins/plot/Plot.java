@@ -494,8 +494,10 @@ public class Plot implements Comparable {
             final private String text;
             public Label(String buildNum, String buildTime, String text) {
                 this.buildNum = Integer.parseInt(buildNum);
-                this.buildDate = DATE_FORMAT.format(
-                        new Date(Long.parseLong(buildTime)));
+                synchronized (DATE_FORMAT) {
+                    this.buildDate = DATE_FORMAT.format(
+                            new Date(Long.parseLong(buildTime)));
+                }
                 this.text = text;
             }
             public Label(String buildNum, String buildTime) {
