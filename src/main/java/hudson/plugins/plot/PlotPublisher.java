@@ -159,7 +159,7 @@ public class PlotPublisher extends Recorder {
     }
 
     /**
-     * Called by Hudson.
+     * Called by Jenkins.
      */
     @Override
     public Action getProjectAction(AbstractProject<?, ?> project) {
@@ -171,7 +171,7 @@ public class PlotPublisher extends Recorder {
     }
 
     /**
-     * Called by Hudson.
+     * Called by Jenkins.
      */
     @Override
     public BuildStepDescriptor<Publisher> getDescriptor() {
@@ -179,7 +179,7 @@ public class PlotPublisher extends Recorder {
     }
 
     /**
-     * Called by Hudson when a build is finishing.
+     * Called by Jenkins when a build is finishing.
      */
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
