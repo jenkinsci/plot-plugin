@@ -14,8 +14,10 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -29,6 +31,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -93,10 +96,10 @@ public class XMLSeries extends Series {
     public XMLSeries(String file, String xpath, String nodeType, String url) {
     	super(file, "", "xml");
 
-	this.xpathString = xpath;
-        this.nodeTypeString = nodeType;
-	this.nodeType = qnameMap.get(nodeType);
-	this.url = url;
+    	this.xpathString = xpath;
+    	this.nodeTypeString = nodeType;
+    	this.nodeType = qnameMap.get(nodeType);
+    	this.url = url;
     }
 
     private Object readResolve() {
@@ -127,8 +130,8 @@ public class XMLSeries extends Series {
 		
         try {
 			List<PlotPoint> ret = new ArrayList<PlotPoint>();
-	
 			FilePath[] seriesFiles = null;
+			
 	        try {
 	            seriesFiles = workspaceRootDir.list(getFile());
 	        } catch (Exception e) {
@@ -168,27 +171,100 @@ public class XMLSeries extends Series {
     		 */
     		if (nodeType.equals(XPathConstants.NODESET))
     		{
-    			NodeList nl=(NodeList)xmlObject;
+    			NodeList nl = (NodeList) xmlObject;
+    			
             	if (LOGGER.isLoggable(defaultLogLevel))
             		LOGGER.log(defaultLogLevel,"Number of nodes: " + nl.getLength());
     			
-    			for (int i = 0; i < nl.getLength(); i++) {
-					Node n = nl.item(i);
-					if (n != null && n.getLocalName() != null && n.getTextContent() != null) {
-						addValueToList(ret, n.getLocalName().trim(), n.getTextContent().trim());
-					}
-				}
+            	Map<Node, List<Node>> parentNodeMap = new HashMap<Node, List<Node>>();
+            	
+            	for (int i = 0; i < nl.getLength(); i++) {
+    				Node node = nl.item(i);
+    				Node parent = node.getParentNode();
+    				List<Node>  nodeList = parentNodeMap.get(parent);
+    				
+    				// TODO:  Temp debug code:
+    				Object obj = nl.item(i);
+    				Object obj2 = node.getFirstChild();
+
+    				// Make sure these nodes aren't all from the parent node:
+    				if (node.getFirstChild() != null) {
+    					if (nodeList == null) {
+    						nodeList = new LinkedList<Node>();
+    						parentNodeMap.put(parent, nodeList);
+    					}
+
+    					nodeList.add(node);
+    				}
+            	}
+            	
+            	int numParents = parentNodeMap.size();
+            	int numNodes = nl.getLength();
+            	
+            	// If we found nodes with common parents, combine them:
+            	if ((parentNodeMap.size() != 0) && (parentNodeMap.size() < nl.getLength())) {
+            		Set<Map.Entry<Node, List<Node>>> entries = parentNodeMap.entrySet();
+            		
+            		// TODO:  Put in logging messages about what is being processed.
+            		
+            		// If there are multiple names and multiple values, we'll always use the 
+            		// latest one.
+            		for (Map.Entry<Node, List<Node>> entry : entries) {
+            			String name = null;
+            			String value = null;
+            		    List<Node> nodeList = entry.getValue();
+            		    
+            		    for (Node node : nodeList) {
+            		    	try {
+            		    		Double.parseDouble(node.getTextContent());
+            		    		value = node.getTextContent().trim();
+            		    	} catch (NumberFormatException nfe) {
+            		    		name = node.getTextContent().trim();
+            		    	}
+            		    }
+            		    addValueToList(ret, name, value);
+            		}
+            		
+            	} else {
+            		for (int i = 0; i < nl.getLength(); i++) {
+            			Node n = nl.item(i);
+
+            			if (n != null && n.getLocalName() != null && n.getTextContent() != null) {
+            				addNodeToList(ret, n);
+            			}
+            		}
+            	}
+    		} else if (nodeType.equals(XPathConstants.NODE)) {
+    			addNodeToList(ret, (Node) xmlObject);
     		} else {
     			// otherwise we have a single type and can do a toString on it.
-				addValueToList(ret,label, xmlObject);
+    			if (xmlObject instanceof NodeList) {
+    				NodeList nl = (NodeList) xmlObject;
+        			
+                	if (LOGGER.isLoggable(defaultLogLevel))
+                		LOGGER.log(defaultLogLevel,"Number of nodes: " + nl.getLength());
+        			
+        			for (int i = 0; i < nl.getLength(); i++) {
+    					Node n = nl.item(i);
+    					
+    					if (n != null && n.getLocalName() != null && n.getTextContent() != null) {
+    						addValueToList(ret, label, xmlObject);
+    					}
+    				}
+    				
+    			} else {
+				    addValueToList(ret, label, xmlObject);
+    			}
     		}
         
             return ret.toArray(new PlotPoint[ret.size()]);
 
         } catch (XPathExpressionException e) {
             //ignore
+        	Throwable cause = e.getCause();
+        	
         	if (LOGGER.isLoggable(defaultLogLevel))
-        		LOGGER.log(defaultLogLevel,"Exception: " + e);
+        		LOGGER.log(defaultLogLevel,"XPathExpressionException for XPath '" + getXpath() + "': " + cause.getMessage());
 		} finally {
         	if (in != null) {
                 try {
@@ -201,6 +277,16 @@ public class XMLSeries extends Series {
 
         return null;
     }
+
+	private void addNodeToList(List<PlotPoint> ret, Node n) {
+		NamedNodeMap nodeMap = n.getAttributes();
+		
+		if ((null != nodeMap) && (null != nodeMap.getNamedItem("name"))) {
+			addValueToList(ret, nodeMap.getNamedItem("name").getTextContent().trim(), n);
+		} else {
+			addValueToList(ret, n.getLocalName().trim(), n);
+		}
+	}
 
 	
 	/**
@@ -249,24 +335,72 @@ public class XMLSeries extends Series {
 		if (nodeType==XPathConstants.NUMBER)
 			return ((Double)obj).toString().trim();
 		
-		if (nodeType==XPathConstants.NODE)
-			ret = ((Node)obj).toString().trim();
+		if (nodeType==XPathConstants.NODE || nodeType==XPathConstants.NODESET) {
+			if (obj instanceof String) {
+				ret = ((String)obj).trim();
+			} else {
+				if (null == obj) {
+					return null;
+				}
+				
+				Node node = (Node) obj;
+				NamedNodeMap nodeMap = node.getAttributes();
 
-		if (nodeType==XPathConstants.STRING || nodeType==XPathConstants.NODESET)
+				if ((null != nodeMap) && (null != nodeMap.getNamedItem("time"))) {
+					ret = nodeMap.getNamedItem("time").getTextContent();
+				}
+
+				if (null == ret) {
+					ret = node.getTextContent().trim();
+				}
+			}
+		}
+
+		if (nodeType==XPathConstants.STRING)
 			ret = ((String)obj).trim();
 		
 		// for Node/String/NodeSet, try and parse it as a double.
 		// we don't store a double, so just throw away the result.
 		if (ret != null)
 		{
+			// First remove any commas that may exist in the String.  JUnit formats them that way, but 
+			// Double won't parse them.
+			ret = removeCommas(ret);
+
 			try {
 				Double.parseDouble(ret);
-				return ret;
 			} catch (NumberFormatException ignore) {
 			}
+			return ret;
 		}
 		
 		return null;
+	}
+
+	/**
+	 * Parsing a double doesn't handle commas, but JUnit formats test execution times with commas for 
+	 * easy viewing by humans.  We need to take them out, and make sure the string is shorter so we
+	 * don't get weird non-printable characters at the end.
+	 * @param ret
+	 * @return
+	 */
+	private String removeCommas(String ret) {
+		int length = ret.length();
+		StringBuffer r = new StringBuffer(length);
+		r.setLength(length);
+		int current = 0;
+
+		for (int i = 0; i < ret.length(); i ++) {
+			char cur = ret.charAt(i);
+			if (cur != ',') {
+				r.setCharAt( current++, cur );
+			} else {
+				length--;
+				r.setLength(length);
+			}
+		}
+		ret = r.toString().trim();
+		return ret;
 	}
 	
 	/**
@@ -279,6 +413,7 @@ public class XMLSeries extends Series {
 	private void addValueToList(List<PlotPoint> list, String label, Object nodeValue)
 	{
 		String value = nodeToString(nodeValue);
+		
 		if (value != null) {
 			if (LOGGER.isLoggable(defaultLogLevel))
 				LOGGER.log(defaultLogLevel, "Adding node: " + label + " value: " + value);
