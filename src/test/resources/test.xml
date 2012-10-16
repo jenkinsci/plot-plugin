@@ -1,0 +1,13 @@
+<testsuite failures="0" time="48.113" errors="0" skipped="0" tests="3" name="com.adchemy.sem.ExperimentalTest">
+   <properties>
+      <property name="java.vendor.url.bug" value="http://bugreport.apple.com/"/>
+      <property name="sun.cpu.endian" value="little"/>
+      <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+      <property name="mrj.version" value="1060.1.6.0_26-384"/>
+      <property name="sun.cpu.isalist" value=""/>
+   </properties>
+   <testcase time="11.004" classname="com.adchemy.sem.ExperimentalTest" name="testOne"/>
+   <testcase time="10.001" classname="com.adchemy.sem.ExperimentalTest" name="testTwo"/>
+   <testcase time="27" classname="com.adchemy.sem.ExperimentalTest" name="testThree"/>
+   <testcase time="1,234.56" classname="com.adchemy.sem.ExperimentalTest" name="testFour"/>
+</testsuite>

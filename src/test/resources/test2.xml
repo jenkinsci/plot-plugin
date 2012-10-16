@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<UIActions>
+   <UIAction>
+      <name>AxTermDataService.createEntity</name>
+      <numCalls>2</numCalls>
+      <averageTime>59.0</averageTime>
+      <minTimeMS>36</minTimeMS>
+      <maxTimeMS>82</maxTimeMS>
+   </UIAction>
+   <UIAction>
+      <name>AxTermDataService.updateItem</name>
+      <numCalls>7</numCalls>
+      <averageTime>75.71428571428571</averageTime>
+      <minTimeMS>43</minTimeMS>
+      <maxTimeMS>151</maxTimeMS>
+   </UIAction>
+   <UIAction>
+      <name>AxMsnCampaignDataService.getEntities;AxMsnCampaignDataService.count</name>
+      <numCalls>15</numCalls>
+      <averageTime>68.2</averageTime>
+      <minTimeMS>13</minTimeMS>
+      <maxTimeMS>175</maxTimeMS>
+   </UIAction>
+   <UIAction>
+      <name>AxTermDataService.getEntities;AxTermDataService.getEntities;AxTermDataService.getEntity;AxTermDataService.getEntities;AxAbstractDataService.count</name>
+      <numCalls>1</numCalls>
+      <averageTime>78.0</averageTime>
+      <minTimeMS>78</minTimeMS>
+      <maxTimeMS>78</maxTimeMS>
+   </UIAction>
+</UIActions>
