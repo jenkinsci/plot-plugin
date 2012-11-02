@@ -30,8 +30,10 @@
             <f:option value="area" selected="${plot.style=='area'}">${%Area}</f:option>
             <f:option value="bar" selected="${plot.style=='bar'}">${%Bar}</f:option>
             <f:option value="bar3d" selected="${plot.style=='bar3d'}">${%Bar 3D}</f:option>
+            <f:option value="histogram" selected="${plot.style=='histogram'}">${%Histogram}</f:option>
             <f:option value="line" selected="${plot.style=='line' || plot.style=='' || plot.style==null}">${%Line}</f:option>
             <f:option value="line3d" selected="${plot.style=='line3d'}">${%Line 3D}</f:option>
+            <f:option value="scatter" selected="${plot.style=='scatter'}">${%Scatter}</f:option>
             <f:option value="stackedArea" selected="${plot.style=='stackedArea'}">${%Stacked Area}</f:option>
             <f:option value="stackedbar" selected="${plot.style=='stackedbar'}">${%Stacked Bar}</f:option>
             <f:option value="stackedbar3d" selected="${plot.style=='stackedbar3d'}">${%Stacked Bar 3D}</f:option>
