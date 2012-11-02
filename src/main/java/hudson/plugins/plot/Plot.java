@@ -636,6 +636,16 @@ public class Plot implements Comparable {
                     getURLTitle(), /*categoryAxisLabel=*/null, getYaxis(), dataset,
                     PlotOrientation.VERTICAL, hasLegend(), /*tooltips=*/true, /*url=*/false);
         }
+        if (s.equalsIgnoreCase("histogram")) {
+            return ChartFactory.createHistogram(
+                    getURLTitle(), /*categoryAxisLabel=*/null, getYaxis(), dataset,
+                    PlotOrientation.VERTICAL, hasLegend(), /*tooltips=*/true, /*url=*/false);
+        }
+        if (s.equalsIgnoreCase("scatter")) {
+            return ChartFactory.createScatterPlot(
+                    getURLTitle(), /*categoryAxisLabel=*/null, getYaxis(), dataset,
+                    PlotOrientation.VERTICAL, hasLegend(), /*tooltips=*/true, /*url=*/false);
+        }
         if (s.equalsIgnoreCase("stackedarea")) {
             return ChartFactory.createStackedAreaChart(
                     getURLTitle(), /*categoryAxisLabel=*/null, getYaxis(), dataset,
