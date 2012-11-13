@@ -363,6 +363,10 @@ public class Plot implements Comparable {
         return height;
     }
     
+    public AbstractProject getProject(){
+        return project;
+    }
+    
     /**
      * A reference to the project is needed to retrieve
      * the project's root directory where the CSV file
