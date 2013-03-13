@@ -8,12 +8,10 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
+import hudson.model.Action;
+import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.Action;
-import hudson.model.Build;
-import hudson.model.BuildListener;
-import hudson.model.Project;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
@@ -26,8 +24,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-
 import net.sf.json.JSONObject;
+
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -163,7 +161,7 @@ public class PlotPublisher extends Recorder {
      */
     @Override
     public Action getProjectAction(AbstractProject<?, ?> project) {
-        return project instanceof Project ? new PlotAction((Project) project, this) : null;
+        return new PlotAction(project, this);
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -184,14 +182,10 @@ public class PlotPublisher extends Recorder {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
             BuildListener listener) throws IOException, InterruptedException {
-        // Should always be a Build due to isApplicable below
-        if (!(build instanceof Build)) {
-            return true;
-        }
         listener.getLogger().println("Recording plot data");
         // add the build to each plot
         for (Plot plot : getPlots()) {
-            plot.addBuild((Build) build, listener.getLogger());
+            plot.addBuild(build, listener.getLogger());
         }
         // misconfigured plots will not fail a build so always return true
         return true;
@@ -211,7 +205,7 @@ public class PlotPublisher extends Recorder {
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {
-            return Project.class.isAssignableFrom(jobType);
+            return true;
         }
 
         /**

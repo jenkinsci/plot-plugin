@@ -7,8 +7,6 @@ package hudson.plugins.plot;
 
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.Build;
-import hudson.model.Project;
 import hudson.model.Run;
 import hudson.util.ChartUtil;
 import hudson.util.ShiftedCategoryAxis;
@@ -92,7 +90,7 @@ public class Plot implements Comparable {
      * to the project is needed to retrieve and save the CSV file
      * that is stored in the project's root directory.
      */
-	private transient AbstractProject project;
+	private transient AbstractProject<?, ?> project;
     
     /** All plots share the same JFreeChart drawing supplier object. */
     private static final DrawingSupplier supplier = new DefaultDrawingSupplier(
@@ -371,7 +369,7 @@ public class Plot implements Comparable {
      * 
      * @param project the project
      */
-    public void setProject(Project project) {
+    public void setProject(AbstractProject<?, ?> project) {
         this.project = project;
     }
     
@@ -443,7 +441,7 @@ public class Plot implements Comparable {
      * @param build
      * @param logger
      */
-    public void addBuild(Build build, PrintStream logger) {
+    public void addBuild(AbstractBuild<?, ?> build, PrintStream logger) {
         if (project == null) project = build.getProject();
         
         // load the existing plot data from disk
