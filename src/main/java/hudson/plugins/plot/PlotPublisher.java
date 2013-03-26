@@ -8,11 +8,13 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
+import hudson.matrix.MatrixRun;
+import hudson.matrix.MatrixProject;
 import hudson.model.Action;
 import hudson.model.Build;
 import hudson.model.BuildListener;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.Project;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -26,8 +28,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-
 import net.sf.json.JSONObject;
+
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -163,7 +165,7 @@ public class PlotPublisher extends Recorder {
      */
     @Override
     public Action getProjectAction(AbstractProject<?, ?> project) {
-        return project instanceof Project ? new PlotAction((Project) project, this) : null;
+        return (project instanceof Project || project instanceof MatrixProject) ? new PlotAction(project, this) : null;
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -186,6 +188,9 @@ public class PlotPublisher extends Recorder {
             BuildListener listener) throws IOException, InterruptedException {
         // Should always be a Build due to isApplicable below
         if (!(build instanceof Build)) {
+            return true;
+        }
+        if (!(build instanceof MatrixRun)) {
             return true;
         }
         listener.getLogger().println("Recording plot data");
@@ -211,7 +216,7 @@ public class PlotPublisher extends Recorder {
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {
-            return Project.class.isAssignableFrom(jobType);
+            return Project.class.isAssignableFrom(jobType) || MatrixProject.class.isAssignableFrom(jobType);
         }
 
         /**

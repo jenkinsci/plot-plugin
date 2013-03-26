@@ -5,10 +5,10 @@
 
 package hudson.plugins.plot;
 
+import hudson.matrix.MatrixConfiguration;
+import hudson.model.Build;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.Build;
-import hudson.model.Project;
 import hudson.model.Run;
 import hudson.util.ChartUtil;
 import hudson.util.ShiftedCategoryAxis;
@@ -371,7 +371,7 @@ public class Plot implements Comparable {
      * 
      * @param project the project
      */
-    public void setProject(Project project) {
+    public void setProject(AbstractProject<?, ?> project) {
         this.project = project;
     }
     
@@ -520,7 +520,7 @@ public class Plot implements Comparable {
             }
         }
         //LOGGER.info("Determining if we should generate plot " + getCsvFileName());
-        File csvFile = new File(project.getRootDir(),getCsvFileName());
+        File csvFile = new File(getRootDir(),getCsvFileName());
         if (csvFile.lastModified() == csvLastModification &&
             plot != null &&
             !forceGenerate) 
@@ -683,7 +683,7 @@ public class Plot implements Comparable {
     private void loadPlotData() {
         rawPlotData = new ArrayList<String[]>();
         // load existing plot file
-        File plotFile = new File(project.getRootDir(),getCsvFileName());
+        File plotFile = new File(getRootDir(),getCsvFileName());
         if (!plotFile.exists()) {
             return;
         }
@@ -717,7 +717,7 @@ public class Plot implements Comparable {
      * The data is read from the rawPlotData instance variable.
      */
     private void savePlotData() {
-        File plotFile = new File(project.getRootDir(),getCsvFileName());
+        File plotFile = new File(getRootDir(),getCsvFileName());
         CSVWriter writer = null;
         try {
             writer = new CSVWriter(new FileWriter(plotFile));
@@ -750,7 +750,7 @@ public class Plot implements Comparable {
     private void saveTableData(AbstractBuild<?,?> build, String fileName) {
     	ArrayList rawTableData = new ArrayList();
 
-    	File tableFile = new File(project.getRootDir(), "table_"+getCsvFileName());
+    	File tableFile = new File(getRootDir(), "table_"+getCsvFileName());
     	File rawCSVFile = new File(build.getWorkspace() + File.separator + fileName);
     	CSVReader existingTableReader = null;
     	CSVReader newTupleReader = null;
@@ -821,4 +821,12 @@ public class Plot implements Comparable {
             }
         }
     }
+    
+    private File getRootDir() {
+    	if (project instanceof MatrixConfiguration) {
+    		return project.getParent().getRootDir();
+    	}
+    	return project.getRootDir();
+    }
+   
 }
