@@ -9,7 +9,7 @@
   <artifactId>plot</artifactId>
   <packaging>hpi</packaging>
   <name>Plot plugin</name>
-  <version>1.6.1</version>
+  <version>1.6.2</version>
   <url>http://wiki.jenkins-ci.org/display/JENKINS/Plot+Plugin</url>
 
   <developers>
