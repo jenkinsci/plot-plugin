@@ -4,10 +4,14 @@
  */
 package hudson.plugins.plot;
 
+import hudson.FilePath;
+import hudson.matrix.MatrixConfiguration;
+import hudson.matrix.MatrixProject;
 import hudson.model.Action;
-import hudson.model.Project;
+import hudson.model.AbstractProject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import org.kohsuke.stapler.StaplerProxy;
@@ -22,15 +26,15 @@ import org.kohsuke.stapler.StaplerResponse;
 public class PlotAction implements Action, StaplerProxy {
 
     private static final Logger LOGGER = Logger.getLogger(PlotAction.class.getName());
-    private final Project project;
+    private final AbstractProject<?, ?> project;
     private final PlotPublisher publisher;
 
-    public PlotAction(Project project, PlotPublisher publisher) {
+    public PlotAction(AbstractProject<?, ?> project, PlotPublisher publisher) {
         this.project = project;
         this.publisher = publisher;
     }
 
-    public Project getProject() {
+    public AbstractProject<?, ?> getProject() {
         return project;
     }
 
@@ -48,7 +52,8 @@ public class PlotAction implements Action, StaplerProxy {
 
     // called from PlotAction/index.jelly
     public boolean hasPlots() throws IOException {
-        return publisher.getPlots().length != 0;
+    	ArrayList<PlotData> array = getPlotData(publisher.getPlots());
+        return array.size() > 0;
     }
     
     // called from PlotAction/index.jelly
@@ -65,9 +70,11 @@ public class PlotAction implements Action, StaplerProxy {
     public PlotReport getDynamic(String group, StaplerRequest req, 
     		StaplerResponse rsp) throws IOException 
     {
+    	ArrayList<PlotData> array = getPlotData(publisher.getPlots(getUrlGroup(group)));
+
     	return new PlotReport(project, 
                        publisher.urlGroupToOriginalGroup(getUrlGroup(group)),
-                       publisher.getPlots(getUrlGroup(group)));
+                       array.toArray(new PlotData[]{}));
     }
     
     /**
@@ -77,10 +84,31 @@ public class PlotAction implements Action, StaplerProxy {
     public Object getTarget() {
     	String[] groups = getOriginalGroups();
     	if (groups != null && groups.length == 1) {
-    		return new PlotReport(project, groups[0], 
-        			publisher.getPlots(getUrlGroup(groups[0])));
-    	} else {
-    		return this;
+        	ArrayList<PlotData> array = getPlotData(publisher.getPlots(getUrlGroup(groups[0])));
+    		if (array.size() > 0) {
+    			return new PlotReport(project, groups[0],array.toArray(new PlotData[]{}));
+    		}
     	}
+		return this;
+    }
+    
+    private ArrayList<PlotData> getPlotData(Plot[] plots) {
+       	ArrayList<PlotData> array = new ArrayList<PlotData>();
+    	for( Plot plot: plots) {
+			if(project instanceof MatrixProject ) {
+				for(MatrixConfiguration config: ((MatrixProject)project).getActiveConfigurations() ) {
+					PlotData plotData = plot.getPlotData(project,new FilePath(((MatrixProject)project).getRootDirFor(config)));
+					if(plotData != null) {
+						array.add( plotData );
+					}
+				}
+			} else {
+				PlotData plotData = plot.getPlotData(project,new FilePath(project.getRootDir()));
+				if(plotData != null) {
+					array.add( plotData );
+				}
+			}    	
+    	}
+    	return array;
     }
 }

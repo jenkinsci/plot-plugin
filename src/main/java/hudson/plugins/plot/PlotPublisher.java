@@ -8,11 +8,13 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
+import hudson.matrix.MatrixRun;
+import hudson.matrix.MatrixProject;
 import hudson.model.Action;
 import hudson.model.Build;
 import hudson.model.BuildListener;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.Project;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -23,17 +25,22 @@ import hudson.util.FormValidation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.Logger;
 
-
 import net.sf.json.JSONObject;
+
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Records the plot data for builds.
+ * 
+ * This is the entry point of the plugin. Jenkins will instanciate this class when loading
+ * a job that contains a plot post build step
  *
  * @author Nigel Daley
  */
@@ -56,8 +63,10 @@ public class PlotPublisher extends Recorder {
      * Setup the groupMap upon deserialization.
      */
     private Object readResolve() {
+    	LOGGER.entering(this.getClass().getName(), "readResolve");
         Plot[] p = plots.toArray(new Plot[]{});
         setPlots(p);
+        LOGGER.exiting(this.getClass().getName(), "readResolve");
         return this;
     }
 
@@ -112,11 +121,14 @@ public class PlotPublisher extends Recorder {
      * @param plots the new list of plots
      */
     public void setPlots(Plot[] plots) {
+    	LOGGER.entering(this.getClass().getName(), "setPlots");
         this.plots = new ArrayList<Plot>();
         groupMap = new HashMap<String, ArrayList<Plot>>();
         for (Plot plot : plots) {
+        	LOGGER.finest("Setting the plot: " + plot);
             addPlot(plot);
         }
+        LOGGER.exiting(this.getClass().getName(), "setPlots");
     }
 
     /**
@@ -162,8 +174,13 @@ public class PlotPublisher extends Recorder {
      * Called by Jenkins.
      */
     @Override
-    public Action getProjectAction(AbstractProject<?, ?> project) {
-        return project instanceof Project ? new PlotAction((Project) project, this) : null;
+    public Collection<Action> getProjectActions(AbstractProject<?, ?> project) {
+    	LOGGER.entering(this.getClass().getName(), "getProjectActions");
+    	Vector<Action> vec = new Vector<Action>();
+    	if(project instanceof Project || project instanceof MatrixProject) {
+    		vec.add( new PlotAction(project, this) );
+    	}
+        return vec;
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -184,21 +201,28 @@ public class PlotPublisher extends Recorder {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
             BuildListener listener) throws IOException, InterruptedException {
-        // Should always be a Build due to isApplicable below
-        if (!(build instanceof Build)) {
-            return true;
+    	LOGGER.entering(this.getClass().getName(), "perform");
+    	
+    	// Should always be a supported Build due to isApplicable below. But does not hurt to double check
+        if (!(build instanceof Build) && !(build instanceof MatrixRun) ) {
+        	LOGGER.warning("The type of project is not supported");
+        	return true;
         }
         listener.getLogger().println("Recording plot data");
-        // add the build to each plot
+        
+        // add the build to each plot configured for this jobs.
         for (Plot plot : getPlots()) {
-            plot.addBuild((Build) build, listener.getLogger());
+        	LOGGER.fine("Adding the build to the plot " + plot);
+    		plot.addBuild((Build<?, ?>) build, listener);
         }
         // misconfigured plots will not fail a build so always return true
         return true;
     }
+    
     @Extension
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
+    // Actual implementation of the plugin so that it is recognized by Jenkins and instanciated
     public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
         public DescriptorImpl() {
@@ -211,7 +235,8 @@ public class PlotPublisher extends Recorder {
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {
-            return Project.class.isAssignableFrom(jobType);
+        	// This is where we specify this plugin is applicable to FreeStyle and Matrix projects
+            return Project.class.isAssignableFrom(jobType) || MatrixProject.class.isAssignableFrom(jobType);
         }
 
         /**
@@ -225,7 +250,6 @@ public class PlotPublisher extends Recorder {
             }
             return publisher;
         }
-
         private static Plot bindPlot(JSONObject data, StaplerRequest req) {
             Plot p = req.bindJSON(Plot.class, data);
             p.series = SeriesFactory.createSeriesList(data.get("series"), req);
