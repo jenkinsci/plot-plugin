@@ -505,6 +505,9 @@ public class PlotData implements Comparable<PlotData> {
                 }
                 this.text = text;
             }
+            public Label(String buildNum, String buildTime) {
+                this(buildNum, buildTime, null);
+            }            
             public int compareTo(Label that) {
                 return this.buildNum - that.buildNum;
             }
@@ -547,7 +550,7 @@ public class PlotData implements Comparable<PlotData> {
             String series = record[1];
             Label xlabel = getUrlUseDescr()
                     ? new Label(record[2], record[3], descriptionForBuild(buildNum))
-                    : new Label(record[2], record[3],getBuildName(buildNum));
+                    : new Label(record[2], record[3]);
             String url = null;
             if (record.length >= 5) url = record[4]; 
             dataset.setValue(value, url, series, xlabel);

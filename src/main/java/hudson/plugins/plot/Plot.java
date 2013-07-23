@@ -175,10 +175,7 @@ public class Plot {
      */
     public void addBuild(Build<?, ?> build, BuildListener listener) throws IOException, InterruptedException {
     	LOGGER.entering(this.getClass().getName(), "addBuild");
-    	
-        // Get the environment from the build.
-        EnvVars envVars = build.getEnvironment(listener);
-    	
+    	    	
 	    // extract the data for each data series
         for (Series series : getSeries()) {
         	if (series == null)
@@ -193,9 +190,6 @@ public class Plot {
         		LOGGER.finest("Creating an empty PlotData with the file " + csvFile);
         		plotData = new PlotData(build.getProject(),new FilePath(csvFile));
     		}
-        	LOGGER.finest("Expanding the variables in the title and yaxis");
-    		plotData.setTitle(envVars.expand(this.title));
-    		plotData.setYaxis(envVars.expand(this.yaxis));
     		plotData.addSeriesData(seriesData, build, listener);
     	}
         LOGGER.exiting(this.getClass().getName(), "addBuild");
