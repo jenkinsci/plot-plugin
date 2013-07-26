@@ -4,15 +4,18 @@
  */
 package hudson.plugins.plot;
 
-import hudson.model.Project;
+import hudson.FilePath;
+import hudson.matrix.MatrixConfiguration;
+import hudson.matrix.MatrixProject;
+import hudson.model.AbstractProject;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.ArrayList;
 
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -27,19 +30,19 @@ import au.com.bytecode.opencsv.CSVReader;
 public class PlotReport {
 	private static final Logger LOGGER = Logger.getLogger(PlotReport.class.getName());
 	
-    private final Project project;
+    private final AbstractProject<?, ?> project;
     
 	/**
 	 * The sorted list of plots that belong to the same group.
 	 */
-	private Plot[] plots;
+	private PlotData[] plots;
 	
 	/**
 	 * The group these plots belong to.
 	 */
 	private String group;
 	
-	public PlotReport(Project project, String group, Plot[] plots) {
+	public PlotReport(AbstractProject<?, ?> project, String group, PlotData[] plots) {
 		Arrays.sort(plots);
 		this.plots = plots;
 		this.group = group;
@@ -47,7 +50,7 @@ public class PlotReport {
 	}
 
 	// called from PlotReport/index.jelly
-    public Project getProject() {
+    public AbstractProject<?, ?> getProject() {
         return project;
     }
 
@@ -57,16 +60,18 @@ public class PlotReport {
     }
     
     // called from PlotReport/index.jelly
-	public Plot[] getPlots() {
+	public PlotData[] getPlotData() {
 		return plots;
 	}
 	
 	// called from PlotReport/index.jelly
 	public void doGetPlot(StaplerRequest req, StaplerResponse rsp) {
 		String i = req.getParameter("index");
-		Plot plot = getPlot(i);
+		PlotData plotData = getPlot(i);
 		try {
-			plot.plotGraph(req,rsp);
+			if (plotData != null) {
+				plotData.plotGraph(req,rsp);
+			}
 		} catch (IOException ioe) {
 			LOGGER.log(Level.INFO,"Exception plotting graph",ioe);
 		}
@@ -75,9 +80,11 @@ public class PlotReport {
 	// called from PlotReport/index.jelly
 	public void doGetPlotMap(StaplerRequest req, StaplerResponse rsp) {
 		String i = req.getParameter("index");
-		Plot plot = getPlot(i);
+		PlotData plotData = getPlot(i);
 		try {
-			plot.plotGraphMap(req,rsp);
+			if (plotData != null) {
+				plotData.plotGraphMap(req,rsp);
+			}
 		} catch (IOException ioe) {
 			LOGGER.log(Level.INFO,"Exception plotting graph",ioe);
 		}
@@ -85,23 +92,23 @@ public class PlotReport {
 
 	// called from PlotReport/index.jelly
 	public boolean getDisplayTableFlag(int i) {
-		Plot plot = getPlot(Integer.toString(i));
+/*		PlotData plotData = getPlot(Integer.toString(i));
 
-		if (plot.getSeries()!=null) {
-    	    Series series = plot.getSeries()[0];
+		if (plotData.getSeries()!=null) {
+    	    Series series = plotData.getSeries()[0];
     	    return (series instanceof CSVSeries) && ((CSVSeries)series).getDisplayTableFlag();
     	}
-    	return false;
+*/    	return false;
 	}
 	
 	// called from PlotReport/index.jelly
     public ArrayList getTable(int i) {
     	ArrayList tableData = new ArrayList<String[]>();
     	
-    	Plot plot = getPlot(""+i);
+    	PlotData plotData = getPlot(""+i);
     	
         // load existing csv file
-        File tableFile = new File(project.getRootDir(), "table_"+plot.getCsvFileName());
+        File tableFile = new File(project.getRootDir(), "table_"+plotData.getCsvFileName());
         if (!tableFile.exists()) {
             return tableData;
         }
@@ -123,10 +130,9 @@ public class PlotReport {
     	return tableData;
     }
 	
-    private Plot getPlot(String i) {
+    private PlotData getPlot(String i) {
     	try {
-    		Plot p = plots[Integer.valueOf(i)];
-    		p.setProject(project);
+    		PlotData p = plots[Integer.valueOf(i)];
     		return p; 
     	} catch (NumberFormatException ignore) {
     		//ignore
