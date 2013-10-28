@@ -542,7 +542,8 @@ public class Plot implements Comparable {
             int buildNum;
             try {
                 buildNum = Integer.valueOf(record[2]);
-                if (buildNum > getRightBuildNum()) {
+                if (project.getBuildByNumber(buildNum) == null
+                        || buildNum > getRightBuildNum()) {
                     continue; // skip this record
                 }
             } catch (NumberFormatException nfe) {
@@ -732,7 +733,9 @@ public class Plot implements Comparable {
             writer.writeNext(header2);
             // write each entry of rawPlotData to a new line in the CSV file
             for (String[] entry : rawPlotData) {
-                writer.writeNext(entry);
+                if (project.getBuildByNumber(Integer.parseInt(entry[2])) != null) {
+                    writer.writeNext(entry);
+                }
             }
         } catch (IOException ioe) {
             //ignore
