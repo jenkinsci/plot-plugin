@@ -18,6 +18,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import au.com.bytecode.opencsv.CSVReader;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Represents a plot report for a single group of plots.
@@ -96,19 +97,71 @@ public class PlotReport {
 	
 	// called from PlotReport/index.jelly
     public ArrayList getTable(int i) {
-    	ArrayList tableData = new ArrayList<String[]>();
+    	ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
     	
     	Plot plot = getPlot(""+i);
     	
         // load existing csv file
-        File tableFile = new File(project.getRootDir(), "table_"+plot.getCsvFileName());
-        if (!tableFile.exists()) {
+        File plotFile = new File(project.getRootDir(), plot.getCsvFileName());
+        if (!plotFile.exists()) {
             return tableData;
         }
         CSVReader reader = null;
         try {
-            reader = new CSVReader(new FileReader(tableFile));
-            tableData = (ArrayList)reader.readAll();
+            reader = new CSVReader(new FileReader(plotFile));
+            // throw away 2 header lines
+            reader.readNext(); reader.readNext();
+            // array containing header titles
+            ArrayList<String> header = new ArrayList<String>();
+            header.add(Messages.Plot_Build() + " #");
+            tableData.add(header);
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                String buildNumber = nextLine[2];
+                if (project.getBuildByNumber(Integer.parseInt(buildNumber)) == null) {
+                    continue;
+                }
+                String seriesLabel = nextLine[1];
+                // index of the column where the value should be located
+                int index = header.lastIndexOf(seriesLabel);
+                if (index <= 0) {
+                    // add header label
+                    index = header.size();
+                    header.add(seriesLabel);
+                }
+                ArrayList<String> tableRow = null;
+                for (int j = 1; j < tableData.size(); j++) {
+                    ArrayList<String> r = tableData.get(j);
+                    if (StringUtils.equals(r.get(0), buildNumber)) {
+                        // found table row corresponding to the build number
+                        tableRow = r;
+                        break;
+                    }
+                }
+                // table row corresponding to the build number not found
+                if (tableRow == null) {
+                    // create table row with build number at first column
+                    tableRow = new ArrayList<String>();
+                    tableRow.add(buildNumber);
+                    tableData.add(tableRow);
+                }
+                // set value at index column
+                String value = nextLine[0];
+                if (index < tableRow.size()) {
+                    tableRow.set(index, value);
+                } else {
+                    for (int j = tableRow.size(); j < index; j++) {
+                        tableRow.add(StringUtils.EMPTY);
+                    }
+                    tableRow.add(value);
+                }
+            }
+            int lastColumn = tableData.get(0).size();
+            for (ArrayList<String> tableRow : tableData) {
+                for (int j = tableRow.size(); j < lastColumn; j++) {
+                    tableRow.add(StringUtils.EMPTY);
+                }
+            }
         } catch (IOException ioe) {
             //ignore
         } finally {

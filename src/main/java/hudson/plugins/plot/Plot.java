@@ -471,14 +471,6 @@ public class Plot implements Comparable {
         
         // save the updated plot data to disk
         savePlotData();
-        
-        // currently only support for csv type
-        if (getSeries() != null) {
-        	Series series = getSeries()[0];
-        	if ("csv".equals(series.getFileType())) {
-        		saveTableData(build, series.getFile());
-        	}
-        }
     }
 
     /**
@@ -743,81 +735,6 @@ public class Plot implements Comparable {
             if (writer != null) {
                 try {
                     writer.close();
-                } catch (IOException ignore) {
-                    //ignore
-                }
-            }
-        }
-    }
-
-    private void saveTableData(AbstractBuild<?,?> build, String fileName) {
-    	ArrayList rawTableData = new ArrayList();
-
-    	File tableFile = new File(project.getRootDir(), "table_"+getCsvFileName());
-    	File rawCSVFile = new File(build.getWorkspace() + File.separator + fileName);
-    	CSVReader existingTableReader = null;
-    	CSVReader newTupleReader = null;
-    	CSVWriter newTableWriter = null;
-    	try {
-    		newTupleReader = new CSVReader(new FileReader(rawCSVFile));
-
-    		// new header including build #
-    		String [] header = newTupleReader.readNext();
-    		String [] headerIncBuild = new String [header.length+1];
-                headerIncBuild[0] = Messages.Plot_build() + " #";
-    		System.arraycopy(header, 0, headerIncBuild, 1, header.length);
-    		
-    		// add a new tuple
-    		String [] tuple = newTupleReader.readNext();
-    		String [] tupleIncBuild = new String [tuple.length+1];
-    		tupleIncBuild[0] = ""+ build.getNumber();
-    		System.arraycopy(tuple, 0, tupleIncBuild, 1, tuple.length);
-    		rawTableData.add (tupleIncBuild);
-
-    		// load existing data
-    		if (tableFile.exists()) {
-    			existingTableReader = new CSVReader(new FileReader(tableFile));
-        		// skip header
-        		existingTableReader.readNext();
-        		
-                int numBuilds;
-                try {
-                    numBuilds = Integer.parseInt(getNumBuilds());
-                } catch (NumberFormatException nfe) {
-                    numBuilds = Integer.MAX_VALUE;
-                }
-                
-        		String [] nextLine;
-        		int count = 0;                
-        		while ((nextLine = existingTableReader.readNext()) != null && count++ < numBuilds-1) {
-                    rawTableData.add(nextLine);
-        		}
-    		}
-    		
-    		// write to CSV file 
-    		newTableWriter = new CSVWriter(new FileWriter(tableFile));
-    		newTableWriter.writeNext(headerIncBuild);
-            newTableWriter.writeAll(rawTableData);
-    	} catch (IOException ioe) {
-            //ignore
-        } finally {
-            if (existingTableReader != null) {
-                try {
-                    existingTableReader.close();
-                } catch (IOException ignore) {
-                    //ignore
-                }
-            }
-            if (newTupleReader != null) {
-                try {
-                    newTupleReader.close();
-                } catch (IOException ignore) {
-                    //ignore
-                }
-            }
-            if (newTableWriter != null) {
-                try {
-                    newTableWriter.close();
                 } catch (IOException ignore) {
                     //ignore
                 }
