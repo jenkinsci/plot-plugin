@@ -350,7 +350,7 @@ public class CSVSeries extends Series {
 		/*
 		 * Check the name first, and do replacement upon it.
 		 */
-		Matcher nameMatcher = PAT_NAME.matcher(label);
+		Matcher nameMatcher = PAT_NAME.matcher(url);
 		if (nameMatcher.find())
 		{
 			url = nameMatcher.replaceAll(label);
@@ -359,7 +359,7 @@ public class CSVSeries extends Series {
 		/*
 		 * Check the index, and do replacement on it.
 		 */
-		Matcher indexMatcher = PAT_INDEX.matcher(label);
+		Matcher indexMatcher = PAT_INDEX.matcher(url);
 		if (indexMatcher.find())
 		{
 			url = indexMatcher.replaceAll(label);
