@@ -8,12 +8,11 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
+import hudson.matrix.MatrixProject;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
-import hudson.model.Build;
 import hudson.model.BuildListener;
-import hudson.model.Project;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
@@ -64,7 +63,7 @@ public class PlotPublisher extends Recorder {
     /**
      * Converts a URL friendly plot group name to the original group name.
      * If the given urlGroup doesn't already exist then the empty string will
-     * be returned. 
+     * be returned.
      */
     public String urlGroupToOriginalGroup(String urlGroup) {
         if (urlGroup == null || "nogroup".equals(urlGroup)) {
@@ -108,7 +107,7 @@ public class PlotPublisher extends Recorder {
 
     /**
      * Replaces the plots managed by this object with the given list.
-     * 
+     *
      * @param plots the new list of plots
      */
     public void setPlots(Plot[] plots) {
@@ -120,8 +119,8 @@ public class PlotPublisher extends Recorder {
     }
 
     /**
-     * Adds the new plot to the plot data structures managed by this object. 
-     * 
+     * Adds the new plot to the plot data structures managed by this object.
+     *
      * @param plot the new plot
      */
     public void addPlot(Plot plot) {
@@ -163,7 +162,7 @@ public class PlotPublisher extends Recorder {
      */
     @Override
     public Action getProjectAction(AbstractProject<?, ?> project) {
-        return project instanceof Project ? new PlotAction((Project) project, this) : null;
+        return new PlotAction(project, this);
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
@@ -184,14 +183,10 @@ public class PlotPublisher extends Recorder {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
             BuildListener listener) throws IOException, InterruptedException {
-        // Should always be a Build due to isApplicable below
-        if (!(build instanceof Build)) {
-            return true;
-        }
         listener.getLogger().println("Recording plot data");
         // add the build to each plot
         for (Plot plot : getPlots()) {
-            plot.addBuild((Build) build, listener.getLogger());
+            plot.addBuild(build, listener.getLogger());
         }
         // misconfigured plots will not fail a build so always return true
         return true;
@@ -211,7 +206,8 @@ public class PlotPublisher extends Recorder {
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {
-            return Project.class.isAssignableFrom(jobType);
+            return AbstractProject.class.isAssignableFrom(jobType)
+                    && !MatrixProject.class.isAssignableFrom(jobType);
         }
 
         /**
@@ -235,7 +231,7 @@ public class PlotPublisher extends Recorder {
         /**
          * Checks if the series file is valid.
          */
-        public FormValidation doCheckSeriesFile(@AncestorInPath AbstractProject project,
+        public FormValidation doCheckSeriesFile(@AncestorInPath AbstractProject<?, ?> project,
                 @QueryParameter String value) throws IOException {
             return FilePath.validateFileMask(project.getSomeWorkspace(), value);
         }
