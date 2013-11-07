@@ -36,7 +36,7 @@ import org.kohsuke.stapler.StaplerRequest;
  *
  * @author Nigel Daley
  */
-public class PlotPublisher extends Recorder {
+public class PlotPublisher extends AbstractPlotPublisher {
 
     private static final Logger LOGGER = Logger.getLogger(PlotPublisher.class.getName());
     /**
@@ -76,20 +76,6 @@ public class PlotPublisher extends Recorder {
             }
         }
         return "";
-    }
-
-    /**
-     * Converts the original plot group name to a URL friendly group name.
-     */
-    public String originalGroupToUrlEncodedGroup(String originalGroup) {
-        return Util.rawEncode(originalGroupToUrlGroup(originalGroup));
-    }
-
-    private String originalGroupToUrlGroup(String originalGroup) {
-        if (originalGroup == null || "".equals(originalGroup)) {
-            return "nogroup";
-        }
-        return originalGroup.replace('/', ' ');
     }
 
     /**
@@ -163,10 +149,6 @@ public class PlotPublisher extends Recorder {
     @Override
     public Action getProjectAction(AbstractProject<?, ?> project) {
         return new PlotAction(project, this);
-    }
-
-    public BuildStepMonitor getRequiredMonitorService() {
-        return BuildStepMonitor.BUILD;
     }
 
     /**
