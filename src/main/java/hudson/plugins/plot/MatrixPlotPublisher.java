@@ -1,29 +1,28 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package hudson.plugins.plot;
 
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixProject;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
-import hudson.model.Build;
 import hudson.model.BuildListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.ObjectUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -34,23 +33,24 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class MatrixPlotPublisher extends AbstractPlotPublisher {
 
-    transient private Map<MatrixConfiguration,List<Plot>> plotsOfConfigurations = new HashMap<MatrixConfiguration, List<Plot>>();
+    transient private Map<MatrixConfiguration, List<Plot>> plotsOfConfigurations = new HashMap<MatrixConfiguration, List<Plot>>();
 
-    transient private HashMap<String, ArrayList<Plot>> groupMap = new HashMap<String, ArrayList<Plot>>();
+    transient private Map<String, List<Plot>> groupMap = new HashMap<String, List<Plot>>();
 
-    private ArrayList<Plot> plots = new ArrayList<Plot>(); //plots setting for matrix project
+    private List<Plot> plots = new ArrayList<Plot>(); //plots setting for matrix project
 
     public String urlGroupToOriginalGroup(String urlGroup, MatrixConfiguration c) {
         if (urlGroup == null || "nogroup".equals(urlGroup)) {
             return "Plots";
         }
         if (groupMap.containsKey(urlGroup)) {
-            ArrayList<Plot> plots = new ArrayList<Plot>();
-            for(Plot plot:groupMap.get(urlGroup)){
-                if(plot.getProject().equals(c))
+            List<Plot> plots = new ArrayList<Plot>();
+            for (Plot plot : groupMap.get(urlGroup)) {
+                if (ObjectUtils.equals(plot.getProject(), c)) {
                     plots.add(plot);
+                }
             }
-            if (plots.size() > 0 ) {
+            if (plots.size() > 0) {
                 return plots.get(0).group;
             }
         }
@@ -60,14 +60,13 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     /**
      * Returns all group names as the original user specified strings.
      */
-    public String[] getOriginalGroups(MatrixConfiguration configuration) {
-        ArrayList<String> originalGroups = new ArrayList<String>();
+    public List<String> getOriginalGroups(MatrixConfiguration configuration) {
+        List<String> originalGroups = new ArrayList<String>();
         for (String urlGroup : groupMap.keySet()) {
-            originalGroups.add(urlGroupToOriginalGroup(urlGroup,configuration));
+            originalGroups.add(urlGroupToOriginalGroup(urlGroup, configuration));
         }
-        String[] retVal = originalGroups.toArray(new String[]{});
-        Arrays.sort(retVal);
-        return retVal;
+        Collections.sort(originalGroups);
+        return originalGroups;
     }
 
     /**
@@ -75,10 +74,9 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
      *
      * @param plots the new list of plots
      */
-    public void setPlots(Plot[] p) {
-        plots = new ArrayList<Plot>();
-        groupMap = new HashMap<String, ArrayList<Plot>>();
-        plots.addAll(Arrays.asList(p));
+    public void setPlots(List<Plot> plots) {
+        this.plots = plots;
+        groupMap = new HashMap<String, List<Plot>>();
         plotsOfConfigurations = new HashMap<MatrixConfiguration, List<Plot>>();
     }
 
@@ -90,53 +88,49 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     public void addPlot(Plot plot) {
         String urlGroup = originalGroupToUrlEncodedGroup(plot.getGroup());
         if (groupMap.containsKey(urlGroup)) {
-                ArrayList<Plot> list = groupMap.get(urlGroup);
-                list.add(plot);
-            } else {
-                ArrayList<Plot> list = new ArrayList<Plot>();
-                list.add(plot);
-                groupMap.put(urlGroup, list);
-            }
-        if(plotsOfConfigurations.get((MatrixConfiguration)plot.getProject())==null){
-            ArrayList<Plot> list = new ArrayList<Plot>();
+            List<Plot> list = groupMap.get(urlGroup);
             list.add(plot);
-            plotsOfConfigurations.put((MatrixConfiguration)plot.getProject(), list);
+        } else {
+            List<Plot> list = new ArrayList<Plot>();
+            list.add(plot);
+            groupMap.put(urlGroup, list);
         }
-        else{
-            plotsOfConfigurations.get((MatrixConfiguration)plot.getProject()).add(plot);
+        if (plotsOfConfigurations.get((MatrixConfiguration) plot.getProject()) == null) {
+            List<Plot> list = new ArrayList<Plot>();
+            list.add(plot);
+            plotsOfConfigurations.put((MatrixConfiguration) plot.getProject(), list);
+        } else {
+            plotsOfConfigurations.get((MatrixConfiguration) plot.getProject()).add(plot);
         }
     }
 
     /**
      * Returns the entire list of plots managed by this object.
      */
-    public Plot[] getPlots(MatrixConfiguration configuration) {
-        List<Plot> configurationPlots = plotsOfConfigurations.get(configuration);
-        if(configurationPlots==null){
-            return new Plot[]{};
-        }
-        return plotsOfConfigurations.get(configuration).toArray(new Plot[]{});
+    public List<Plot> getPlots(MatrixConfiguration configuration) {
+        List<Plot> p = plotsOfConfigurations.get(configuration);
+        return (p != null) ? p : new ArrayList<Plot>();
     }
 
-    public Plot[] getPlots(){
-        Plot[] p = plots.toArray(new Plot[]{});
-        return p;
+    public List<Plot> getPlots() {
+        return plots;
     }
 
     /**
-     * Returns the list of plots with the given group name.  The given
+     * Returns the list of plots with the given group name. The given
      * group must be the URL friendly form of the group name.
      */
-    public Plot[] getPlots(String urlGroup, MatrixConfiguration configuration) {
+    public List<Plot> getPlots(String urlGroup, MatrixConfiguration configuration) {
         List<Plot> groupPlots = new ArrayList<Plot>();
         List<Plot> p = groupMap.get(urlGroup);
         if (p != null) {
-            for(Plot plot:p){
-                if(plot.getProject().equals(configuration))
+            for (Plot plot : p) {
+                if (ObjectUtils.equals(plot.getProject(), configuration)) {
                     groupPlots.add(plot);
+                }
             }
         }
-        return groupPlots.toArray(new Plot[]{});
+        return groupPlots;
     }
 
     /**
@@ -144,22 +138,22 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
      */
     @Override
     public Action getProjectAction(AbstractProject<?, ?> project) {
-        if(project instanceof MatrixConfiguration){
+        if (project instanceof MatrixConfiguration) {
             return new MatrixPlotAction((MatrixConfiguration) project, this);
         }
         return null;
     }
 
     @Override
-    public boolean prebuild(AbstractBuild<?, ?> build,BuildListener listener){
-            if(!plotsOfConfigurations.containsKey((MatrixConfiguration)build.getProject())){
-                for(Plot p:plots){
-                    Plot plot = new Plot(p.title,p.yaxis, p.group, p.numBuilds, p.csvFileName, p.style, p.useDescr);
-                    plot.series=p.series;
-                    plot.setProject((MatrixConfiguration)build.getProject());
-                    addPlot(plot);
-                }
+    public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
+        if (!plotsOfConfigurations.containsKey((MatrixConfiguration) build.getProject())) {
+            for (Plot p : plots) {
+                Plot plot = new Plot(p.title, p.yaxis, p.group, p.numBuilds, p.csvFileName, p.style, p.useDescr);
+                plot.series = p.series;
+                plot.setProject((MatrixConfiguration) build.getProject());
+                addPlot(plot);
             }
+        }
         return true;
     }
 
@@ -167,14 +161,14 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
             BuildListener listener) throws IOException, InterruptedException {
         // Should always be a Build due to isApplicable below
-        if (!(build instanceof Build)) {
+        if (!(build instanceof MatrixBuild)) {
             return true;
         }
         listener.getLogger().println("Recording plot data");
 
         // add the build to each plot
-        for(Plot plot: plotsOfConfigurations.get((MatrixConfiguration)build.getProject())){
-            plot.addBuild((Build) build, listener.getLogger());
+        for (Plot plot : plotsOfConfigurations.get((MatrixConfiguration) build.getProject())) {
+            plot.addBuild(build, listener.getLogger());
         }
         // misconfigured plots will not fail a build so always return true
         return true;
@@ -184,15 +178,14 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
      * Setup the groupMap upon deserialization.
      */
     private Object readResolve() {
-        Plot[] p = plots.toArray(new Plot[]{});
-        setPlots(p);
+        setPlots(plots);
         return this;
     }
 
     @Extension
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
-     /**
+    /**
      * Called by Jenkins.
      */
     @Override
@@ -221,12 +214,11 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
         @Override
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             MatrixPlotPublisher publisher = new MatrixPlotPublisher();
-            ArrayList<Plot> plots = new ArrayList<Plot>();
+            List<Plot> plots = new ArrayList<Plot>();
             for (Object data : SeriesFactory.getArray(formData.get("plots"))) {
                 plots.add(bindPlot((JSONObject) data, req));
             }
-            Plot pl[] = plots.toArray(new Plot[]{});
-            publisher.setPlots(pl);
+            publisher.setPlots(plots);
             return publisher;
         }
 

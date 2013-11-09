@@ -10,23 +10,25 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.logging.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Test a CSV series.
- * 
+ *
  * @author Allen Reese
  *
  */
 public class CSVSeriesTest extends SeriesTestCase {
     private static transient final Logger LOGGER = Logger.getLogger(CSVSeriesTest.class.getName());
-    
+
     private static final String[] files = {
 		"test.csv",
 	};
-	
+
 	private static final String[] labels = {
 		"testLabel",
 	};
@@ -36,13 +38,13 @@ public class CSVSeriesTest extends SeriesTestCase {
 		// first create a FilePath to load the test Properties file.
 		File workspaceDirFile = new File ("target/test-classes/");
 		FilePath workspaceRootDir = new FilePath (workspaceDirFile);
-		
+
 		LOGGER.info("workspace File path: " + workspaceDirFile.getAbsolutePath());
 		LOGGER.info("workspace Dir path: " + workspaceRootDir.getName());
-		
+
 		// Check the number of columns
 		int columns = -1;
-		
+
 		try {
 			columns = getNumColumns(workspaceRootDir, files[0]);
 		} catch (IOException e) {
@@ -50,20 +52,20 @@ public class CSVSeriesTest extends SeriesTestCase {
 		} catch (InterruptedException e) {
 			assertFalse(true);
 		}
-		
+
 		// Create a new CSV series.
 		CSVSeries series = new CSVSeries(files[0], null, "OFF", "", false);
-	
+
 		LOGGER.info("Created series " + series.toString());
 		// test the basic subclass properties.
 		testSeries(series, files[0], "", "csv");
-		
+
 		// load the series.
-		PlotPoint[] points = series.loadSeries(workspaceRootDir, System.out);
-		LOGGER.info("Got " + points.length + " plot points");
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
 		testPlotPoints(points, columns);
 	}
-	
+
 	private int getNumColumns(FilePath workspaceRootDir, String file) throws IOException, InterruptedException
 	{
 		CSVReader csvreader = null;
@@ -78,9 +80,9 @@ public class CSVSeriesTest extends SeriesTestCase {
 				LOGGER.info("No plot data file found: " + workspaceRootDir.getName() + " " + file);
 			    return -1;
 			}
-			
+
 			LOGGER.info("Loading plot series data from: " + file);
-				
+
 			in = seriesFiles[0].read();
 
 			inputReader = new InputStreamReader(in);
@@ -95,20 +97,10 @@ public class CSVSeriesTest extends SeriesTestCase {
 			try {
 	        	if (csvreader != null)
 	        		csvreader.close();
-			} catch (IOException e) {
+                } catch (IOException e) {
 			}
-			
-			try {
-	        	if (inputReader != null)
-	        		inputReader.close();
-			} catch (IOException e) {
-			}
-
-			try {
-	        	if (in != null)
-	        		in.close();
-			} catch (IOException e) {
-			}
+            IOUtils.closeQuietly(inputReader);
+            IOUtils.closeQuietly(in);
 		}
 	}
 }

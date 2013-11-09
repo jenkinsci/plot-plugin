@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.  
+ * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.
  * Copyrights licensed under the MIT License.
  */
 package hudson.plugins.plot;
@@ -8,15 +8,17 @@ import hudson.model.AbstractProject;
 import hudson.model.Action;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * Project action to display plots.
- * 
+ *
  * @author Nigel Daley
  */
 public class PlotAction implements Action, StaplerProxy {
@@ -48,37 +50,37 @@ public class PlotAction implements Action, StaplerProxy {
 
     // called from PlotAction/index.jelly
     public boolean hasPlots() throws IOException {
-        return publisher.getPlots().length != 0;
+        return CollectionUtils.isNotEmpty(publisher.getPlots());
     }
-    
+
     // called from PlotAction/index.jelly
-    public String[] getOriginalGroups() {
+    public List<String> getOriginalGroups() {
     	return publisher.getOriginalGroups();
     }
-    
+
     // called from PlotAction/index.jelly
     public String getUrlGroup(String originalGroup) {
     	return publisher.originalGroupToUrlEncodedGroup(originalGroup);
-    } 
-    
-    // called from href created in PlotAction/index.jelly    
-    public PlotReport getDynamic(String group, StaplerRequest req, 
-    		StaplerResponse rsp) throws IOException 
+    }
+
+    // called from href created in PlotAction/index.jelly
+    public PlotReport getDynamic(String group, StaplerRequest req,
+    		StaplerResponse rsp) throws IOException
     {
-    	return new PlotReport(project, 
+    	return new PlotReport(project,
                        publisher.urlGroupToOriginalGroup(getUrlGroup(group)),
                        publisher.getPlots(getUrlGroup(group)));
     }
-    
+
     /**
-     * If there's only one plot category, simply display that 
+     * If there's only one plot category, simply display that
      * category of reports on this view.
      */
     public Object getTarget() {
-    	String[] groups = getOriginalGroups();
-    	if (groups != null && groups.length == 1) {
-    		return new PlotReport(project, groups[0], 
-        			publisher.getPlots(getUrlGroup(groups[0])));
+        List<String> groups = getOriginalGroups();
+        if (groups != null && groups.size() == 1) {
+            return new PlotReport(project, groups.get(0),
+                    publisher.getPlots(getUrlGroup(groups.get(0))));
     	} else {
     		return this;
     	}

@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2009 Yahoo! Inc.  All rights reserved.
  * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-  
+
 package hudson.plugins.plot;
 
 import hudson.FilePath;
@@ -23,22 +23,25 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 
 import au.com.bytecode.opencsv.CSVReader;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Represents a plot data series configuration from an CSV file.
- * 
+ *
  * @author Allen Reese
  *
  */
 public class CSVSeries extends Series {
-    private static transient final Logger LOGGER = Logger.getLogger(Series.class.getName());
+    private static transient final Logger LOGGER = Logger.getLogger(CSVSeries.class.getName());
     // Debugging hack, so I don't have to change FINE/INFO...
     private static transient final Level defaultLogLevel = Level.FINEST;
-    private static transient final Pattern PAT_COMMA = Pattern.compile(","); 
+    private static transient final Pattern PAT_COMMA = Pattern.compile(",");
 	private static transient final Pattern PAT_NAME = Pattern.compile("%name%");
 	private static transient final Pattern PAT_INDEX = Pattern.compile("%index%");
-	
+
 	public static enum InclusionFlag
 	{
 		OFF,
@@ -57,26 +60,26 @@ public class CSVSeries extends Series {
 	 * Set for excluding values by column #
 	 */
 	private Set<Integer> colExclusionSet;
-	
+
 	/**
 	 * Flag controlling how values are excluded.
 	 */
 	private InclusionFlag inclusionFlag = InclusionFlag.OFF;
-	
+
 	/**
 	 * Comma separated list of columns to exclude.
 	 */
 	private String exclusionValues;
 
 	/**
-	 * Url to use as a base for mapping points. 
+	 * Url to use as a base for mapping points.
 	 */
 	private String url;
-	
+
 	private boolean displayTableFlag;
 
 	/**
-	 * 
+	 *
 	 * @param file
 	 * @param label
 	 * @param req Stapler request
@@ -87,7 +90,7 @@ public class CSVSeries extends Series {
     public CSVSeries(String file, String url, String inclusionFlag, String exclusionValues, boolean displayTableFlag)
     {
     	super(file, "", "csv");
-    	
+
     	this.url = url;
 
     	if (exclusionValues == null)
@@ -104,7 +107,7 @@ public class CSVSeries extends Series {
     }
 
     public String getInclusionFlag() {
-        return inclusionFlag.toString();
+        return ObjectUtils.toString(inclusionFlag);
     }
 
     public String getExclusionValues() {
@@ -114,7 +117,7 @@ public class CSVSeries extends Series {
     public String getUrl() {
         return url;
     }
-	
+
     public boolean getDisplayTableFlag() {
     	return displayTableFlag;
     }
@@ -123,40 +126,40 @@ public class CSVSeries extends Series {
      * Load the series from a properties file.
      */
 	@Override
-	public PlotPoint[] loadSeries(FilePath workspaceRootDir, PrintStream logger) {
+    public List<PlotPoint> loadSeries(FilePath workspaceRootDir, PrintStream logger) {
         CSVReader reader = null;
 		InputStream in = null;
 		InputStreamReader inputReader = null;
-		
+
         try {
 			List<PlotPoint> ret = new ArrayList<PlotPoint>();
-	
+
 			FilePath[] seriesFiles = null;
 	        try {
 	            seriesFiles = workspaceRootDir.list(getFile());
 	        } catch (Exception e) {
-	        	LOGGER.warning("Exception trying to retrieve series files: " + e);
+                LOGGER.log(Level.SEVERE, "Exception trying to retrieve series files", e);
 	            return null;
 	        }
-	
-	        if (seriesFiles != null && seriesFiles.length < 1) {
+
+            if (ArrayUtils.isEmpty(seriesFiles)) {
 	        	LOGGER.info("No plot data file found: " + workspaceRootDir.getName() + " " + getFile());
 	            return null;
 	        }
-	        
+
 	        try {
             	if (LOGGER.isLoggable(defaultLogLevel))
 	        		LOGGER.log(defaultLogLevel,"Loading plot series data from: " + getFile());
-	        	
+
 	            in = seriesFiles[0].read();
 	        } catch (Exception e) {
-	        	LOGGER.warning("Exception reading plot series data from: " + seriesFiles[0] + " " + e);
+                LOGGER.log(Level.SEVERE, "Exception reading plot series data from " + seriesFiles[0], e);
 	            return null;
 	        }
-	
+
         	if (LOGGER.isLoggable(defaultLogLevel))
         		LOGGER.log(defaultLogLevel,"Loaded CSV Plot file: " + getFile());
-	    	
+
 	        // load existing plot file
         	inputReader = new InputStreamReader(in);
             reader = new CSVReader(inputReader);
@@ -172,31 +175,31 @@ public class CSVSeries extends Series {
             	// skip empty lines
             	if (nextLine.length==1 && nextLine[0].length()==0)
             		continue;
-            	
+
             	for (int index = 0; index < nextLine.length; index++)
             	{
                 	String yvalue;
                 	String label = null;
-                	
+
                 	if (index > nextLine.length)
                 		continue;
-                	
+
                 	yvalue = nextLine[index];
 
                 	if (index < headerLine.length)
                 		label = headerLine[index];
-                	
+
                 	if (label == null || label.length()<=0)
                 	{
                 		// if there isn't a label, use the index as the label
-                		label = "" + index; 
+                		label = "" + index;
                 	}
-                	
+
                 	//LOGGER.finest("Loaded point: " + point);
-                	
+
             		// create a new point with the yvalue from the csv file and url from the URL_index in the properties file.
                 	if (!excludePoint(label,index)) {
-                		PlotPoint point = new PlotPoint(yvalue, getUrl(label,index), label); 
+                		PlotPoint point = new PlotPoint(yvalue, getUrl(label,index), label);
                     	if (LOGGER.isLoggable(defaultLogLevel))
                     		LOGGER.log(defaultLogLevel,"CSV Point: [" +index + ":" + lineNum +"]"+ point);
                 		ret.add(point);
@@ -205,32 +208,14 @@ public class CSVSeries extends Series {
                     		LOGGER.log(defaultLogLevel,"excluded CSV Column: " + index + " : " + label);
                 	}
             	}
-            	++lineNum;
+                lineNum++;
             }
-        
-            return ret.toArray(new PlotPoint[ret.size()]);
+
+            return ret;
 
         } catch (IOException ioe) {
-            //ignore
-        	if (LOGGER.isLoggable(defaultLogLevel))
-        		LOGGER.log(defaultLogLevel,"Exception: " + ioe);
+            LOGGER.log(Level.SEVERE, "Exception loading series", ioe);
         } finally {
-        	if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException ignore) {
-                    //ignore
-                }
-        	}
-        	
-        	if (inputReader != null) {
-                try {
-                	inputReader.close();
-                } catch (IOException ignore) {
-                    //ignore
-                }
-            }
-
         	if (reader != null) {
                 try {
                     reader.close();
@@ -238,6 +223,8 @@ public class CSVSeries extends Series {
                     //ignore
                 }
             }
+            IOUtils.closeQuietly(inputReader);
+            IOUtils.closeQuietly(in);
         }
 
         return null;
@@ -252,21 +239,21 @@ public class CSVSeries extends Series {
 	{
 		if (inclusionFlag == null || inclusionFlag == InclusionFlag.OFF)
 			return false;
-		
+
 		boolean retVal=false;
-		
+
 		switch (inclusionFlag)
 		{
 			case INCLUDE_BY_STRING:
 				// if the set contains it, don't exclude it.
 				retVal = !(strExclusionSet.contains(label));
 				break;
-				
+
 			case EXCLUDE_BY_STRING:
 				// if the set doesn't contain it, exclude it.
 				retVal = strExclusionSet.contains(label);
 				break;
-				
+
 			case INCLUDE_BY_COLUMN:
 				// if the set contains it, don't exclude it.
 				retVal = !(colExclusionSet.contains(Integer.valueOf(index)));
@@ -277,13 +264,13 @@ public class CSVSeries extends Series {
 				retVal = colExclusionSet.contains(Integer.valueOf(index));
 				break;
 		}
-		
+
     	if (LOGGER.isLoggable(Level.FINEST))
     		LOGGER.finest(((retVal)?"excluded":"included") + " CSV Column: " + index + " : " + label);
-		
+
 		return retVal;
 	}
-	
+
 	/**
 	 * This function loads the set of columns that should be included or excluded.
 	 */
@@ -291,20 +278,20 @@ public class CSVSeries extends Series {
 	{
 		if (inclusionFlag == InclusionFlag.OFF)
 			return;
-		
+
 		if (exclusionValues == null)
 		{
 			inclusionFlag = InclusionFlag.OFF;
 			return;
 		}
-		
-		switch (inclusionFlag) 
+
+		switch (inclusionFlag)
 		{
 			case INCLUDE_BY_STRING:
 			case EXCLUDE_BY_STRING:
 				strExclusionSet = new HashSet<String>();
 				break;
-				
+
 			case INCLUDE_BY_COLUMN:
 			case EXCLUDE_BY_COLUMN:
 				colExclusionSet = new HashSet<Integer>();
@@ -315,8 +302,8 @@ public class CSVSeries extends Series {
 		{
 			if (str==null || str.length()<=0)
 				continue;
-			
-			switch (inclusionFlag) 
+
+			switch (inclusionFlag)
 			{
 				case INCLUDE_BY_STRING:
 				case EXCLUDE_BY_STRING:
@@ -324,7 +311,7 @@ public class CSVSeries extends Series {
                 		LOGGER.finest(inclusionFlag + " CSV Column: " + str);
 					strExclusionSet.add(str);
 					break;
-					
+
 				case INCLUDE_BY_COLUMN:
 				case EXCLUDE_BY_COLUMN:
 					try {
@@ -332,13 +319,13 @@ public class CSVSeries extends Series {
                     		LOGGER.finest(inclusionFlag + " CSV Column: " + str);
 						colExclusionSet.add(Integer.valueOf(str));
 					} catch (NumberFormatException nfe) {
-						// ignore badly formatted columns.
+                        LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
 					}
 					break;
 			}
 		}
 	}
-	
+
 	/**
 	 * Return the url that should be used for this point.
 	 * @param label Name of the column
@@ -364,7 +351,7 @@ public class CSVSeries extends Series {
 		{
 			url = indexMatcher.replaceAll(label);
 		}
-		
+
 		return url;
 	}
 }

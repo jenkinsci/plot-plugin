@@ -5,9 +5,10 @@
 
 package hudson.plugins.plot;
 
-import java.io.PrintStream;
-
 import hudson.FilePath;
+
+import java.io.PrintStream;
+import java.util.List;
 
 /**
  * Represents a plot data series configuration.
@@ -15,7 +16,7 @@ import hudson.FilePath;
  * @author Nigel Daley
  * @author Allen Reese
  */
-public class Series {
+public abstract class Series {
     /**
      * Relative path to the data series property file. Mandatory.
      */
@@ -29,21 +30,21 @@ public class Series {
     /**
      * Data series type. Mandatory.
      * This can be csv, xml, or properties file.
-     * This should be an enum, but I am not sure how to support that with stapler at the moment 
+     * This should be an enum, but I am not sure how to support that with stapler at the moment
      */
     protected String fileType;
-    
+
     protected Series(String file, String label, String fileType) {
-        this.file = file; 
+        this.file = file;
 
         // TODO: look into this, what do we do if there is no label?
         if (label == null)
 			label = Messages.Plot_Missing();
-        
+
         this.label = label;
         this.fileType = fileType;
     }
-    
+
     public String getFile() {
         return file;
     }
@@ -53,18 +54,15 @@ public class Series {
     public String getFileType() {
         return fileType;
     }
-    
+
     /**
      * Retrieves the plot data for one series after a build from the workspace.
-     * 
+     *
      * @param workspaceRootDir the root directory of the workspace
      * @param logger the logger to use
      * @return a PlotPoint array of points to plot
      */
-    public PlotPoint[] loadSeries(FilePath workspaceRootDir, PrintStream logger)
-    {
-    	return null;
-    }
+    public abstract List<PlotPoint> loadSeries(FilePath workspaceRootDir, PrintStream logger);
 
     // Convert data from before version 1.3
     private Object readResolve() {

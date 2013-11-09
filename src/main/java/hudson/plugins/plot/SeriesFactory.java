@@ -5,13 +5,16 @@
 
 package hudson.plugins.plot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * This class creates a Series class based on the data source
- * 
+ *
  * @author areese, Alan.Harder@sun.com
  */
 public class SeriesFactory {
@@ -35,12 +38,11 @@ public class SeriesFactory {
         return typeClass!=null ? req.bindJSON(typeClass, formData) : null;
     }
 
-    public static Series[] createSeriesList(Object data, StaplerRequest req) {
+    public static List<Series> createSeriesList(Object data, StaplerRequest req) {
         JSONArray list = getArray(data);
-        Series[] result = new Series[list.size()];
-        int i = 0;
+        List<Series> result = new ArrayList<Series>();
         for (Object series : list) {
-            result[i++] = createSeries((JSONObject)series, req);
+            result.add(createSeries((JSONObject) series, req));
         }
         return result;
     }

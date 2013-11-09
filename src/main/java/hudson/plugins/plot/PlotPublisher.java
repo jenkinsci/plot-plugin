@@ -7,26 +7,25 @@ package hudson.plugins.plot;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.Util;
 import hudson.matrix.MatrixProject;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.tasks.BuildStepDescriptor;
-import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
-import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
-
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.CollectionUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -43,20 +42,19 @@ public class PlotPublisher extends AbstractPlotPublisher {
      * Array of Plot objects that represent the job's configured
      * plots; must be non-null
      */
-    private ArrayList<Plot> plots = new ArrayList<Plot>();
+    private List<Plot> plots = new ArrayList<Plot>();
     /**
      * Maps plot groups to plot objects; group strings are in a
      * URL friendly format; map must be non-null
      */
-    transient private HashMap<String, ArrayList<Plot>> groupMap =
-            new HashMap<String, ArrayList<Plot>>();
+    transient private Map<String, List<Plot>> groupMap =
+            new HashMap<String, List<Plot>>();
 
     /**
      * Setup the groupMap upon deserialization.
      */
     private Object readResolve() {
-        Plot[] p = plots.toArray(new Plot[]{});
-        setPlots(p);
+        setPlots(plots);
         return this;
     }
 
@@ -70,8 +68,8 @@ public class PlotPublisher extends AbstractPlotPublisher {
             return "Plots";
         }
         if (groupMap.containsKey(urlGroup)) {
-            ArrayList<Plot> plots = groupMap.get(urlGroup);
-            if (plots.size() > 0) {
+            List<Plot> plots = groupMap.get(urlGroup);
+            if (CollectionUtils.isNotEmpty(plots)) {
                 return plots.get(0).group;
             }
         }
@@ -81,14 +79,13 @@ public class PlotPublisher extends AbstractPlotPublisher {
     /**
      * Returns all group names as the original user specified strings.
      */
-    public String[] getOriginalGroups() {
-        ArrayList<String> originalGroups = new ArrayList<String>();
+    public List<String> getOriginalGroups() {
+        List<String> originalGroups = new ArrayList<String>();
         for (String urlGroup : groupMap.keySet()) {
             originalGroups.add(urlGroupToOriginalGroup(urlGroup));
         }
-        String[] retVal = originalGroups.toArray(new String[]{});
-        Arrays.sort(retVal);
-        return retVal;
+        Collections.sort(originalGroups);
+        return originalGroups;
     }
 
     /**
@@ -96,9 +93,9 @@ public class PlotPublisher extends AbstractPlotPublisher {
      *
      * @param plots the new list of plots
      */
-    public void setPlots(Plot[] plots) {
+    public void setPlots(List<Plot> plots) {
         this.plots = new ArrayList<Plot>();
-        groupMap = new HashMap<String, ArrayList<Plot>>();
+        groupMap = new HashMap<String, List<Plot>>();
         for (Plot plot : plots) {
             addPlot(plot);
         }
@@ -115,10 +112,10 @@ public class PlotPublisher extends AbstractPlotPublisher {
         // update the group-to-plot map
         String urlGroup = originalGroupToUrlEncodedGroup(plot.getGroup());
         if (groupMap.containsKey(urlGroup)) {
-            ArrayList<Plot> list = groupMap.get(urlGroup);
+            List<Plot> list = groupMap.get(urlGroup);
             list.add(plot);
         } else {
-            ArrayList<Plot> list = new ArrayList<Plot>();
+            List<Plot> list = new ArrayList<Plot>();
             list.add(plot);
             groupMap.put(urlGroup, list);
         }
@@ -127,20 +124,17 @@ public class PlotPublisher extends AbstractPlotPublisher {
     /**
      * Returns the entire list of plots managed by this object.
      */
-    public Plot[] getPlots() {
-        return plots.toArray(new Plot[]{});
+    public List<Plot> getPlots() {
+        return plots;
     }
 
     /**
      * Returns the list of plots with the given group name.  The given
      * group must be the URL friendly form of the group name.
      */
-    public Plot[] getPlots(String urlGroup) {
-        ArrayList<Plot> p = groupMap.get(urlGroup);
-        if (p != null) {
-            return p.toArray(new Plot[]{});
-        }
-        return new Plot[]{};
+    public List<Plot> getPlots(String urlGroup) {
+        List<Plot> p = groupMap.get(urlGroup);
+        return (p != null) ? p : new ArrayList<Plot>();
     }
 
     /**

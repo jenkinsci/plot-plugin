@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.  
+ * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.
  * Copyrights licensed under the MIT License.
  */
 package hudson.plugins.plot;
@@ -9,7 +9,8 @@ import hudson.model.AbstractProject;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
@@ -18,30 +19,31 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import au.com.bytecode.opencsv.CSVReader;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
  * Represents a plot report for a single group of plots.
- * 
+ *
  * @author Nigel Daley
  */
 public class PlotReport {
 	private static final Logger LOGGER = Logger.getLogger(PlotReport.class.getName());
-	
+
     private final AbstractProject<?, ?> project;
-    
+
 	/**
 	 * The sorted list of plots that belong to the same group.
 	 */
-	private Plot[] plots;
-	
+    private List<Plot> plots;
+
 	/**
 	 * The group these plots belong to.
 	 */
 	private String group;
-	
-	public PlotReport(AbstractProject<?, ?> project, String group, Plot[] plots) {
-		Arrays.sort(plots);
+
+    public PlotReport(AbstractProject<?, ?> project, String group, List<Plot> plots) {
+        Collections.sort(plots);
 		this.plots = plots;
 		this.group = group;
 		this.project = project;
@@ -56,12 +58,12 @@ public class PlotReport {
     public String getGroup() {
         return group;
     }
-    
+
     // called from PlotReport/index.jelly
-	public Plot[] getPlots() {
+    public List<Plot> getPlots() {
 		return plots;
 	}
-	
+
 	// called from PlotReport/index.jelly
 	public void doGetPlot(StaplerRequest req, StaplerResponse rsp) {
 		String i = req.getParameter("index");
@@ -69,10 +71,10 @@ public class PlotReport {
 		try {
 			plot.plotGraph(req,rsp);
 		} catch (IOException ioe) {
-			LOGGER.log(Level.INFO,"Exception plotting graph",ioe);
+            LOGGER.log(Level.SEVERE, "Exception plotting graph", ioe);
 		}
 	}
-	
+
 	// called from PlotReport/index.jelly
 	public void doGetPlotMap(StaplerRequest req, StaplerResponse rsp) {
 		String i = req.getParameter("index");
@@ -80,27 +82,27 @@ public class PlotReport {
 		try {
 			plot.plotGraphMap(req,rsp);
 		} catch (IOException ioe) {
-			LOGGER.log(Level.INFO,"Exception plotting graph",ioe);
+            LOGGER.log(Level.SEVERE, "Exception plotting graph", ioe);
 		}
 	}
 
-	// called from PlotReport/index.jelly
-	public boolean getDisplayTableFlag(int i) {
-		Plot plot = getPlot(Integer.toString(i));
+    // called from PlotReport/index.jelly
+    public boolean getDisplayTableFlag(int i) {
+        Plot plot = getPlot(i);
 
-		if (plot.getSeries()!=null) {
-    	    Series series = plot.getSeries()[0];
-    	    return (series instanceof CSVSeries) && ((CSVSeries)series).getDisplayTableFlag();
+        if (CollectionUtils.isNotEmpty(plot.getSeries())) {
+            Series series = plot.getSeries().get(0);
+            return (series instanceof CSVSeries) && ((CSVSeries) series).getDisplayTableFlag();
     	}
-    	return false;
-	}
-	
+        return false;
+    }
+
 	// called from PlotReport/index.jelly
-    public ArrayList getTable(int i) {
-    	ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
-    	
-    	Plot plot = getPlot(""+i);
-    	
+    public List<List<String>> getTable(int i) {
+        List<List<String>> tableData = new ArrayList<List<String>>();
+
+        Plot plot = getPlot(i);
+
         // load existing csv file
         File plotFile = new File(project.getRootDir(), plot.getCsvFileName());
         if (!plotFile.exists()) {
@@ -112,7 +114,7 @@ public class PlotReport {
             // throw away 2 header lines
             reader.readNext(); reader.readNext();
             // array containing header titles
-            ArrayList<String> header = new ArrayList<String>();
+            List<String> header = new ArrayList<String>();
             header.add(Messages.Plot_Build() + " #");
             tableData.add(header);
             String[] nextLine;
@@ -129,9 +131,9 @@ public class PlotReport {
                     index = header.size();
                     header.add(seriesLabel);
                 }
-                ArrayList<String> tableRow = null;
+                List<String> tableRow = null;
                 for (int j = 1; j < tableData.size(); j++) {
-                    ArrayList<String> r = tableData.get(j);
+                    List<String> r = tableData.get(j);
                     if (StringUtils.equals(r.get(0), buildNumber)) {
                         // found table row corresponding to the build number
                         tableRow = r;
@@ -157,12 +159,13 @@ public class PlotReport {
                 }
             }
             int lastColumn = tableData.get(0).size();
-            for (ArrayList<String> tableRow : tableData) {
+            for (List<String> tableRow : tableData) {
                 for (int j = tableRow.size(); j < lastColumn; j++) {
                     tableRow.add(StringUtils.EMPTY);
                 }
             }
         } catch (IOException ioe) {
+            LOGGER.log(Level.SEVERE, "Exception reading csv file", ioe);
             //ignore
         } finally {
             if (reader != null) {
@@ -175,14 +178,18 @@ public class PlotReport {
         }
     	return tableData;
     }
-	
+
+    private Plot getPlot(int i) {
+        Plot p = plots.get(i);
+        p.setProject(project);
+        return p;
+    }
+
     private Plot getPlot(String i) {
     	try {
-    		Plot p = plots[Integer.valueOf(i)];
-    		p.setProject(project);
-    		return p; 
+            return getPlot(Integer.valueOf(i));
     	} catch (NumberFormatException ignore) {
-    		//ignore
+    		LOGGER.log(Level.SEVERE, "Exception converting to integer", ignore);
     		return null;
     	}
     }
