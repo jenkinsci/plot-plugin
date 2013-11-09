@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.  
+ * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.
  * Copyrights licensed under the MIT License.
  */
 package hudson.plugins.plot;
@@ -7,6 +7,7 @@ package hudson.plugins.plot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.jfree.data.category.CategoryDataset;
@@ -16,48 +17,48 @@ import org.jfree.data.general.AbstractDataset;
  * A {@link CategoryDataset} implementation that stores numeric data points
  * and corresponding URLs.  This data structure is basically a table
  * with row and column names (keys).
- * 
+ *
  * @author Nigel Daley
  */
 public class PlotCategoryDataset extends AbstractDataset implements CategoryDataset {
 	private static final long serialVersionUID = 9215482265757674967L;
 
 	private static final Logger LOGGER = Logger.getLogger(PlotCategoryDataset.class.getName());
-	
+
 	class DataElement {
 		public final Number number;
 		public final String url;
 		public DataElement(Number n, String u) {
-			this.number = n; 
-			this.url = u; 
+			this.number = n;
+			this.url = u;
 		}
 	}
-	
+
 	/** The row keys */
-	private ArrayList<Comparable> rowKeys;
+    private List<Comparable> rowKeys;
 
 	/** The column keys */
-	private ArrayList<Comparable> columnKeys;
+    private List<Comparable> columnKeys;
 
 	/** The row data */
-	private ArrayList<HashMap<Comparable,DataElement>> data;
+    private List<Map<Comparable, DataElement>> data;
 
 	/** The max number of builds to plot */
 	private int maxColumns;
-	
+
 	/**
 	 * Creates a new empty instance.
 	 */
 	public PlotCategoryDataset() {
 		this.rowKeys = new ArrayList<Comparable>();
 		this.columnKeys = new ArrayList<Comparable>();
-		this.data = new ArrayList<HashMap<Comparable,DataElement>>();
+        this.data = new ArrayList<Map<Comparable, DataElement>>();
 	}
 
 	/**
 	 * Truncates the dataset to the <i>last</i> <code>maxColumns</code>
 	 * columns.
-	 * 
+	 *
 	 * @param maxColumns the maximum number columns that will appear to
 	 *        be in the dataset.
 	 */
@@ -69,7 +70,7 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
 		if (getColumnCount() > 0) {
 			Comparable lowColumn = getColumnKey(0);
 			for (int i = data.size() - 1 ; i >= 0 ; i--) {
-				HashMap<Comparable,DataElement> row = data.get(i);
+                Map<Comparable, DataElement> row = data.get(i);
 				boolean removeRow = true;
 				for (Comparable column : row.keySet()) {
 					if (column.compareTo(lowColumn) >= 0) {
@@ -85,7 +86,7 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
 			}
 		}
 	}
-	
+
 	// Values2D interface method
 	public int getRowCount() {
 		return rowKeys.size();
@@ -141,11 +142,11 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
 		int lastIndex = Math.max(0, columnKeys.size());
 		return columnKeys.subList(firstIndex, lastIndex);
 	}
-	
+
 	// KeyedValues2D interface method
 	/**
 	 * Gets the value with the given row and column keys.
-	 * 
+	 *
 	 *  @param rowKey the row key
 	 *  @param columnKey the column key
 	 *  @return the value with the given row and column keys
@@ -158,7 +159,7 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
 		if (element == null) return null;
 		return element.number;
 	}
-	
+
 	/**
 	 * Returns the URL at the given row and column.
 	 *
@@ -185,7 +186,7 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
 	 *
 	 * @param value the value to add
 	 * @param url the URL to add and associate with the value
-	 * @param rowKey the row key 
+	 * @param rowKey the row key
 	 * @param columnKey the column key
 	 */
 	public void setValue(Number value, String url, Comparable rowKey, Comparable columnKey) {
