@@ -17,14 +17,18 @@
       <id>nidaley</id>
       <name>Nigel Daley</name>
     </developer>
+    <developer>
+      <id>ericbn</id>
+      <name>Eric Nielsen</name>
+    </developer>
   </developers>
 
   <dependencies>
-        <dependency>
-            <groupId>net.sf.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>1.7</version>
-        </dependency>
+    <dependency>
+      <groupId>net.sf.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+      <version>1.7</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -46,8 +50,8 @@
   </build>
 
   <scm>
-    <connection>scm:git:git://github.com/jenkinsci/plot-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/plot-plugin.git</developerConnection>
+    <connection>scm:git:https://github.com/jenkinsci/plot-plugin.git</connection>
+    <developerConnection>scm:git:https://git@github.com/jenkinsci/plot-plugin.git</developerConnection>
     <url>https://github.com/jenkinsci/plot-plugin</url>
   </scm>
 
