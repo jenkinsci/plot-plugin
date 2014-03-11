@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Ignore;
+import org.junit.Before;
+import org.junit.After;
 
 /**
  * Test an XML series.
@@ -18,162 +20,190 @@ import org.junit.Ignore;
 public class XMLSeriesTest extends SeriesTestCase {
     private static final String TEST_XML_FILE = "test.xml";
     private static final String TEST2_XML_FILE = "test2.xml";
+    private static final String TEST3_XML_FILE = "test3.xml";
 
-	public void testXMLSeriesString2()
-	{
-		// first create a FilePath to load the test Properties file.
-		File workspaceDirFile = new File ("target/test-classes/");
-		FilePath workspaceRootDir = new FilePath (workspaceDirFile);
+    private File workspaceDirFile;
+    private FilePath workspaceRootDir;
 
-		// Create a new XML series.
-		String xpath = "//UIAction/name|//UIAction/numCalls";
-		XMLSeries series = new XMLSeries(TEST2_XML_FILE, xpath, "NODESET", null);
+    @Before
+    public void setUp() {
+        // first create a FilePath to load the test Properties file.
+        workspaceDirFile = new File("target/test-classes/");
+        workspaceRootDir = new FilePath(workspaceDirFile);
+    }
 
-		// test the basic subclass properties.
-		testSeries(series, TEST2_XML_FILE, "", "xml");
+    @After
+    public void tearDown() {
+        workspaceRootDir = null;
+        workspaceDirFile = null;
+    }
 
-		// load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, System.out);
-		assertNotNull(points);
-        assertEquals (4, points.size());
-		Map<String, Integer>  map = new HashMap<String, Integer>();
+    public void testXMLSeries_WhenNodesSharingAParentHaveOneStringAndOneNumericContent_ThenCoalesceNodesToPointLabelledWithStringContent() {
+
+        // Create a new XML series.
+        String xpath = "//UIAction/name|//UIAction/numCalls";
+        XMLSeries series = new XMLSeries(TEST2_XML_FILE, xpath, "NODESET", null);
+
+        // test the basic subclass properties.
+        testSeries(series, TEST2_XML_FILE, "", "xml");
+
+        // load the series.
+        List<PlotPoint> points = series
+                .loadSeries(workspaceRootDir, System.out);
+        assertNotNull(points);
+        assertEquals(4, points.size());
+        Map<String, Double> map = new HashMap<String, Double>();
         for (int i = 0; i < points.size(); i++) {
-            map.put(points.get(i).getLabel(), Integer.parseInt(points.get(i).getYvalue()));
-		}
+            map.put(points.get(i).getLabel(),
+                    Double.parseDouble(points.get(i).getYvalue()));
+        }
 
-		assertEquals (7, map.get("AxTermDataService.updateItem").intValue());
-		assertEquals (2, map.get("AxTermDataService.createEntity").intValue());
-		testPlotPoints(points, 4);
-	}
+        assertEquals(7, map.get("AxTermDataService.updateItem").intValue());
+        assertEquals(2, map.get("AxTermDataService.createEntity").intValue());
+        testPlotPoints(points, 4);
+    }
 
-	public void testXMLSeriesNodesetSubset()
-	{
-		// first create a FilePath to load the test Properties file.
-		File workspaceDirFile = new File ("target/test-classes/");
-		FilePath workspaceRootDir = new FilePath (workspaceDirFile);
+    public void testXMLSeries_WhenNodesHaveNoContent_ThenCoalesceForAttributes() {
+        // Create a new XML series.
+        String xpath = "//testcase[@name='testOne'] | //testcase[@name='testTwo'] | //testcase[@name='testThree']";
 
-		// Create a new XML series.
-		String xpath = "//testcase[@name='testOne'] | //testcase[@name='testTwo'] | //testcase[@name='testThree']";
+        XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NODESET", null);
 
-		XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NODESET", null);
+        // test the basic subclass properties.
+        testSeries(series, TEST_XML_FILE, "", "xml");
 
-		// test the basic subclass properties.
-		testSeries(series, TEST_XML_FILE, "", "xml");
-
-		// load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, System.out);
-		assertNotNull(points);
+        // load the series.
+        List<PlotPoint> points = series
+                .loadSeries(workspaceRootDir, System.out);
+        assertNotNull(points);
         assertEquals(points.size(), 3);
         assertEquals(points.get(0).getLabel(), "testOne");
         assertEquals(points.get(1).getLabel(), "testTwo");
         assertEquals(points.get(2).getLabel(), "testThree");
-		testPlotPoints(points, 3);
-	}
+        testPlotPoints(points, 3);
+    }
 
-	public void testXMLSeriesNodeset()
-	{
-		// first create a FilePath to load the test Properties file.
-		File workspaceDirFile = new File ("target/test-classes/");
-		FilePath workspaceRootDir = new FilePath (workspaceDirFile);
+    public void testXMLSeriesNodeset() {
+        // Create a new XML series.
+        String xpath = "//testcase";
 
-		// Create a new XML series.
-		String xpath = "//testcase";
+        XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NODESET", null);
 
-		XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NODESET", null);
+        // test the basic subclass properties.
+        testSeries(series, TEST_XML_FILE, "", "xml");
 
-		// test the basic subclass properties.
-		testSeries(series, TEST_XML_FILE, "", "xml");
-
-		// load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, System.out);
-		assertNotNull(points);
+        // load the series.
+        List<PlotPoint> points = series
+                .loadSeries(workspaceRootDir, System.out);
+        assertNotNull(points);
         assertEquals(4, points.size());
         assertEquals(points.get(0).getLabel(), "testOne");
         assertEquals(points.get(1).getLabel(), "testTwo");
         assertEquals(points.get(2).getLabel(), "testThree");
         assertEquals(points.get(3).getLabel(), "testFour");
         assertEquals(points.get(3).getYvalue(), "1234.56");
-		testPlotPoints(points, 4);
-	}
+        testPlotPoints(points, 4);
+    }
 
-	public void testXMLSeriesNode()
-	{
-		// first create a FilePath to load the test Properties file.
-		File workspaceDirFile = new File ("target/test-classes/");
-		FilePath workspaceRootDir = new FilePath (workspaceDirFile);
+    public void testXMLSeries_WhenAllNodesAreNumeric_ThenPointsAreLabelledWithNodeName() {
+        // Create a new XML series.
+        String xpath = "/results/testcase/*";
 
-		// Create a new XML series.
-		String xpath = "//testcase[@name='testThree']";
-		XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NODE", null);
+        XMLSeries series = new XMLSeries(TEST3_XML_FILE, xpath, "NODESET", null);
 
-		// test the basic subclass properties.
-		testSeries(series, TEST_XML_FILE, "", "xml");
+        // test the basic subclass properties.
+        testSeries(series, TEST3_XML_FILE, "", "xml");
 
-		// load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, System.out);
-		assertNotNull(points);
-        assertEquals (points.size(), 1);
-        assertEquals (points.get(0).getYvalue(), "27");
-		testPlotPoints(points, 1);
-	}
+        // load the series.
+        List<PlotPoint> points = series
+                .loadSeries(workspaceRootDir, System.out);
+        assertNotNull(points);
+        assertEquals(2, points.size());
+        assertEquals(points.get(0).getLabel(), "one");
+        assertEquals(points.get(0).getYvalue(), "0.521");
+        testPlotPoints(points, 2);
+    }
 
-	public void testXMLSeriesString()
-	{
-		// first create a FilePath to load the test Properties file.
-		File workspaceDirFile = new File ("target/test-classes/");
-		FilePath workspaceRootDir = new FilePath (workspaceDirFile);
+    public void testXMLSeriesEmptyNodeset() {
+        // Create a new XML series.
+        String xpath = "/there/is/no/such/element";
 
-		// Create a new XML series.
-		String xpath = "//testcase[@name='testOne']/@time";
-		XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "STRING", null);
+        XMLSeries series = new XMLSeries(TEST3_XML_FILE, xpath, "NODESET", null);
 
-		// test the basic subclass properties.
-		testSeries(series, TEST_XML_FILE, "", "xml");
+        // test the basic subclass properties.
+        testSeries(series, TEST3_XML_FILE, "", "xml");
 
-		// load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, System.out);
-		assertNotNull(points);
-		testPlotPoints(points, 1);
-	}
+        // load the series.
+        List<PlotPoint> points = series
+                .loadSeries(workspaceRootDir, System.out);
+        assertNotNull(points);
+        assertEquals(0, points.size());
+        testPlotPoints(points, 0);
+    }
 
-	public void testXMLSeriesNumber()
-	{
-		// first create a FilePath to load the test Properties file.
-		File workspaceDirFile = new File ("target/test-classes/");
-		FilePath workspaceRootDir = new FilePath (workspaceDirFile);
+    public void testXMLSeriesNode() {
+        // Create a new XML series.
+        String xpath = "//testcase[@name='testThree']";
+        XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NODE", null);
 
-		// Create a new XML series.
-		String xpath = "concat(//testcase[@name='testOne']/@name, '=', //testcase[@name='testOne']/@time)";
-		xpath = "//testcase[@name='testOne']/@time";
-		XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NUMBER", "splunge");
+        // test the basic subclass properties.
+        testSeries(series, TEST_XML_FILE, "", "xml");
 
-		// test the basic subclass properties.
-		testSeries(series, TEST_XML_FILE, "", "xml");
+        // load the series.
+        List<PlotPoint> points = series
+                .loadSeries(workspaceRootDir, System.out);
+        assertNotNull(points);
+        assertEquals(points.size(), 1);
+        assertEquals(Double.parseDouble(points.get(0).getYvalue()), new Double(27));
+        testPlotPoints(points, 1);
+    }
 
-		// load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, System.out);
-		assertNotNull(points);
-		testPlotPoints(points, 1);
-	}
+    public void testXMLSeriesString() {
+        // Create a new XML series.
+        String xpath = "//testcase[@name='testOne']/@time";
+        XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "STRING", null);
 
-	@Ignore
-	public void testXMLSeriesBoolean()
-	{
-		// first create a FilePath to load the test Properties file.
-		File workspaceDirFile = new File ("target/test-classes/");
-		FilePath workspaceRootDir = new FilePath (workspaceDirFile);
+        // test the basic subclass properties.
+        testSeries(series, TEST_XML_FILE, "", "xml");
 
-		// Create a new XML series.
-		String xpath = "//testcase[@name='testOne']/@time";
-		XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "BOOLEAN", null);
+        // load the series.
+        List<PlotPoint> points = series
+                .loadSeries(workspaceRootDir, System.out);
+        assertNotNull(points);
+        testPlotPoints(points, 1);
+    }
 
-		// test the basic subclass properties.
-		testSeries(series, TEST_XML_FILE, "", "xml");
+    public void testXMLSeriesNumber() {
+        // Create a new XML series.
+        String xpath = "concat(//testcase[@name='testOne']/@name, '=', //testcase[@name='testOne']/@time)";
+        xpath = "//testcase[@name='testOne']/@time";
+        XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NUMBER",
+                "splunge");
 
-		// load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, System.out);
-		assertNotNull(points);
-		testPlotPoints(points, 1);
-	}
+        // test the basic subclass properties.
+        testSeries(series, TEST_XML_FILE, "", "xml");
+
+        // load the series.
+        List<PlotPoint> points = series
+                .loadSeries(workspaceRootDir, System.out);
+        assertNotNull(points);
+        testPlotPoints(points, 1);
+    }
+
+    @Ignore
+    public void testXMLSeriesBoolean() {
+        // Create a new XML series.
+        String xpath = "//testcase[@name='testOne']/@time";
+        XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "BOOLEAN", null);
+
+        // test the basic subclass properties.
+        testSeries(series, TEST_XML_FILE, "", "xml");
+
+        // load the series.
+        List<PlotPoint> points = series
+                .loadSeries(workspaceRootDir, System.out);
+        assertNotNull(points);
+        testPlotPoints(points, 1);
+    }
 
 }
