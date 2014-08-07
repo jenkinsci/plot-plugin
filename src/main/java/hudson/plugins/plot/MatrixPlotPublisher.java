@@ -148,7 +148,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
         if (!plotsOfConfigurations.containsKey((MatrixConfiguration) build.getProject())) {
             for (Plot p : plots) {
-                Plot plot = new Plot(p.title, p.yaxis, p.group, p.numBuilds, p.csvFileName, p.style, p.useDescr);
+                Plot plot = new Plot(p.title, p.yaxis, p.group, p.numBuilds, p.csvFileName, p.style, p.useDescr, p.exclZero);
                 plot.series = p.series;
                 plot.setProject((MatrixConfiguration) build.getProject());
                 addPlot(plot);

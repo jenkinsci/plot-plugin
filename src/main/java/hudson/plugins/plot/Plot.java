@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jfree.chart.ChartFactory;
@@ -39,6 +40,8 @@ import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.DefaultDrawingSupplier;
@@ -177,6 +180,9 @@ public class Plot implements Comparable<Plot> {
     /** Whether or not to use build descriptions as X-axis labels. Optional. */
     public boolean useDescr;
 
+    /** Whether or not to exclude zero as default Y-axis value. Optional. */
+    public boolean exclZero;
+
     /**
      * Creates a new plot with the given paramenters.  If numBuilds
      * is the empty string, then all builds will be included. Must
@@ -184,7 +190,7 @@ public class Plot implements Comparable<Plot> {
      */
     @DataBoundConstructor
     public Plot(String title, String yaxis,
-            String group, String numBuilds, String csvFileName, String style, boolean useDescr)
+            String group, String numBuilds, String csvFileName, String style, boolean useDescr, boolean exclZero)
     {
         this.title = title;
         this.yaxis = yaxis;
@@ -197,6 +203,7 @@ public class Plot implements Comparable<Plot> {
         this.csvFileName = csvFileName;
         this.style = style;
         this.useDescr = useDescr;
+        this.exclZero = exclZero;
     }
 
     // needed for serialization
@@ -264,6 +271,10 @@ public class Plot implements Comparable<Plot> {
         return urlUseDescr != null ? urlUseDescr : useDescr;
     }
 
+    private boolean getExclZero() {
+    	return exclZero;
+    }
+    
     /**
      * Sets the number of builds to plot from the "numbuilds" parameter
      * in the given StaplerRequest.  If the parameter doesn't exist
@@ -595,6 +606,11 @@ public class Plot implements Comparable<Plot> {
             } else {
                 domainAxis.addCategoryLabelToolTip(label, descriptionForBuild(label.buildNum));
             }
+        }
+        // optionally exclude zero as default y-axis value
+        ValueAxis rangeAxis = categoryPlot.getRangeAxis();
+        if ((rangeAxis != null) && (rangeAxis instanceof NumberAxis)) {
+        	((NumberAxis) rangeAxis).setAutoRangeIncludesZero(!getExclZero());
         }
 
         AbstractCategoryItemRenderer renderer =

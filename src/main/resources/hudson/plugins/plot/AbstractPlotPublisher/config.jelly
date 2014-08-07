@@ -41,6 +41,9 @@
         <f:entry title="${%Build Descriptions as labels}" help="/plugin/plot/help-useDescr.html">
           <f:checkbox name="useDescr" checked="${plot.useDescr}" />
         </f:entry>
+        <f:entry title="${%exclude zero as default Y-axis value}" help="/plugin/plot/help-exclZero.html">
+          <f:checkbox name="exclZero" checked="${plot.exclZero}" />
+        </f:entry>
 
         <f:entry title="" description="${%A new data series definition}">
           <f:repeatable var="series" items="${plot.series}" minimum="1">
