@@ -44,7 +44,7 @@ public class PlotTest {
     public void discardPlotSamplesForOldBuilds() throws Exception {
         FreeStyleProject p = jobArchivingBuilds(1);
 
-        plotBuilds(p, 2, false);
+        plotBuilds(p, "2", false);
 
         j.buildAndAssertSuccess(p);
         assertSampleCount(p, 1);
@@ -60,7 +60,7 @@ public class PlotTest {
     public void discardPlotSamplesForDeletedBuilds() throws Exception {
         FreeStyleProject p = jobArchivingBuilds(10);
 
-        plotBuilds(p, 10, false);
+        plotBuilds(p, "", false);
 
         j.buildAndAssertSuccess(p);
         assertSampleCount(p, 1);
@@ -79,7 +79,7 @@ public class PlotTest {
     public void keepPlotSamplesForOldBuilds() throws Exception {
         FreeStyleProject p = jobArchivingBuilds(1);
 
-        plotBuilds(p, 2, true);
+        plotBuilds(p, "2", true);
 
         j.buildAndAssertSuccess(p);
         assertSampleCount(p, 1);
@@ -98,7 +98,7 @@ public class PlotTest {
     public void keepPlotSamplesForDeletedBuilds() throws Exception {
         FreeStyleProject p = jobArchivingBuilds(10);
 
-        plotBuilds(p, 10, true);
+        plotBuilds(p, "", true);
 
         j.buildAndAssertSuccess(p);
         assertSampleCount(p, 1);
@@ -121,9 +121,9 @@ public class PlotTest {
         return p;
     }
 
-    private void plotBuilds(FreeStyleProject p, int count, boolean keepRecords) {
+    private void plotBuilds(FreeStyleProject p, String count, boolean keepRecords) {
         final PlotPublisher publisher = new PlotPublisher();
-        final Plot plot = new Plot("Title", "Number", "default", String.valueOf(count), null, "line", false, keepRecords);
+        final Plot plot = new Plot("Title", "Number", "default", count, null, "line", false, keepRecords);
         p.getPublishersList().add(publisher);
         publisher.addPlot(plot);
         plot.series = Arrays.<Series>asList(new PropertiesSeries("src.properties", null));

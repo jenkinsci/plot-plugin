@@ -773,7 +773,15 @@ public class Plot implements Comparable<Plot> {
      * @return true if the build should be part of the graph.
      */
     /*package*/ boolean reportBuild(int buildNumber) {
-        int numBuilds = Integer.parseInt(this.numBuilds);
+        int numBuilds;
+        try {
+
+            numBuilds = Integer.parseInt(this.numBuilds);
+        } catch (NumberFormatException ex) {
+            // Report all builds
+            numBuilds = Integer.MAX_VALUE;
+        }
+
         if (buildNumber < project.getNextBuildNumber() - numBuilds) return false;
         return keepRecords || project.getBuildByNumber(buildNumber) != null;
     }
