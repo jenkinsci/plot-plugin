@@ -24,14 +24,19 @@
 package hudson.plugins.plot;
 
 import static org.junit.Assert.assertEquals;
+import hudson.matrix.AxisList;
+import hudson.matrix.MatrixConfiguration;
+import hudson.matrix.MatrixProject;
+import hudson.matrix.TextAxis;
+import hudson.model.AbstractProject;
 import hudson.model.FreeStyleProject;
-import hudson.model.Job;
 import hudson.tasks.LogRotator;
 import hudson.tasks.Shell;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -113,6 +118,52 @@ public class PlotTest {
         assertSampleCount(p, 3); // Data should be kept
     }
 
+    @Test @Ignore // Plots on matrix configurations does not seem to work at all. Empty graph is all I see
+    public void discardPlotSamplesForDeletedMatrixBuilds() throws Exception {
+        MatrixProject p = matrixJobArchivingBuilds(10);
+        p.setAxes(new AxisList(new TextAxis("a", "a")));
+
+        MatrixConfiguration c = p.getItem("a=a");
+
+        plotMatrixBuilds(p, "10", false);
+
+        j.buildAndAssertSuccess(p);
+        assertSampleCount(c, 1);
+
+        j.buildAndAssertSuccess(p);
+        assertSampleCount(c, 2);
+
+        j.buildAndAssertSuccess(p);
+        assertSampleCount(c, 3);
+
+        c.getLastBuild().delete();
+        assertSampleCount(c, 2); // Data should be removed
+    }
+
+    @Test @Ignore // Plots on matrix configurations does not seem to work at all. Empty graph is all I see
+    public void keepPlotSamplesForDeletedMatrixBuilds() throws Exception {
+        MatrixProject p = matrixJobArchivingBuilds(10);
+        p.setAxes(new AxisList(new TextAxis("a", "a")));
+
+        MatrixConfiguration c = p.getItem("a=a");
+
+        plotMatrixBuilds(p, "10", true);
+
+        j.buildAndAssertSuccess(p);
+        assertSampleCount(c, 1);
+
+        j.buildAndAssertSuccess(p);
+        assertSampleCount(c, 2);
+
+        j.buildAndAssertSuccess(p);
+        assertSampleCount(c, 3);
+
+        c.getLastBuild().delete();
+        assertSampleCount(c, 3); // Data should be kept
+        p.getLastBuild().delete();
+        assertSampleCount(c, 3); // Data should be kept
+    }
+
     private FreeStyleProject jobArchivingBuilds(int count) throws Exception {
         FreeStyleProject p = j.createFreeStyleProject();
         p.getBuildersList().add(new Shell("echo YVALUE=$BUILD_NUMBER > src.properties"));
@@ -121,7 +172,15 @@ public class PlotTest {
         return p;
     }
 
-    private void plotBuilds(FreeStyleProject p, String count, boolean keepRecords) {
+    private MatrixProject matrixJobArchivingBuilds(int count) throws Exception {
+        MatrixProject p = j.createMatrixProject();
+        p.getBuildersList().add(new Shell("echo YVALUE=$BUILD_NUMBER > src.properties"));
+        p.setBuildDiscarder(new LogRotator(-1, count, -1, -1));
+
+        return p;
+    }
+
+    private void plotBuilds(AbstractProject<?, ?> p, String count, boolean keepRecords) {
         final PlotPublisher publisher = new PlotPublisher();
         final Plot plot = new Plot("Title", "Number", "default", count, null, "line", false, keepRecords);
         p.getPublishersList().add(publisher);
@@ -129,8 +188,19 @@ public class PlotTest {
         plot.series = Arrays.<Series>asList(new PropertiesSeries("src.properties", null));
     }
 
-    private void assertSampleCount(Job p, int count) throws Exception {
-        PlotReport pr = p.getAction(PlotAction.class).getDynamic("default", null, null);
+    private void plotMatrixBuilds(AbstractProject<?, ?> p, String count, boolean keepRecords) {
+        final MatrixPlotPublisher publisher = new MatrixPlotPublisher();
+        final Plot plot = new Plot("Title", "Number", "default", count, null, "line", false, keepRecords);
+        p.getPublishersList().add(publisher);
+        publisher.setPlots(Arrays.asList(plot));
+        plot.series = Arrays.<Series>asList(new PropertiesSeries("src.properties", null));
+    }
+
+    private void assertSampleCount(AbstractProject<?, ?> p, int count) throws Exception {
+        PlotReport pr = p instanceof MatrixConfiguration
+                ? p.getAction(MatrixPlotAction.class).getDynamic("default", null, null)
+                : p.getAction(PlotAction.class).getDynamic("default", null, null)
+        ;
         List<List<String>> table = pr.getTable(0);
         assertEquals("Plot sample count", count, table.size() - 1);
     }
