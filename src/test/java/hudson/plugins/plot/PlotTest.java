@@ -118,7 +118,7 @@ public class PlotTest {
         assertSampleCount(p, 3); // Data should be kept
     }
 
-    @Test @Ignore // Plots on matrix configurations does not seem to work at all. Empty graph is all I see
+    @Test
     public void discardPlotSamplesForDeletedMatrixBuilds() throws Exception {
         MatrixProject p = matrixJobArchivingBuilds(10);
         p.setAxes(new AxisList(new TextAxis("a", "a")));
@@ -140,7 +140,7 @@ public class PlotTest {
         assertSampleCount(c, 2); // Data should be removed
     }
 
-    @Test @Ignore // Plots on matrix configurations does not seem to work at all. Empty graph is all I see
+    @Test
     public void keepPlotSamplesForDeletedMatrixBuilds() throws Exception {
         MatrixProject p = matrixJobArchivingBuilds(10);
         p.setAxes(new AxisList(new TextAxis("a", "a")));
