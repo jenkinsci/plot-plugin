@@ -9,18 +9,18 @@ import hudson.model.AbstractProject;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.ArrayList;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import au.com.bytecode.opencsv.CSVReader;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Represents a plot report for a single group of plots.
@@ -120,7 +120,7 @@ public class PlotReport {
             String[] nextLine;
             while ((nextLine = reader.readNext()) != null) {
                 String buildNumber = nextLine[2];
-                if (project.getBuildByNumber(Integer.parseInt(buildNumber)) == null) {
+                if (!plot.reportBuild(Integer.parseInt(buildNumber))) {
                     continue;
                 }
                 String seriesLabel = nextLine[1];

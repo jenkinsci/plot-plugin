@@ -42,6 +42,10 @@
           <f:checkbox name="useDescr" checked="${plot.useDescr}" />
         </f:entry>
 
+        <f:entry title="${%Keep records for deleted builds}" help="/plugin/plot/help-keepRecords.html">
+          <f:checkbox name="keepRecords" checked="${plot.keepRecords}" />
+        </f:entry>
+
         <f:entry title="" description="${%A new data series definition}">
           <f:repeatable var="series" items="${plot.series}" minimum="1">
             <table width="100%" bgcolor="#EEEEEE">

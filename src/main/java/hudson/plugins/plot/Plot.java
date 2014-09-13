@@ -29,8 +29,6 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jfree.chart.ChartFactory;
@@ -49,6 +47,9 @@ import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  * Represents the configuration for a single plot.  A plot can
@@ -177,6 +178,9 @@ public class Plot implements Comparable<Plot> {
     /** Whether or not to use build descriptions as X-axis labels. Optional. */
     public boolean useDescr;
 
+    /** keep records for builds that was deleted */
+    private boolean keepRecords;
+
     /**
      * Creates a new plot with the given paramenters.  If numBuilds
      * is the empty string, then all builds will be included. Must
@@ -184,7 +188,7 @@ public class Plot implements Comparable<Plot> {
      */
     @DataBoundConstructor
     public Plot(String title, String yaxis,
-            String group, String numBuilds, String csvFileName, String style, boolean useDescr)
+            String group, String numBuilds, String csvFileName, String style, boolean useDescr, boolean keepRecords)
     {
         this.title = title;
         this.yaxis = yaxis;
@@ -197,10 +201,23 @@ public class Plot implements Comparable<Plot> {
         this.csvFileName = csvFileName;
         this.style = style;
         this.useDescr = useDescr;
+        this.keepRecords = keepRecords;
+    }
+
+    /**
+     * @deprecated Kept for backward compatibility.
+     */
+    @Deprecated
+    public Plot(String title, String yaxis, String group, String numBuilds, String csvFileName, String style, boolean useDescr) {
+        this(title, yaxis, group, numBuilds, csvFileName, style, useDescr, false);
     }
 
     // needed for serialization
     public Plot() {}
+
+    public boolean getKeepRecords() {
+        return keepRecords;
+    }
 
     public int compareTo(Plot o) {
         return title.compareTo(o.getTitle());
@@ -542,8 +559,7 @@ public class Plot implements Comparable<Plot> {
             int buildNum;
             try {
                 buildNum = Integer.valueOf(record[2]);
-                if (project.getBuildByNumber(buildNum) == null
-                        || buildNum > getRightBuildNum()) {
+                if (!reportBuild(buildNum) || buildNum > getRightBuildNum()) {
                     continue; // skip this record
                 }
             } catch (NumberFormatException nfe) {
@@ -736,7 +752,7 @@ public class Plot implements Comparable<Plot> {
             writer.writeNext(header2);
             // write each entry of rawPlotData to a new line in the CSV file
             for (String[] entry : rawPlotData) {
-                if (project.getBuildByNumber(Integer.parseInt(entry[2])) != null) {
+                if (reportBuild(Integer.parseInt(entry[2]))) {
                     writer.writeNext(entry);
                 }
             }
@@ -751,5 +767,22 @@ public class Plot implements Comparable<Plot> {
                 }
             }
         }
+    }
+
+    /**
+     * @return true if the build should be part of the graph.
+     */
+    /*package*/ boolean reportBuild(int buildNumber) {
+        int numBuilds;
+        try {
+
+            numBuilds = Integer.parseInt(this.numBuilds);
+        } catch (NumberFormatException ex) {
+            // Report all builds
+            numBuilds = Integer.MAX_VALUE;
+        }
+
+        if (buildNumber < project.getNextBuildNumber() - numBuilds) return false;
+        return keepRecords || project.getBuildByNumber(buildNumber) != null;
     }
 }

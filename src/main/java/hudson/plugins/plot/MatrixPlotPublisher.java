@@ -3,8 +3,8 @@ package hudson.plugins.plot;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.matrix.MatrixBuild;
 import hudson.matrix.MatrixConfiguration;
+import hudson.matrix.MatrixRun;
 import hudson.matrix.MatrixProject;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.json.JSONObject;
+
 import org.apache.commons.lang.ObjectUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
@@ -37,7 +38,10 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
 
     transient private Map<String, List<Plot>> groupMap = new HashMap<String, List<Plot>>();
 
-    private List<Plot> plots = new ArrayList<Plot>(); //plots setting for matrix project
+    /**
+     * Configured plots.
+     */
+    private List<Plot> plots = new ArrayList<Plot>();
 
     public String urlGroupToOriginalGroup(String urlGroup, MatrixConfiguration c) {
         if (urlGroup == null || "nogroup".equals(urlGroup)) {
@@ -148,7 +152,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
         if (!plotsOfConfigurations.containsKey((MatrixConfiguration) build.getProject())) {
             for (Plot p : plots) {
-                Plot plot = new Plot(p.title, p.yaxis, p.group, p.numBuilds, p.csvFileName, p.style, p.useDescr);
+                Plot plot = new Plot(p.title, p.yaxis, p.group, p.numBuilds, p.csvFileName, p.style, p.useDescr, p.getKeepRecords());
                 plot.series = p.series;
                 plot.setProject((MatrixConfiguration) build.getProject());
                 addPlot(plot);
@@ -160,14 +164,13 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
             BuildListener listener) throws IOException, InterruptedException {
-        // Should always be a Build due to isApplicable below
-        if (!(build instanceof MatrixBuild)) {
+        if (!(build instanceof MatrixRun)) {
             return true;
         }
         listener.getLogger().println("Recording plot data");
 
         // add the build to each plot
-        for (Plot plot : plotsOfConfigurations.get((MatrixConfiguration) build.getProject())) {
+        for (Plot plot : plotsOfConfigurations.get(((MatrixRun) build).getProject())) {
             plot.addBuild(build, listener.getLogger());
         }
         // misconfigured plots will not fail a build so always return true
