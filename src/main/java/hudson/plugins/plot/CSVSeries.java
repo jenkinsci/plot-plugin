@@ -334,6 +334,7 @@ public class CSVSeries extends Series {
 	 */
 	private String getUrl(String label,int index)
 	{
+        String url = this.url;
 		/*
 		 * Check the name first, and do replacement upon it.
 		 */
@@ -349,7 +350,7 @@ public class CSVSeries extends Series {
 		Matcher indexMatcher = PAT_INDEX.matcher(url);
 		if (indexMatcher.find())
 		{
-			url = indexMatcher.replaceAll(label);
+            url = indexMatcher.replaceAll(String.valueOf(index));
 		}
 
 		return url;

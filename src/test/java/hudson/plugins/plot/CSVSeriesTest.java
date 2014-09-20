@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import au.com.bytecode.opencsv.CSVReader;
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 
 /**
  * Test a CSV series.
@@ -27,10 +28,6 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     private static final String[] files = {
 		"test.csv",
-	};
-
-	private static final String[] labels = {
-		"testLabel",
 	};
 
 	public void testCSVSeriesWithNoExclusions()
@@ -54,7 +51,7 @@ public class CSVSeriesTest extends SeriesTestCase {
 		}
 
 		// Create a new CSV series.
-		CSVSeries series = new CSVSeries(files[0], null, "OFF", "", false);
+        CSVSeries series = new CSVSeries(files[0], "http://localhost:8080/%name%/%index%/", "OFF", "", false);
 
 		LOGGER.info("Created series " + series.toString());
 		// test the basic subclass properties.
@@ -64,6 +61,15 @@ public class CSVSeriesTest extends SeriesTestCase {
         List<PlotPoint> points = series.loadSeries(workspaceRootDir, System.out);
         LOGGER.info("Got " + points.size() + " plot points");
 		testPlotPoints(points, columns);
+
+        assertEquals("http://localhost:8080/Avg/0/", points.get(0).getUrl());
+        assertEquals("http://localhost:8080/Median/0/", points.get(1).getUrl());
+        assertEquals("http://localhost:8080/90/0/", points.get(2).getUrl());
+        assertEquals("http://localhost:8080/min/0/", points.get(3).getUrl());
+        assertEquals("http://localhost:8080/max/0/", points.get(4).getUrl());
+        assertEquals("http://localhost:8080/samples/0/", points.get(5).getUrl());
+        assertEquals("http://localhost:8080/errors/0/", points.get(6).getUrl());
+        assertEquals("http://localhost:8080/error %/0/", points.get(7).getUrl());
 	}
 
 	private int getNumColumns(FilePath workspaceRootDir, String file) throws IOException, InterruptedException
