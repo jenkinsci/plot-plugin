@@ -63,13 +63,13 @@ public class CSVSeriesTest extends SeriesTestCase {
 		testPlotPoints(points, columns);
 
         assertEquals("http://localhost:8080/Avg/0/", points.get(0).getUrl());
-        assertEquals("http://localhost:8080/Median/0/", points.get(1).getUrl());
-        assertEquals("http://localhost:8080/90/0/", points.get(2).getUrl());
-        assertEquals("http://localhost:8080/min/0/", points.get(3).getUrl());
-        assertEquals("http://localhost:8080/max/0/", points.get(4).getUrl());
-        assertEquals("http://localhost:8080/samples/0/", points.get(5).getUrl());
-        assertEquals("http://localhost:8080/errors/0/", points.get(6).getUrl());
-        assertEquals("http://localhost:8080/error %/0/", points.get(7).getUrl());
+        assertEquals("http://localhost:8080/Median/1/", points.get(1).getUrl());
+        assertEquals("http://localhost:8080/90/2/", points.get(2).getUrl());
+        assertEquals("http://localhost:8080/min/3/", points.get(3).getUrl());
+        assertEquals("http://localhost:8080/max/4/", points.get(4).getUrl());
+        assertEquals("http://localhost:8080/samples/5/", points.get(5).getUrl());
+        assertEquals("http://localhost:8080/errors/6/", points.get(6).getUrl());
+        assertEquals("http://localhost:8080/error %/7/", points.get(7).getUrl());
 	}
 
 	private int getNumColumns(FilePath workspaceRootDir, String file) throws IOException, InterruptedException
