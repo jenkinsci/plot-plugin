@@ -24,19 +24,22 @@
 package hudson.plugins.plot;
 
 import static org.junit.Assert.assertEquals;
+import hudson.Launcher;
 import hudson.matrix.AxisList;
 import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.TextAxis;
+import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
 import hudson.model.FreeStyleProject;
+import hudson.tasks.Builder;
 import hudson.tasks.LogRotator;
-import hudson.tasks.Shell;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -166,7 +169,7 @@ public class PlotTest {
 
     private FreeStyleProject jobArchivingBuilds(int count) throws Exception {
         FreeStyleProject p = j.createFreeStyleProject();
-        p.getBuildersList().add(new Shell("echo YVALUE=$BUILD_NUMBER > src.properties"));
+        p.getBuildersList().add(new PlotBuildNumber());
         p.setBuildDiscarder(new LogRotator(-1, count, -1, -1));
 
         return p;
@@ -174,7 +177,7 @@ public class PlotTest {
 
     private MatrixProject matrixJobArchivingBuilds(int count) throws Exception {
         MatrixProject p = j.createMatrixProject();
-        p.getBuildersList().add(new Shell("echo YVALUE=$BUILD_NUMBER > src.properties"));
+        p.getBuildersList().add(new PlotBuildNumber());
         p.setBuildDiscarder(new LogRotator(-1, count, -1, -1));
 
         return p;
@@ -203,5 +206,14 @@ public class PlotTest {
         ;
         List<List<String>> table = pr.getTable(0);
         assertEquals("Plot sample count", count, table.size() - 1);
+    }
+
+    private static final class PlotBuildNumber extends Builder {
+
+        @Override
+        public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+            build.getWorkspace().child("src.properties").write(String.format("YVALUE=%d", build.getNumber()), "UTF-8");
+            return true;
+        }
     }
 }
