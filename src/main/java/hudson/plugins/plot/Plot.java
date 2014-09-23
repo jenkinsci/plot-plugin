@@ -191,8 +191,7 @@ public class Plot implements Comparable<Plot> {
      * not be zero.
      */
     @DataBoundConstructor
-    public Plot(String title, String yaxis,
-            String group, String numBuilds, String csvFileName, String style, boolean useDescr,
+    public Plot(String title, String yaxis, String group, String numBuilds, String csvFileName, String style, boolean useDescr,
             boolean keepRecords, boolean exclZero) {
         this.title = title;
         this.yaxis = yaxis;
@@ -222,6 +221,10 @@ public class Plot implements Comparable<Plot> {
 
     public boolean getKeepRecords() {
         return keepRecords;
+    }
+
+    public boolean getExclZero() {
+        return exclZero;
     }
 
     public int compareTo(Plot o) {
@@ -284,10 +287,6 @@ public class Plot implements Comparable<Plot> {
     }
     private boolean getUrlUseDescr() {
         return urlUseDescr != null ? urlUseDescr : useDescr;
-    }
-
-    private boolean getExclZero() {
-        return exclZero;
     }
     
     /**
