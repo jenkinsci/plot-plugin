@@ -50,8 +50,8 @@
   </build>
 
   <scm>
-    <connection>scm:git:https://github.com/jenkinsci/plot-plugin.git</connection>
-    <developerConnection>scm:git:https://git@github.com/jenkinsci/plot-plugin.git</developerConnection>
+    <connection>scm:git:ssh://github.com/jenkinsci/plot-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/plot-plugin.git</developerConnection>
     <url>https://github.com/jenkinsci/plot-plugin</url>
     <tag>HEAD</tag>
   </scm>
