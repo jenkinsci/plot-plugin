@@ -153,7 +153,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
         if (!plotsOfConfigurations.containsKey((MatrixConfiguration) build.getProject())) {
             for (Plot p : plots) {
                 Plot plot = new Plot(p.title, p.yaxis, p.group, p.numBuilds, p.csvFileName, p.style, p.useDescr,
-                        p.getKeepRecords(), p.getExclZero());
+                        p.getKeepRecords(), p.getExclZero(), p.isLogarithmic());
                 plot.series = p.series;
                 plot.setProject((MatrixConfiguration) build.getProject());
                 addPlot(plot);

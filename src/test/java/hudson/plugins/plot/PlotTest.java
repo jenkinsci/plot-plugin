@@ -185,7 +185,7 @@ public class PlotTest {
 
     private void plotBuilds(AbstractProject<?, ?> p, String count, boolean keepRecords) {
         final PlotPublisher publisher = new PlotPublisher();
-        final Plot plot = new Plot("Title", "Number", "default", count, null, "line", false, keepRecords, false);
+        final Plot plot = new Plot("Title", "Number", "default", count, null, "line", false, keepRecords, false, false);
         p.getPublishersList().add(publisher);
         publisher.addPlot(plot);
         plot.series = Arrays.<Series>asList(new PropertiesSeries("src.properties", null));
@@ -193,7 +193,7 @@ public class PlotTest {
 
     private void plotMatrixBuilds(AbstractProject<?, ?> p, String count, boolean keepRecords) {
         final MatrixPlotPublisher publisher = new MatrixPlotPublisher();
-        final Plot plot = new Plot("Title", "Number", "default", count, null, "line", false, keepRecords, false);
+        final Plot plot = new Plot("Title", "Number", "default", count, null, "line", false, keepRecords, false, false);
         p.getPublishersList().add(publisher);
         publisher.setPlots(Arrays.asList(plot));
         plot.series = Arrays.<Series>asList(new PropertiesSeries("src.properties", null));

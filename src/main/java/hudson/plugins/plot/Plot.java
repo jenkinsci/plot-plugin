@@ -39,6 +39,7 @@ import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.axis.LogarithmicAxis;
 import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.DefaultDrawingSupplier;
@@ -185,6 +186,10 @@ public class Plot implements Comparable<Plot> {
 
     /** Whether or not to exclude zero as default Y-axis value. Optional. */
     public boolean exclZero;
+
+    /** Use a logarithmic Y-axis. */
+    public boolean logarithmic;
+
     /**
      * Creates a new plot with the given paramenters.  If numBuilds
      * is the empty string, then all builds will be included. Must
@@ -192,7 +197,7 @@ public class Plot implements Comparable<Plot> {
      */
     @DataBoundConstructor
     public Plot(String title, String yaxis, String group, String numBuilds, String csvFileName, String style, boolean useDescr,
-            boolean keepRecords, boolean exclZero) {
+            boolean keepRecords, boolean exclZero, boolean logarithmic) {
         this.title = title;
         this.yaxis = yaxis;
         this.group = group;
@@ -206,6 +211,7 @@ public class Plot implements Comparable<Plot> {
         this.useDescr = useDescr;
         this.keepRecords = keepRecords;
         this.exclZero = exclZero;
+        this.logarithmic = logarithmic;
     }
 
     /**
@@ -213,7 +219,7 @@ public class Plot implements Comparable<Plot> {
      */
     @Deprecated
     public Plot(String title, String yaxis, String group, String numBuilds, String csvFileName, String style, boolean useDescr) {
-        this(title, yaxis, group, numBuilds, csvFileName, style, useDescr, false, false);
+        this(title, yaxis, group, numBuilds, csvFileName, style, useDescr, false, false, false);
     }
 
     // needed for serialization
@@ -225,6 +231,10 @@ public class Plot implements Comparable<Plot> {
 
     public boolean getExclZero() {
         return exclZero;
+    }
+
+    public boolean isLogarithmic() {
+        return logarithmic;
     }
 
     public int compareTo(Plot o) {
@@ -240,6 +250,7 @@ public class Plot implements Comparable<Plot> {
             "),NUMBUILDS("+numBuilds+
             "),RIGHTBUILDNUM("+getRightBuildNum()+
             "),HASLEGEND("+hasLegend()+
+            "),ISLOGARITHMIC("+isLogarithmic()+
             "),FILENAME("+csvFileName+")";
     }
 
@@ -620,6 +631,13 @@ public class Plot implements Comparable<Plot> {
                 domainAxis.addCategoryLabelToolTip(label, descriptionForBuild(label.buildNum));
             }
         }
+        // Replace the range axis by a logarithmic axis if the option is selected
+        if (isLogarithmic()) {
+            LogarithmicAxis logAxis = new LogarithmicAxis(getYaxis());
+            logAxis.setExpTickLabelsFlag( true );
+            categoryPlot.setRangeAxis(logAxis);
+        }
+
         // optionally exclude zero as default y-axis value
         ValueAxis rangeAxis = categoryPlot.getRangeAxis();
         if ((rangeAxis != null) && (rangeAxis instanceof NumberAxis)) {
