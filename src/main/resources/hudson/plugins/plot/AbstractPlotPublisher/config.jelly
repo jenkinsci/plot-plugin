@@ -44,6 +44,9 @@
         <f:entry title="${%Exclude zero as default Y-axis value}" help="/plugin/plot/help-exclZero.html">
           <f:checkbox name="exclZero" checked="${plot.exclZero}" />
         </f:entry>
+        <f:entry title="${%Use a logarithmic Y-axis}" help="/plugin/plot/help-logarithmic.html">
+          <f:checkbox name="logarithmic" checked="${plot.logarithmic}" />
+        </f:entry>
 
         <f:entry title="${%Keep records for deleted builds}" help="/plugin/plot/help-keepRecords.html">
           <f:checkbox name="keepRecords" checked="${plot.keepRecords}" />
