@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Ignore;
-import org.junit.Before;
 import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
 
 /**
  * Test an XML series.
@@ -188,6 +188,25 @@ public class XMLSeriesTest extends SeriesTestCase {
                 .loadSeries(workspaceRootDir, System.out);
         assertNotNull(points);
         testPlotPoints(points, 1);
+    }
+    
+    public void testXMLSeriesUrl() {
+        // Create a new XML series.
+        String xpath = "/results/testcase/*";
+
+        XMLSeries series = new XMLSeries(TEST3_XML_FILE, xpath, "NODESET",
+                "http://localhost/%index%/%name%/");
+
+        // test the basic subclass properties.
+        testSeries(series, TEST3_XML_FILE, "", "xml");
+
+        // load the series.
+        List<PlotPoint> points = series
+                .loadSeries(workspaceRootDir, System.out);
+        assertNotNull(points);
+        testPlotPoints(points, 2);
+        assertEquals("http://localhost/0/one/", points.get(0).getUrl());
+        assertEquals("http://localhost/0/two/", points.get(1).getUrl());
     }
 
     @Ignore

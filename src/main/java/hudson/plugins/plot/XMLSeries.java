@@ -13,11 +13,9 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -326,31 +324,34 @@ public class XMLSeries extends Series {
      * @return url for the label.
      */
     private String getUrl(String label, int index) {
-        if (label == null) {
-            // This implmentation searches for tokens to replace. If the
-            // argument
-            // was NULL then replacing the null with an empty string should
-            // still
-            // produce the desired outcome.
-            label = "";
-        }
-        /*
-         * Check the name first, and do replacement upon it.
-         */
-        Matcher nameMatcher = PAT_NAME.matcher(label);
-        if (nameMatcher.find()) {
-            url = nameMatcher.replaceAll(label);
+        String resultUrl = this.url;
+        if(resultUrl != null) {
+            if (label == null) {
+                // This implmentation searches for tokens to replace. If the
+                // argument
+                // was NULL then replacing the null with an empty string should
+                // still
+                // produce the desired outcome.
+                label = "";
+            }
+            /*
+             * Check the name first, and do replacement upon it.
+             */
+            Matcher nameMatcher = PAT_NAME.matcher(resultUrl);
+            if (nameMatcher.find()) {
+                resultUrl = nameMatcher.replaceAll(label);
+            }
+    
+            /*
+             * Check the index, and do replacement on it.
+             */
+            Matcher indexMatcher = PAT_INDEX.matcher(resultUrl);
+            if (indexMatcher.find()) {
+                resultUrl = indexMatcher.replaceAll(String.valueOf(index));
+            }
         }
 
-        /*
-         * Check the index, and do replacement on it.
-         */
-        Matcher indexMatcher = PAT_INDEX.matcher(label);
-        if (indexMatcher.find()) {
-            url = indexMatcher.replaceAll(label);
-        }
-
-        return url;
+        return resultUrl;
     }
 
     /**
