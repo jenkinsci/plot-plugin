@@ -334,25 +334,32 @@ public class CSVSeries extends Series {
 	 */
 	private String getUrl(String label,int index)
 	{
-        String url = this.url;
-		/*
-		 * Check the name first, and do replacement upon it.
-		 */
-		Matcher nameMatcher = PAT_NAME.matcher(url);
-		if (nameMatcher.find())
-		{
-			url = nameMatcher.replaceAll(label);
-		}
+        String resultUrl = this.url;
+        if (resultUrl != null) {
+            if (label == null) {
+                // This implmentation searches for tokens to replace. If the argument
+                // was NULL then replacing the null with an empty string should still
+                // produce the desired outcome.
+                label = "";
+            }
+            /*
+             * Check the name first, and do replacement upon it.
+             */
+            Matcher nameMatcher = PAT_NAME.matcher(resultUrl);
+            if (nameMatcher.find())
+            {
+                resultUrl = nameMatcher.replaceAll(label);
+            }
 
-		/*
-		 * Check the index, and do replacement on it.
-		 */
-		Matcher indexMatcher = PAT_INDEX.matcher(url);
-		if (indexMatcher.find())
-		{
-            url = indexMatcher.replaceAll(String.valueOf(index));
-		}
-
-		return url;
+            /*
+             * Check the index, and do replacement on it.
+             */
+            Matcher indexMatcher = PAT_INDEX.matcher(resultUrl);
+            if (indexMatcher.find())
+            {
+                resultUrl = indexMatcher.replaceAll(String.valueOf(index));
+            }
+        }
+		return resultUrl;
 	}
 }
