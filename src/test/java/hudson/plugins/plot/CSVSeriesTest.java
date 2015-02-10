@@ -13,9 +13,9 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.logging.Logger;
 
-import au.com.bytecode.opencsv.CSVReader;
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * Test a CSV series.
@@ -58,7 +58,7 @@ public class CSVSeriesTest extends SeriesTestCase {
 		testSeries(series, files[0], "", "csv");
 
 		// load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
         LOGGER.info("Got " + points.size() + " plot points");
 		testPlotPoints(points, columns);
 

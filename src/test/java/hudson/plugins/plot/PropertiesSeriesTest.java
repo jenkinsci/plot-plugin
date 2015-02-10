@@ -40,7 +40,7 @@ public class PropertiesSeriesTest extends SeriesTestCase {
 		testSeries(propSeries, files[0], labels[0], "properties");
 
 		// load the series.
-        List<PlotPoint> points = propSeries.loadSeries(workspaceRootDir, System.err);
+        List<PlotPoint> points = propSeries.loadSeries(workspaceRootDir, 0, System.err);
 		testPlotPoints(points, 1);
 	}
 }

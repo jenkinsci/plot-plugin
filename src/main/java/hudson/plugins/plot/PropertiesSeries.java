@@ -34,7 +34,7 @@ public class PropertiesSeries extends Series {
      * Load the series from a properties file.
      */
 	@Override
-    public List<PlotPoint> loadSeries(FilePath workspaceRootDir, PrintStream logger) {
+    public List<PlotPoint> loadSeries(FilePath workspaceRootDir, int buildNumber, PrintStream logger) {
         InputStream in = null;
         FilePath[] seriesFiles = null;
 

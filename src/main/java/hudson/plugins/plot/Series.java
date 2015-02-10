@@ -6,9 +6,12 @@
 package hudson.plugins.plot;
 
 import hudson.FilePath;
+import hudson.plugins.plot.Messages;
 
 import java.io.PrintStream;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents a plot data series configuration.
@@ -17,6 +20,11 @@ import java.util.List;
  * @author Allen Reese
  */
 public abstract class Series {
+    private static transient final Pattern PAT_NAME = Pattern.compile("%name%");
+    private static transient final Pattern PAT_INDEX = Pattern
+            .compile("%index%");
+    private static final Pattern PAT_BUILD_NUMBER = Pattern.compile("%build%");;
+    
     /**
      * Relative path to the data series property file. Mandatory.
      */
@@ -33,6 +41,12 @@ public abstract class Series {
      * This should be an enum, but I am not sure how to support that with stapler at the moment
      */
     protected String fileType;
+    
+
+    /**
+     * Url to use as a base for mapping points.
+     */
+    protected String baseUrl;
 
     protected Series(String file, String label, String fileType) {
         this.file = file;
@@ -59,14 +73,65 @@ public abstract class Series {
      * Retrieves the plot data for one series after a build from the workspace.
      *
      * @param workspaceRootDir the root directory of the workspace
+     * @param buildNumber the build Number
      * @param logger the logger to use
      * @return a PlotPoint array of points to plot
      */
-    public abstract List<PlotPoint> loadSeries(FilePath workspaceRootDir, PrintStream logger);
+    public abstract List<PlotPoint> loadSeries(FilePath workspaceRootDir, int buildNumber, PrintStream logger);
 
     // Convert data from before version 1.3
     private Object readResolve() {
         return (fileType == null) ? new PropertiesSeries(file, label) : this;
+    }
+    
+    /**
+     * Return the url that should be used for this point.
+     * 
+     * @param label
+     *            Name of the column
+     * @param index
+     *            Index of the column
+     * @param buildNumber
+     *            The build number
+     * @return url for the label.
+     */
+    protected String getUrl(String label, int index, int buildNumber) {
+        String resultUrl = this.baseUrl;
+        if(resultUrl != null) {
+            if (label == null) {
+                // This implmentation searches for tokens to replace. If the
+                // argument
+                // was NULL then replacing the null with an empty string should
+                // still
+                // produce the desired outcome.
+                label = "";
+            }
+            /*
+             * Check the name first, and do replacement upon it.
+             */
+            Matcher nameMatcher = PAT_NAME.matcher(resultUrl);
+            if (nameMatcher.find()) {
+                resultUrl = nameMatcher.replaceAll(label);
+            }
+    
+            /*
+             * Check the index, and do replacement on it.
+             */
+            Matcher indexMatcher = PAT_INDEX.matcher(resultUrl);
+            if (indexMatcher.find()) {
+                resultUrl = indexMatcher.replaceAll(String.valueOf(index));
+            }
+            
+            /*
+             * Check the build number first, and do replacement upon it.
+             */
+            Matcher buildNumberMatcher = PAT_BUILD_NUMBER.matcher(resultUrl);
+            if (buildNumberMatcher.find()) {
+                resultUrl = buildNumberMatcher.replaceAll(String.valueOf(buildNumber));
+            }
+        }
+
+        return resultUrl;
     }
 }
 

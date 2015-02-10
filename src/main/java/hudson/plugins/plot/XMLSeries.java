@@ -19,8 +19,6 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.xml.namespace.QName;
@@ -48,9 +46,6 @@ public class XMLSeries extends Series {
             .getLogger(XMLSeries.class.getName());
     // Debugging hack, so I don't have to change FINE/INFO...
     private static transient final Level defaultLogLevel = Level.INFO;
-    private static transient final Pattern PAT_NAME = Pattern.compile("%name%");
-    private static transient final Pattern PAT_INDEX = Pattern
-            .compile("%index%");
 
     private static transient final Map<String, QName> qnameMap;
 
@@ -72,10 +67,6 @@ public class XMLSeries extends Series {
      */
     private String xpathString;
 
-    /**
-     * Url to use as a base for mapping points.
-     */
-    private String url;
 
     /**
      * String of the qname type to use
@@ -98,13 +89,13 @@ public class XMLSeries extends Series {
      * @throws ServletException
      */
     @DataBoundConstructor
-    public XMLSeries(String file, String xpath, String nodeType, String url) {
+    public XMLSeries(String file, String xpath, String nodeType, String baseUrl) {
         super(file, "", "xml");
 
         this.xpathString = xpath;
         this.nodeTypeString = nodeType;
         this.nodeType = qnameMap.get(nodeType);
-        this.url = url;
+        this.baseUrl = baseUrl;
     }
 
     private Object readResolve() {
@@ -121,21 +112,18 @@ public class XMLSeries extends Series {
         return nodeTypeString;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
     /***
+     * @param buildNumber the build number
      * @returns a List of PlotPoints where the label is the element name and the
      *          value is the node content.
      * @throws RunTimeException
      *             (NullPointerException)if a Node text content is not numeric
      ***/
     private List<PlotPoint> mapNodeNameAsLabelTextContentAsValueStrategy(
-            NodeList nodeList) {
+            NodeList nodeList, int buildNumber) {
         List<PlotPoint> retval = new ArrayList<PlotPoint>();
         for (int i = 0; i < nodeList.getLength(); i++) {
-            this.addNodeToList(retval, nodeList.item(i));
+            this.addNodeToList(retval, nodeList.item(i), buildNumber);
         }
         return retval;
     }
@@ -145,12 +133,13 @@ public class XMLSeries extends Series {
      * enabling users to create lists by selecting them such that names and
      * values share a common parent.  If a node has attributes and is empty 
      * that node will be re-enqueued as a parent to its attributes.
+     * @param buildNumber the build number
      * 
      * @returns a list of PlotPoints where the label is the last non numeric
      *          text content and the value is the last numeric text content for
      *          each set of nodes under a given parent.
      ***/
-    private List<PlotPoint> coalesceTextnodesAsLabelsStrategy(NodeList nodeList) {
+    private List<PlotPoint> coalesceTextnodesAsLabelsStrategy(NodeList nodeList, int buildNumber) {
         Map<Node, List<Node>> parentNodeMap = new HashMap<Node, List<Node>>();
 
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -187,7 +176,7 @@ public class XMLSeries extends Series {
                 }
             }
             if ((label != null) && (value != null)) {
-                addValueToList(retval, new String(label), String.valueOf(value));
+                addValueToList(retval, new String(label), String.valueOf(value), buildNumber);
             }
         }
         return retval;
@@ -201,7 +190,7 @@ public class XMLSeries extends Series {
      */
     @Override
     public List<PlotPoint> loadSeries(FilePath workspaceRootDir,
-            PrintStream logger) {
+            int buildNumber, PrintStream logger) {
         InputStream in = null;
         InputSource inputSource = null;
 
@@ -263,12 +252,12 @@ public class XMLSeries extends Series {
                     Node node = nl.item(i);
                     if (!new Scanner(node.getTextContent().trim())
                             .hasNextDouble()) {
-                        return coalesceTextnodesAsLabelsStrategy(nl);
+                        return coalesceTextnodesAsLabelsStrategy(nl, buildNumber);
                     }
                 }
-                return mapNodeNameAsLabelTextContentAsValueStrategy(nl);
+                return mapNodeNameAsLabelTextContentAsValueStrategy(nl, buildNumber);
             } else if (nodeType.equals(XPathConstants.NODE)) {
-                addNodeToList(ret, (Node) xmlObject);
+                addNodeToList(ret, (Node) xmlObject, buildNumber);
             } else {
                 // otherwise we have a single type and can do a toString on it.
                 if (xmlObject instanceof NodeList) {
@@ -283,12 +272,12 @@ public class XMLSeries extends Series {
 
                         if (n != null && n.getLocalName() != null
                                 && n.getTextContent() != null) {
-                            addValueToList(ret, label, xmlObject);
+                            addValueToList(ret, label, xmlObject, buildNumber);
                         }
                     }
 
                 } else {
-                    addValueToList(ret, label, xmlObject);
+                    addValueToList(ret, label, xmlObject, buildNumber);
                 }
             }
             return ret;
@@ -303,55 +292,15 @@ public class XMLSeries extends Series {
         return null;
     }
 
-    private void addNodeToList(List<PlotPoint> ret, Node n) {
+    private void addNodeToList(List<PlotPoint> ret, Node n, int buildNumber) {
         NamedNodeMap nodeMap = n.getAttributes();
 
         if ((null != nodeMap) && (null != nodeMap.getNamedItem("name"))) {
             addValueToList(ret, nodeMap.getNamedItem("name").getTextContent()
-                    .trim(), n);
+                    .trim(), n, buildNumber);
         } else {
-            addValueToList(ret, n.getLocalName().trim(), n);
+            addValueToList(ret, n.getLocalName().trim(), n, buildNumber);
         }
-    }
-
-    /**
-     * Return the url that should be used for this point.
-     * 
-     * @param label
-     *            Name of the column
-     * @param index
-     *            Index of the column
-     * @return url for the label.
-     */
-    private String getUrl(String label, int index) {
-        String resultUrl = this.url;
-        if(resultUrl != null) {
-            if (label == null) {
-                // This implmentation searches for tokens to replace. If the
-                // argument
-                // was NULL then replacing the null with an empty string should
-                // still
-                // produce the desired outcome.
-                label = "";
-            }
-            /*
-             * Check the name first, and do replacement upon it.
-             */
-            Matcher nameMatcher = PAT_NAME.matcher(resultUrl);
-            if (nameMatcher.find()) {
-                resultUrl = nameMatcher.replaceAll(label);
-            }
-    
-            /*
-             * Check the index, and do replacement on it.
-             */
-            Matcher indexMatcher = PAT_INDEX.matcher(resultUrl);
-            if (indexMatcher.find()) {
-                resultUrl = indexMatcher.replaceAll(String.valueOf(index));
-            }
-        }
-
-        return resultUrl;
     }
 
     /**
@@ -413,16 +362,17 @@ public class XMLSeries extends Series {
      * @param list
      * @param label
      * @param nodeValue
+     * @param buildNumber 
      */
     private void addValueToList(List<PlotPoint> list, String label,
-            Object nodeValue) {
+            Object nodeValue, int buildNumber) {
         String value = nodeToString(nodeValue);
 
         if (value != null) {
             if (LOGGER.isLoggable(defaultLogLevel))
                 LOGGER.log(defaultLogLevel, "Adding node: " + label
                         + " value: " + value);
-            list.add(new PlotPoint(value, getUrl(label, 0), label));
+            list.add(new PlotPoint(value, getUrl(label, 0, buildNumber), label));
         } else {
             if (LOGGER.isLoggable(defaultLogLevel))
                 LOGGER.log(defaultLogLevel, "Unable to add node: " + label

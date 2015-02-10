@@ -17,16 +17,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 
-import au.com.bytecode.opencsv.CSVReader;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * Represents a plot data series configuration from an CSV file.
@@ -39,8 +39,6 @@ public class CSVSeries extends Series {
     // Debugging hack, so I don't have to change FINE/INFO...
     private static transient final Level defaultLogLevel = Level.FINEST;
     private static transient final Pattern PAT_COMMA = Pattern.compile(",");
-	private static transient final Pattern PAT_NAME = Pattern.compile("%name%");
-	private static transient final Pattern PAT_INDEX = Pattern.compile("%index%");
 
 	public static enum InclusionFlag
 	{
@@ -71,10 +69,6 @@ public class CSVSeries extends Series {
 	 */
 	private String exclusionValues;
 
-	/**
-	 * Url to use as a base for mapping points.
-	 */
-	private String url;
 
 	private boolean displayTableFlag;
 
@@ -91,7 +85,7 @@ public class CSVSeries extends Series {
     {
     	super(file, "", "csv");
 
-    	this.url = url;
+    	this.baseUrl = url;
 
     	if (exclusionValues == null)
 		{
@@ -114,10 +108,6 @@ public class CSVSeries extends Series {
         return exclusionValues;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
     public boolean getDisplayTableFlag() {
     	return displayTableFlag;
     }
@@ -126,7 +116,7 @@ public class CSVSeries extends Series {
      * Load the series from a properties file.
      */
 	@Override
-    public List<PlotPoint> loadSeries(FilePath workspaceRootDir, PrintStream logger) {
+    public List<PlotPoint> loadSeries(FilePath workspaceRootDir, int buildNumber, PrintStream logger) {
         CSVReader reader = null;
 		InputStream in = null;
 		InputStreamReader inputReader = null;
@@ -199,7 +189,7 @@ public class CSVSeries extends Series {
 
             		// create a new point with the yvalue from the csv file and url from the URL_index in the properties file.
                 	if (!excludePoint(label,index)) {
-                		PlotPoint point = new PlotPoint(yvalue, getUrl(label,index), label);
+                		PlotPoint point = new PlotPoint(yvalue, getUrl(label, index, buildNumber), label);
                     	if (LOGGER.isLoggable(defaultLogLevel))
                     		LOGGER.log(defaultLogLevel,"CSV Point: [" +index + ":" + lineNum +"]"+ point);
                 		ret.add(point);
@@ -324,42 +314,5 @@ public class CSVSeries extends Series {
 					break;
 			}
 		}
-	}
-
-	/**
-	 * Return the url that should be used for this point.
-	 * @param label Name of the column
-	 * @param index Index of the column
-	 * @return url for the label.
-	 */
-	private String getUrl(String label,int index)
-	{
-        String resultUrl = this.url;
-        if (resultUrl != null) {
-            if (label == null) {
-                // This implmentation searches for tokens to replace. If the argument
-                // was NULL then replacing the null with an empty string should still
-                // produce the desired outcome.
-                label = "";
-            }
-            /*
-             * Check the name first, and do replacement upon it.
-             */
-            Matcher nameMatcher = PAT_NAME.matcher(resultUrl);
-            if (nameMatcher.find())
-            {
-                resultUrl = nameMatcher.replaceAll(label);
-            }
-
-            /*
-             * Check the index, and do replacement on it.
-             */
-            Matcher indexMatcher = PAT_INDEX.matcher(resultUrl);
-            if (indexMatcher.find())
-            {
-                resultUrl = indexMatcher.replaceAll(String.valueOf(index));
-            }
-        }
-		return resultUrl;
 	}
 }
