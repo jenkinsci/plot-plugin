@@ -4,7 +4,6 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.matrix.MatrixProject;
 import hudson.model.AbstractProject;
-import hudson.model.Descriptor.FormException;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
@@ -48,7 +47,8 @@ public class PlotDescriptor extends BuildStepDescriptor<Publisher> {
      * Called when the user saves the project configuration.
      */
     @Override
-    public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+    public Publisher newInstance(StaplerRequest req, JSONObject formData)
+            throws FormException {
         PlotPublisher publisher = new PlotPublisher();
         for (Object data : SeriesFactory.getArray(formData.get("plots"))) {
             publisher.addPlot(bindPlot((JSONObject) data, req));
@@ -65,7 +65,8 @@ public class PlotDescriptor extends BuildStepDescriptor<Publisher> {
     /**
      * Checks if the series file is valid.
      */
-    public FormValidation doCheckSeriesFile(@AncestorInPath AbstractProject<?, ?> project,
+    public FormValidation doCheckSeriesFile(
+            @AncestorInPath AbstractProject<?, ?> project,
             @QueryParameter String value) throws IOException {
         return FilePath.validateFileMask(project.getSomeWorkspace(), value);
     }

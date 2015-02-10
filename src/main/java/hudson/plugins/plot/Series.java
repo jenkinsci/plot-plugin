@@ -6,7 +6,6 @@
 package hudson.plugins.plot;
 
 import hudson.FilePath;
-import hudson.plugins.plot.Messages;
 
 import java.io.PrintStream;
 import java.util.List;
@@ -24,7 +23,7 @@ public abstract class Series {
     private static transient final Pattern PAT_INDEX = Pattern
             .compile("%index%");
     private static final Pattern PAT_BUILD_NUMBER = Pattern.compile("%build%");;
-    
+
     /**
      * Relative path to the data series property file. Mandatory.
      */
@@ -36,12 +35,11 @@ public abstract class Series {
     protected String label;
 
     /**
-     * Data series type. Mandatory.
-     * This can be csv, xml, or properties file.
-     * This should be an enum, but I am not sure how to support that with stapler at the moment
+     * Data series type. Mandatory. This can be csv, xml, or properties file.
+     * This should be an enum, but I am not sure how to support that with
+     * stapler at the moment
      */
     protected String fileType;
-    
 
     /**
      * Url to use as a base for mapping points.
@@ -53,7 +51,7 @@ public abstract class Series {
 
         // TODO: look into this, what do we do if there is no label?
         if (label == null)
-			label = Messages.Plot_Missing();
+            label = Messages.Plot_Missing();
 
         this.label = label;
         this.fileType = fileType;
@@ -62,9 +60,11 @@ public abstract class Series {
     public String getFile() {
         return file;
     }
+
     public String getLabel() {
         return label;
     }
+
     public String getFileType() {
         return fileType;
     }
@@ -72,18 +72,22 @@ public abstract class Series {
     /**
      * Retrieves the plot data for one series after a build from the workspace.
      *
-     * @param workspaceRootDir the root directory of the workspace
-     * @param buildNumber the build Number
-     * @param logger the logger to use
+     * @param workspaceRootDir
+     *            the root directory of the workspace
+     * @param buildNumber
+     *            the build Number
+     * @param logger
+     *            the logger to use
      * @return a PlotPoint array of points to plot
      */
-    public abstract List<PlotPoint> loadSeries(FilePath workspaceRootDir, int buildNumber, PrintStream logger);
+    public abstract List<PlotPoint> loadSeries(FilePath workspaceRootDir,
+            int buildNumber, PrintStream logger);
 
     // Convert data from before version 1.3
     private Object readResolve() {
         return (fileType == null) ? new PropertiesSeries(file, label) : this;
     }
-    
+
     /**
      * Return the url that should be used for this point.
      * 
@@ -97,7 +101,7 @@ public abstract class Series {
      */
     protected String getUrl(String label, int index, int buildNumber) {
         String resultUrl = this.baseUrl;
-        if(resultUrl != null) {
+        if (resultUrl != null) {
             if (label == null) {
                 // This implmentation searches for tokens to replace. If the
                 // argument
@@ -113,7 +117,7 @@ public abstract class Series {
             if (nameMatcher.find()) {
                 resultUrl = nameMatcher.replaceAll(label);
             }
-    
+
             /*
              * Check the index, and do replacement on it.
              */
@@ -121,17 +125,17 @@ public abstract class Series {
             if (indexMatcher.find()) {
                 resultUrl = indexMatcher.replaceAll(String.valueOf(index));
             }
-            
+
             /*
              * Check the build number first, and do replacement upon it.
              */
             Matcher buildNumberMatcher = PAT_BUILD_NUMBER.matcher(resultUrl);
             if (buildNumberMatcher.find()) {
-                resultUrl = buildNumberMatcher.replaceAll(String.valueOf(buildNumber));
+                resultUrl = buildNumberMatcher.replaceAll(String
+                        .valueOf(buildNumber));
             }
         }
 
         return resultUrl;
     }
 }
-

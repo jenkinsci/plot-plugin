@@ -17,30 +17,27 @@ import java.util.List;
  *
  */
 public class PropertiesSeriesTest extends SeriesTestCase {
-	private static final String[] files = {
-		"test.properties",
-	};
+    private static final String[] files = { "test.properties", };
 
-	private static final String[] labels = {
-		"testLabel",
-	};
+    private static final String[] labels = { "testLabel", };
 
-	public void testPropertiesSeries()
-	{
-		// first create a FilePath to load the test Properties file.
-		File workspaceDirFile = new File ("target/test-classes/");
-		FilePath workspaceRootDir = new FilePath (workspaceDirFile);
+    public void testPropertiesSeries() {
+        // first create a FilePath to load the test Properties file.
+        File workspaceDirFile = new File("target/test-classes/");
+        FilePath workspaceRootDir = new FilePath(workspaceDirFile);
 
-		System.out.println ("workspace path path: " + workspaceDirFile.getAbsolutePath());
+        System.out.println("workspace path path: "
+                + workspaceDirFile.getAbsolutePath());
 
-		// Create a new properties series.
-		PropertiesSeries propSeries = new PropertiesSeries(files[0],labels[0]);
+        // Create a new properties series.
+        PropertiesSeries propSeries = new PropertiesSeries(files[0], labels[0]);
 
-		// test the basic subclass properties.
-		testSeries(propSeries, files[0], labels[0], "properties");
+        // test the basic subclass properties.
+        testSeries(propSeries, files[0], labels[0], "properties");
 
-		// load the series.
-        List<PlotPoint> points = propSeries.loadSeries(workspaceRootDir, 0, System.err);
-		testPlotPoints(points, 1);
-	}
+        // load the series.
+        List<PlotPoint> points = propSeries.loadSeries(workspaceRootDir, 0,
+                System.err);
+        testPlotPoints(points, 1);
+    }
 }

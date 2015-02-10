@@ -15,22 +15,24 @@ import org.jfree.data.category.CategoryDataset;
 public class PointURLGenerator implements CategoryURLGenerator {
 
     /**
-     * Retrieves a URL from the given dataset for a particular 
-     * item within a series.  If the given dataset isn't a 
-     * PlotCategoryDataset, then null is returned.
+     * Retrieves a URL from the given dataset for a particular item within a
+     * series. If the given dataset isn't a PlotCategoryDataset, then null is
+     * returned.
      *
-     * @param dataset the dataset
-     * @param series the series index (zero-based)
-     * @param category the category index (zero-based)
+     * @param dataset
+     *            the dataset
+     * @param series
+     *            the series index (zero-based)
+     * @param category
+     *            the category index (zero-based)
      *
      * @return the generated URL
      */
-    public String generateURL(CategoryDataset dataset, int series, 
-                              int category) {
-    	if (dataset instanceof PlotCategoryDataset) {
-    		return ((PlotCategoryDataset)dataset).getUrl(series,category);
-    	} else {
-    		return null;
-    	}
-    }    
+    public String generateURL(CategoryDataset dataset, int series, int category) {
+        if (dataset instanceof PlotCategoryDataset) {
+            return ((PlotCategoryDataset) dataset).getUrl(series, category);
+        } else {
+            return null;
+        }
+    }
 }

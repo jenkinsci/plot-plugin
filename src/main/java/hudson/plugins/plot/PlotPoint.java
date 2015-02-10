@@ -5,86 +5,81 @@
 
 package hudson.plugins.plot;
 
-public class PlotPoint
-{
-	/**
-	 * YValue for a plot point
-	 */
-	private String yvalue;
-	
-	/**
-	 * Url for a plot point, can be null
-	 */
-	private String url;
+public class PlotPoint {
+    /**
+     * YValue for a plot point
+     */
+    private String yvalue;
 
-	/**
-	 * Label for a plot point
-	 */
-	private String label;
+    /**
+     * Url for a plot point, can be null
+     */
+    private String url;
 
-	/**
-	 */
-	public PlotPoint(String yvalue, String url, String label)
-	{
-		this.yvalue = yvalue;
-		
-		if (url==null)
-			url="";
-		
-		this.url = url;
-		this.label = label;
-	}
+    /**
+     * Label for a plot point
+     */
+    private String label;
 
-	/**
-	 * @return the yvalue for this point. 
+    /**
 	 */
-	public String getYvalue()
-	{
-		return yvalue;
-	}
+    public PlotPoint(String yvalue, String url, String label) {
+        this.yvalue = yvalue;
 
-	/**
-	 * @param yvalue set the yvalue for this point.
-	 */
-	public void setYvalue(String yvalue)
-	{
-		this.yvalue = yvalue;
-	}
+        if (url == null)
+            url = "";
 
-	/**
-	 * @return url for this point.
-	 */
-	public String getUrl()
-	{
-		return url;
-	}
+        this.url = url;
+        this.label = label;
+    }
 
-	/**
-	 * @param url set the url for this point.
-	 */
-	public void setUrl(String url)
-	{
-		this.url = url;
-	} 
+    /**
+     * @return the yvalue for this point.
+     */
+    public String getYvalue() {
+        return yvalue;
+    }
 
-	/**
-	 * @return label for this point.
-	 */
-	public String getLabel()
-	{
-		return label;
-	}
+    /**
+     * @param yvalue
+     *            set the yvalue for this point.
+     */
+    public void setYvalue(String yvalue) {
+        this.yvalue = yvalue;
+    }
 
-	/**
-	 * @param label set the label for this point.
-	 */
-	public void setLabel(String label)
-	{
-		this.label = label;
-	}
+    /**
+     * @return url for this point.
+     */
+    public String getUrl() {
+        return url;
+    }
 
-	@Override
-	public String toString() {
-		return label + " " + url + " " + yvalue;
-	} 
+    /**
+     * @param url
+     *            set the url for this point.
+     */
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    /**
+     * @return label for this point.
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    /**
+     * @param label
+     *            set the label for this point.
+     */
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    @Override
+    public String toString() {
+        return label + " " + url + " " + yvalue;
+    }
 }

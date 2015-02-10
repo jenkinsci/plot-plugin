@@ -19,11 +19,15 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author areese, Alan.Harder@sun.com
  */
 public class SeriesFactory {
-    //private static final Logger LOGGER = Logger.getLogger(SeriesFactory.class.getName());
+    // private static final Logger LOGGER =
+    // Logger.getLogger(SeriesFactory.class.getName());
 
     /**
-     * Using file and label and the Stapler request, create a subclass of series that can process the type selected.
-     * @param formData JSON data for series
+     * Using file and label and the Stapler request, create a subclass of series
+     * that can process the type selected.
+     * 
+     * @param formData
+     *            JSON data for series
      */
     public static Series createSeries(JSONObject formData, StaplerRequest req) {
         String file = formData.getString("file");
@@ -32,11 +36,14 @@ public class SeriesFactory {
         String type = formData.getString("value");
         Class<? extends Series> typeClass = null;
 
-        if ("properties".equals(type)) typeClass = PropertiesSeries.class;
-        else if ("csv".equals(type))   typeClass = CSVSeries.class;
-        else if ("xml".equals(type))   typeClass = XMLSeries.class;
+        if ("properties".equals(type))
+            typeClass = PropertiesSeries.class;
+        else if ("csv".equals(type))
+            typeClass = CSVSeries.class;
+        else if ("xml".equals(type))
+            typeClass = XMLSeries.class;
 
-        return typeClass!=null ? req.bindJSON(typeClass, formData) : null;
+        return typeClass != null ? req.bindJSON(typeClass, formData) : null;
     }
 
     public static List<Series> createSeriesList(Object data, StaplerRequest req) {
@@ -53,10 +60,12 @@ public class SeriesFactory {
      */
     public static JSONArray getArray(Object data) {
         JSONArray result;
-        if (data instanceof JSONArray) result = (JSONArray)data;
+        if (data instanceof JSONArray)
+            result = (JSONArray) data;
         else {
             result = new JSONArray();
-            if (data != null) result.add(data);
+            if (data != null)
+                result.add(data);
         }
         return result;
     }

@@ -67,7 +67,6 @@ public class XMLSeries extends Series {
      */
     private String xpathString;
 
-
     /**
      * String of the qname type to use
      */
@@ -113,7 +112,8 @@ public class XMLSeries extends Series {
     }
 
     /***
-     * @param buildNumber the build number
+     * @param buildNumber
+     *            the build number
      * @returns a List of PlotPoints where the label is the element name and the
      *          value is the node content.
      * @throws RunTimeException
@@ -131,15 +131,18 @@ public class XMLSeries extends Series {
     /***
      * This is a fallback strategy for nodesets that include non numeric content
      * enabling users to create lists by selecting them such that names and
-     * values share a common parent.  If a node has attributes and is empty 
-     * that node will be re-enqueued as a parent to its attributes.
-     * @param buildNumber the build number
+     * values share a common parent. If a node has attributes and is empty that
+     * node will be re-enqueued as a parent to its attributes.
+     * 
+     * @param buildNumber
+     *            the build number
      * 
      * @returns a list of PlotPoints where the label is the last non numeric
      *          text content and the value is the last numeric text content for
      *          each set of nodes under a given parent.
      ***/
-    private List<PlotPoint> coalesceTextnodesAsLabelsStrategy(NodeList nodeList, int buildNumber) {
+    private List<PlotPoint> coalesceTextnodesAsLabelsStrategy(
+            NodeList nodeList, int buildNumber) {
         Map<Node, List<Node>> parentNodeMap = new HashMap<Node, List<Node>>();
 
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -176,7 +179,8 @@ public class XMLSeries extends Series {
                 }
             }
             if ((label != null) && (value != null)) {
-                addValueToList(retval, new String(label), String.valueOf(value), buildNumber);
+                addValueToList(retval, new String(label),
+                        String.valueOf(value), buildNumber);
             }
         }
         return retval;
@@ -252,10 +256,12 @@ public class XMLSeries extends Series {
                     Node node = nl.item(i);
                     if (!new Scanner(node.getTextContent().trim())
                             .hasNextDouble()) {
-                        return coalesceTextnodesAsLabelsStrategy(nl, buildNumber);
+                        return coalesceTextnodesAsLabelsStrategy(nl,
+                                buildNumber);
                     }
                 }
-                return mapNodeNameAsLabelTextContentAsValueStrategy(nl, buildNumber);
+                return mapNodeNameAsLabelTextContentAsValueStrategy(nl,
+                        buildNumber);
             } else if (nodeType.equals(XPathConstants.NODE)) {
                 addNodeToList(ret, (Node) xmlObject, buildNumber);
             } else {
@@ -347,14 +353,13 @@ public class XMLSeries extends Series {
 
         // for Node/String/NodeSet, try and parse it as a double.
         // we don't store a double, so just throw away the result.
-        Scanner scanner = new Scanner( ret );
-        if( scanner.hasNextDouble() ){
+        Scanner scanner = new Scanner(ret);
+        if (scanner.hasNextDouble()) {
             return String.valueOf(scanner.nextDouble());
         }
         return null;
     }
 
-    
     /**
      * Add a given value to the list of results. This encapsulates some
      * otherwise duplicate logic due to nodeset/!nodeset
@@ -362,7 +367,7 @@ public class XMLSeries extends Series {
      * @param list
      * @param label
      * @param nodeValue
-     * @param buildNumber 
+     * @param buildNumber
      */
     private void addValueToList(List<PlotPoint> list, String label,
             Object nodeValue, int buildNumber) {
