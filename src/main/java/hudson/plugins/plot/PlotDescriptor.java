@@ -4,6 +4,7 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.matrix.MatrixProject;
 import hudson.model.AbstractProject;
+import hudson.plugins.plot.publisher.PlotPublisher;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;

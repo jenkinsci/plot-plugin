@@ -1,4 +1,4 @@
-package hudson.plugins.plot;
+package hudson.plugins.plot.publisher;
 
 import hudson.Extension;
 import hudson.FilePath;
@@ -10,6 +10,10 @@ import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.plugins.plot.Messages;
+import hudson.plugins.plot.Plot;
+import hudson.plugins.plot.SeriesFactory;
+import hudson.plugins.plot.action.MatrixPlotAction;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;

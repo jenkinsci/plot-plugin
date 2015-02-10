@@ -5,6 +5,8 @@
 package hudson.plugins.plot;
 
 import hudson.model.AbstractProject;
+import hudson.plugins.plot.series.CSVSeries;
+import hudson.plugins.plot.series.Series;
 
 import java.io.File;
 import java.io.FileReader;

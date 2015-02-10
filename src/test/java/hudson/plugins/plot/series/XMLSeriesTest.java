@@ -1,6 +1,8 @@
-package hudson.plugins.plot;
+package hudson.plugins.plot.series;
 
 import hudson.FilePath;
+import hudson.plugins.plot.PlotPoint;
+import hudson.plugins.plot.series.XMLSeries;
 
 import java.io.File;
 import java.util.HashMap;

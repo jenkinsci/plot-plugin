@@ -2,9 +2,11 @@
  * Copyright (c) 2008-2009 Yahoo! Inc.  All rights reserved.
  * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-package hudson.plugins.plot;
+package hudson.plugins.plot.series;
 
 import hudson.FilePath;
+import hudson.plugins.plot.PlotPoint;
+import hudson.plugins.plot.series.CSVSeries;
 
 import java.io.File;
 import java.io.IOException;
