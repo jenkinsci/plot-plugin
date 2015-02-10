@@ -8,7 +8,6 @@ package hudson.plugins.plot;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
-import hudson.plugins.plot.series.Series;
 import hudson.util.ChartUtil;
 import hudson.util.ShiftedCategoryAxis;
 

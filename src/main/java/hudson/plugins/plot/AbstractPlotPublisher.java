@@ -1,4 +1,4 @@
-package hudson.plugins.plot.publisher;
+package hudson.plugins.plot;
 
 import hudson.Util;
 import hudson.tasks.BuildStepMonitor;

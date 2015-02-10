@@ -3,10 +3,9 @@
  * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-package hudson.plugins.plot.series;
+package hudson.plugins.plot;
 
 import hudson.FilePath;
-import hudson.plugins.plot.PlotPoint;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -69,6 +68,11 @@ public class XMLSeries extends Series {
     private String xpathString;
 
     /**
+     * Url to use as a base for mapping points.
+     */
+    private String url;
+
+    /**
      * String of the qname type to use
      */
     private String nodeTypeString;
@@ -89,13 +93,13 @@ public class XMLSeries extends Series {
      * @throws ServletException
      */
     @DataBoundConstructor
-    public XMLSeries(String file, String xpath, String nodeType, String baseUrl) {
+    public XMLSeries(String file, String xpath, String nodeType, String url) {
         super(file, "", "xml");
 
         this.xpathString = xpath;
         this.nodeTypeString = nodeType;
         this.nodeType = qnameMap.get(nodeType);
-        this.baseUrl = baseUrl;
+        this.url = url;
     }
 
     private Object readResolve() {
@@ -110,6 +114,10 @@ public class XMLSeries extends Series {
 
     public String getNodeType() {
         return nodeTypeString;
+    }
+
+    public String getUrl() {
+        return url;
     }
 
     /***
@@ -378,7 +386,8 @@ public class XMLSeries extends Series {
             if (LOGGER.isLoggable(defaultLogLevel))
                 LOGGER.log(defaultLogLevel, "Adding node: " + label
                         + " value: " + value);
-            list.add(new PlotPoint(value, getUrl(label, 0, buildNumber), label));
+            list.add(new PlotPoint(value, getUrl(url, label, 0, buildNumber),
+                    label));
         } else {
             if (LOGGER.isLoggable(defaultLogLevel))
                 LOGGER.log(defaultLogLevel, "Unable to add node: " + label

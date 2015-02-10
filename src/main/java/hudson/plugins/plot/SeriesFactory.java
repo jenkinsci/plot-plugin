@@ -5,11 +5,6 @@
 
 package hudson.plugins.plot;
 
-import hudson.plugins.plot.series.CSVSeries;
-import hudson.plugins.plot.series.PropertiesSeries;
-import hudson.plugins.plot.series.Series;
-import hudson.plugins.plot.series.XMLSeries;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -3,10 +3,9 @@
  * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-package hudson.plugins.plot.series;
+package hudson.plugins.plot;
 
 import hudson.FilePath;
-import hudson.plugins.plot.PlotPoint;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,6 +65,11 @@ public class CSVSeries extends Series {
      */
     private String exclusionValues;
 
+    /**
+     * Url to use as a base for mapping points.
+     */
+    private String url;
+
     private boolean displayTableFlag;
 
     /**
@@ -83,7 +87,7 @@ public class CSVSeries extends Series {
             String exclusionValues, boolean displayTableFlag) {
         super(file, "", "csv");
 
-        this.baseUrl = url;
+        this.url = url;
 
         if (exclusionValues == null) {
             this.inclusionFlag = InclusionFlag.OFF;
@@ -103,6 +107,10 @@ public class CSVSeries extends Series {
 
     public String getExclusionValues() {
         return exclusionValues;
+    }
+
+    public String getUrl() {
+        return url;
     }
 
     public boolean getDisplayTableFlag() {
@@ -191,8 +199,8 @@ public class CSVSeries extends Series {
                     // create a new point with the yvalue from the csv file and
                     // url from the URL_index in the properties file.
                     if (!excludePoint(label, index)) {
-                        PlotPoint point = new PlotPoint(yvalue, getUrl(label,
-                                index, buildNumber), label);
+                        PlotPoint point = new PlotPoint(yvalue, getUrl(url,
+                                label, index, buildNumber), label);
                         if (LOGGER.isLoggable(defaultLogLevel))
                             LOGGER.log(defaultLogLevel, "CSV Point: [" + index
                                     + ":" + lineNum + "]" + point);

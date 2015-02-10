@@ -2,13 +2,11 @@
  * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.
  * Copyrights licensed under the MIT License.
  */
-package hudson.plugins.plot.action;
+package hudson.plugins.plot;
 
 import hudson.model.Action;
 import hudson.model.AbstractProject;
 import hudson.plugins.plot.Messages;
-import hudson.plugins.plot.PlotReport;
-import hudson.plugins.plot.publisher.PlotPublisher;
 
 import java.io.IOException;
 import java.util.List;

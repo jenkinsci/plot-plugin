@@ -1,11 +1,9 @@
-package hudson.plugins.plot.action;
+package hudson.plugins.plot;
 
 import hudson.matrix.MatrixConfiguration;
 import hudson.model.Action;
 import hudson.model.AbstractProject;
 import hudson.plugins.plot.Messages;
-import hudson.plugins.plot.PlotReport;
-import hudson.plugins.plot.publisher.MatrixPlotPublisher;
 
 import java.io.IOException;
 import java.util.List;

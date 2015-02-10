@@ -6,7 +6,6 @@
 package hudson.plugins.plot;
 
 import hudson.FilePath;
-import hudson.plugins.plot.series.SeriesTestCase;
 
 import java.io.File;
 import java.io.IOException;

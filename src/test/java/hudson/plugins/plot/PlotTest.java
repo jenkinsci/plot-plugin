@@ -33,12 +33,6 @@ import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.FreeStyleProject;
-import hudson.plugins.plot.action.MatrixPlotAction;
-import hudson.plugins.plot.action.PlotAction;
-import hudson.plugins.plot.publisher.MatrixPlotPublisher;
-import hudson.plugins.plot.publisher.PlotPublisher;
-import hudson.plugins.plot.series.PropertiesSeries;
-import hudson.plugins.plot.series.Series;
 import hudson.tasks.Builder;
 import hudson.tasks.LogRotator;
 

@@ -2,16 +2,13 @@
  * Copyright (c) 2007-2009 Yahoo! Inc.  All rights reserved.
  * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-package hudson.plugins.plot.publisher;
+package hudson.plugins.plot;
 
 import hudson.Launcher;
 import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.plugins.plot.Plot;
-import hudson.plugins.plot.PlotDescriptor;
-import hudson.plugins.plot.action.PlotAction;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 

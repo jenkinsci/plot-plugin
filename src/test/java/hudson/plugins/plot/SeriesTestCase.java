@@ -3,10 +3,10 @@
  * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-package hudson.plugins.plot.series;
+package hudson.plugins.plot;
 
 import hudson.plugins.plot.PlotPoint;
-import hudson.plugins.plot.series.Series;
+import hudson.plugins.plot.Series;
 
 import java.util.List;
 

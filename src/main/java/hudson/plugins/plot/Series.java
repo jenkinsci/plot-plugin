@@ -3,11 +3,9 @@
  * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-package hudson.plugins.plot.series;
+package hudson.plugins.plot;
 
 import hudson.FilePath;
-import hudson.plugins.plot.Messages;
-import hudson.plugins.plot.PlotPoint;
 
 import java.io.PrintStream;
 import java.util.List;
@@ -43,10 +41,7 @@ public abstract class Series {
      */
     protected String fileType;
 
-    /**
-     * Url to use as a base for mapping points.
-     */
-    protected String baseUrl;
+    
 
     protected Series(String file, String label, String fileType) {
         this.file = file;
@@ -101,8 +96,8 @@ public abstract class Series {
      *            The build number
      * @return url for the label.
      */
-    protected String getUrl(String label, int index, int buildNumber) {
-        String resultUrl = this.baseUrl;
+    protected String getUrl(String baseUrl, String label, int index, int buildNumber) {
+        String resultUrl = baseUrl;
         if (resultUrl != null) {
             if (label == null) {
                 // This implmentation searches for tokens to replace. If the
