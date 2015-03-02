@@ -6,10 +6,11 @@ import hudson.Launcher;
 import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixRun;
 import hudson.matrix.MatrixProject;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.BuildListener;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.plugins.plot.Messages;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
@@ -67,7 +68,8 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     public List<String> getOriginalGroups(MatrixConfiguration configuration) {
         List<String> originalGroups = new ArrayList<String>();
         for (String urlGroup : groupMap.keySet()) {
-            originalGroups.add(urlGroupToOriginalGroup(urlGroup, configuration));
+            originalGroups
+                    .add(urlGroupToOriginalGroup(urlGroup, configuration));
         }
         Collections.sort(originalGroups);
         return originalGroups;
@@ -76,7 +78,8 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     /**
      * Reset Configuration and set plots settings for matrixConfiguration
      *
-     * @param plots the new list of plots
+     * @param plots
+     *            the new list of plots
      */
     public void setPlots(List<Plot> plots) {
         this.plots = plots;
@@ -87,7 +90,8 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     /**
      * Adds the new plot to the plot data structures managed by this object.
      *
-     * @param plot the new plot
+     * @param plot
+     *            the new plot
      */
     public void addPlot(Plot plot) {
         String urlGroup = originalGroupToUrlEncodedGroup(plot.getGroup());
@@ -102,9 +106,11 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
         if (plotsOfConfigurations.get((MatrixConfiguration) plot.getProject()) == null) {
             List<Plot> list = new ArrayList<Plot>();
             list.add(plot);
-            plotsOfConfigurations.put((MatrixConfiguration) plot.getProject(), list);
+            plotsOfConfigurations.put((MatrixConfiguration) plot.getProject(),
+                    list);
         } else {
-            plotsOfConfigurations.get((MatrixConfiguration) plot.getProject()).add(plot);
+            plotsOfConfigurations.get((MatrixConfiguration) plot.getProject())
+                    .add(plot);
         }
     }
 
@@ -121,10 +127,11 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     }
 
     /**
-     * Returns the list of plots with the given group name. The given
-     * group must be the URL friendly form of the group name.
+     * Returns the list of plots with the given group name. The given group must
+     * be the URL friendly form of the group name.
      */
-    public List<Plot> getPlots(String urlGroup, MatrixConfiguration configuration) {
+    public List<Plot> getPlots(String urlGroup,
+            MatrixConfiguration configuration) {
         List<Plot> groupPlots = new ArrayList<Plot>();
         List<Plot> p = groupMap.get(urlGroup);
         if (p != null) {
@@ -150,10 +157,12 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
 
     @Override
     public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
-        if (!plotsOfConfigurations.containsKey((MatrixConfiguration) build.getProject())) {
+        if (!plotsOfConfigurations.containsKey((MatrixConfiguration) build
+                .getProject())) {
             for (Plot p : plots) {
-                Plot plot = new Plot(p.title, p.yaxis, p.group, p.numBuilds, p.csvFileName, p.style, p.useDescr,
-                        p.getKeepRecords(), p.getExclZero(), p.isLogarithmic());
+                Plot plot = new Plot(p.title, p.yaxis, p.group, p.numBuilds,
+                        p.csvFileName, p.style, p.useDescr, p.getKeepRecords(),
+                        p.getExclZero(), p.isLogarithmic());
                 plot.series = p.series;
                 plot.setProject((MatrixConfiguration) build.getProject());
                 addPlot(plot);
@@ -171,7 +180,8 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
         listener.getLogger().println("Recording plot data");
 
         // add the build to each plot
-        for (Plot plot : plotsOfConfigurations.get(((MatrixRun) build).getProject())) {
+        for (Plot plot : plotsOfConfigurations.get(((MatrixRun) build)
+                .getProject())) {
             plot.addBuild(build, listener.getLogger());
         }
         // misconfigured plots will not fail a build so always return true
@@ -216,7 +226,8 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
          * Called when the user saves the project configuration.
          */
         @Override
-        public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+        public Publisher newInstance(StaplerRequest req, JSONObject formData)
+                throws FormException {
             MatrixPlotPublisher publisher = new MatrixPlotPublisher();
             List<Plot> plots = new ArrayList<Plot>();
             for (Object data : SeriesFactory.getArray(formData.get("plots"))) {
@@ -235,7 +246,8 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
         /**
          * Checks if the series file is valid.
          */
-        public FormValidation doCheckSeriesFile(@AncestorInPath AbstractProject project,
+        public FormValidation doCheckSeriesFile(
+                @AncestorInPath AbstractProject project,
                 @QueryParameter String value) throws IOException {
             return FilePath.validateFileMask(project.getSomeWorkspace(), value);
         }

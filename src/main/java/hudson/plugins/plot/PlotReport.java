@@ -28,63 +28,65 @@ import au.com.bytecode.opencsv.CSVReader;
  * @author Nigel Daley
  */
 public class PlotReport {
-	private static final Logger LOGGER = Logger.getLogger(PlotReport.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PlotReport.class
+            .getName());
 
     private final AbstractProject<?, ?> project;
 
-	/**
-	 * The sorted list of plots that belong to the same group.
-	 */
+    /**
+     * The sorted list of plots that belong to the same group.
+     */
     private List<Plot> plots;
 
-	/**
-	 * The group these plots belong to.
-	 */
-	private String group;
+    /**
+     * The group these plots belong to.
+     */
+    private String group;
 
-    public PlotReport(AbstractProject<?, ?> project, String group, List<Plot> plots) {
+    public PlotReport(AbstractProject<?, ?> project, String group,
+            List<Plot> plots) {
         Collections.sort(plots);
-		this.plots = plots;
-		this.group = group;
-		this.project = project;
-	}
+        this.plots = plots;
+        this.group = group;
+        this.project = project;
+    }
 
-	// called from PlotReport/index.jelly
+    // called from PlotReport/index.jelly
     public AbstractProject<?, ?> getProject() {
         return project;
     }
 
-	// called from PlotReport/index.jelly
+    // called from PlotReport/index.jelly
     public String getGroup() {
         return group;
     }
 
     // called from PlotReport/index.jelly
     public List<Plot> getPlots() {
-		return plots;
-	}
+        return plots;
+    }
 
-	// called from PlotReport/index.jelly
-	public void doGetPlot(StaplerRequest req, StaplerResponse rsp) {
-		String i = req.getParameter("index");
-		Plot plot = getPlot(i);
-		try {
-			plot.plotGraph(req,rsp);
-		} catch (IOException ioe) {
+    // called from PlotReport/index.jelly
+    public void doGetPlot(StaplerRequest req, StaplerResponse rsp) {
+        String i = req.getParameter("index");
+        Plot plot = getPlot(i);
+        try {
+            plot.plotGraph(req, rsp);
+        } catch (IOException ioe) {
             LOGGER.log(Level.SEVERE, "Exception plotting graph", ioe);
-		}
-	}
+        }
+    }
 
-	// called from PlotReport/index.jelly
-	public void doGetPlotMap(StaplerRequest req, StaplerResponse rsp) {
-		String i = req.getParameter("index");
-		Plot plot = getPlot(i);
-		try {
-			plot.plotGraphMap(req,rsp);
-		} catch (IOException ioe) {
+    // called from PlotReport/index.jelly
+    public void doGetPlotMap(StaplerRequest req, StaplerResponse rsp) {
+        String i = req.getParameter("index");
+        Plot plot = getPlot(i);
+        try {
+            plot.plotGraphMap(req, rsp);
+        } catch (IOException ioe) {
             LOGGER.log(Level.SEVERE, "Exception plotting graph", ioe);
-		}
-	}
+        }
+    }
 
     // called from PlotReport/index.jelly
     public boolean getDisplayTableFlag(int i) {
@@ -92,12 +94,13 @@ public class PlotReport {
 
         if (CollectionUtils.isNotEmpty(plot.getSeries())) {
             Series series = plot.getSeries().get(0);
-            return (series instanceof CSVSeries) && ((CSVSeries) series).getDisplayTableFlag();
-    	}
+            return (series instanceof CSVSeries)
+                    && ((CSVSeries) series).getDisplayTableFlag();
+        }
         return false;
     }
 
-	// called from PlotReport/index.jelly
+    // called from PlotReport/index.jelly
     public List<List<String>> getTable(int i) {
         List<List<String>> tableData = new ArrayList<List<String>>();
 
@@ -112,7 +115,8 @@ public class PlotReport {
         try {
             reader = new CSVReader(new FileReader(plotFile));
             // throw away 2 header lines
-            reader.readNext(); reader.readNext();
+            reader.readNext();
+            reader.readNext();
             // array containing header titles
             List<String> header = new ArrayList<String>();
             header.add(Messages.Plot_Build() + " #");
@@ -166,17 +170,17 @@ public class PlotReport {
             }
         } catch (IOException ioe) {
             LOGGER.log(Level.SEVERE, "Exception reading csv file", ioe);
-            //ignore
+            // ignore
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException ignore) {
-                    //ignore
+                    // ignore
                 }
             }
         }
-    	return tableData;
+        return tableData;
     }
 
     private Plot getPlot(int i) {
@@ -186,11 +190,11 @@ public class PlotReport {
     }
 
     private Plot getPlot(String i) {
-    	try {
+        try {
             return getPlot(Integer.valueOf(i));
-    	} catch (NumberFormatException ignore) {
-    		LOGGER.log(Level.SEVERE, "Exception converting to integer", ignore);
-    		return null;
-    	}
+        } catch (NumberFormatException ignore) {
+            LOGGER.log(Level.SEVERE, "Exception converting to integer", ignore);
+            return null;
+        }
     }
 }

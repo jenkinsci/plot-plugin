@@ -1,8 +1,9 @@
 package hudson.plugins.plot;
 
 import hudson.matrix.MatrixConfiguration;
-import hudson.model.AbstractProject;
 import hudson.model.Action;
+import hudson.model.AbstractProject;
+import hudson.plugins.plot.Messages;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,7 +22,8 @@ public class MatrixPlotAction implements Action, StaplerProxy {
     private MatrixConfiguration project;
     private MatrixPlotPublisher publisher;
 
-    public MatrixPlotAction(MatrixConfiguration project, MatrixPlotPublisher publisher) {
+    public MatrixPlotAction(MatrixConfiguration project,
+            MatrixPlotPublisher publisher) {
         this.project = project;
         this.publisher = publisher;
     }
@@ -48,20 +50,20 @@ public class MatrixPlotAction implements Action, StaplerProxy {
     // called from href created in PlotAction/index.jelly
     public PlotReport getDynamic(String group, StaplerRequest req,
             StaplerResponse rsp) throws IOException {
-        return new PlotReport(project,
-                publisher.urlGroupToOriginalGroup(getUrlGroup(group), project),
-                publisher.getPlots(getUrlGroup(group), project));
+        return new PlotReport(project, publisher.urlGroupToOriginalGroup(
+                getUrlGroup(group), project), publisher.getPlots(
+                getUrlGroup(group), project));
     }
 
     /**
-     * If there's only one plot category, simply display that
-     * category of reports on this view.
+     * If there's only one plot category, simply display that category of
+     * reports on this view.
      */
     public Object getTarget() {
         List<String> groups = getOriginalGroups();
         if (groups != null && groups.size() == 1) {
-            return new PlotReport(project, groups.get(0),
-                    publisher.getPlots(getUrlGroup(groups.get(0)), project));
+            return new PlotReport(project, groups.get(0), publisher.getPlots(
+                    getUrlGroup(groups.get(0)), project));
         } else {
             return this;
         }

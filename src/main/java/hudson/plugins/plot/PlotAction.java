@@ -4,8 +4,9 @@
  */
 package hudson.plugins.plot;
 
-import hudson.model.AbstractProject;
 import hudson.model.Action;
+import hudson.model.AbstractProject;
+import hudson.plugins.plot.Messages;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,7 +24,8 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class PlotAction implements Action, StaplerProxy {
 
-    private static final Logger LOGGER = Logger.getLogger(PlotAction.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PlotAction.class
+            .getName());
     private final AbstractProject<?, ?> project;
     private final PlotPublisher publisher;
 
@@ -55,34 +57,33 @@ public class PlotAction implements Action, StaplerProxy {
 
     // called from PlotAction/index.jelly
     public List<String> getOriginalGroups() {
-    	return publisher.getOriginalGroups();
+        return publisher.getOriginalGroups();
     }
 
     // called from PlotAction/index.jelly
     public String getUrlGroup(String originalGroup) {
-    	return publisher.originalGroupToUrlEncodedGroup(originalGroup);
+        return publisher.originalGroupToUrlEncodedGroup(originalGroup);
     }
 
     // called from href created in PlotAction/index.jelly
     public PlotReport getDynamic(String group, StaplerRequest req,
-    		StaplerResponse rsp) throws IOException
-    {
-    	return new PlotReport(project,
-                       publisher.urlGroupToOriginalGroup(getUrlGroup(group)),
-                       publisher.getPlots(getUrlGroup(group)));
+            StaplerResponse rsp) throws IOException {
+        return new PlotReport(project,
+                publisher.urlGroupToOriginalGroup(getUrlGroup(group)),
+                publisher.getPlots(getUrlGroup(group)));
     }
 
     /**
-     * If there's only one plot category, simply display that
-     * category of reports on this view.
+     * If there's only one plot category, simply display that category of
+     * reports on this view.
      */
     public Object getTarget() {
         List<String> groups = getOriginalGroups();
         if (groups != null && groups.size() == 1) {
             return new PlotReport(project, groups.get(0),
                     publisher.getPlots(getUrlGroup(groups.get(0))));
-    	} else {
-    		return this;
-    	}
+        } else {
+            return this;
+        }
     }
 }

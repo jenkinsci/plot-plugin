@@ -5,10 +5,10 @@
 package hudson.plugins.plot;
 
 import hudson.Launcher;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.BuildListener;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 
@@ -29,18 +29,18 @@ import org.apache.commons.collections.CollectionUtils;
  */
 public class PlotPublisher extends AbstractPlotPublisher {
 
-    private static final Logger LOGGER = Logger.getLogger(PlotPublisher.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PlotPublisher.class
+            .getName());
     /**
-     * Array of Plot objects that represent the job's configured
-     * plots; must be non-null
+     * Array of Plot objects that represent the job's configured plots; must be
+     * non-null
      */
     private List<Plot> plots = new ArrayList<Plot>();
     /**
-     * Maps plot groups to plot objects; group strings are in a
-     * URL friendly format; map must be non-null
+     * Maps plot groups to plot objects; group strings are in a URL friendly
+     * format; map must be non-null
      */
-    transient private Map<String, List<Plot>> groupMap =
-            new HashMap<String, List<Plot>>();
+    transient private Map<String, List<Plot>> groupMap = new HashMap<String, List<Plot>>();
 
     /**
      * Setup the groupMap upon deserialization.
@@ -51,9 +51,9 @@ public class PlotPublisher extends AbstractPlotPublisher {
     }
 
     /**
-     * Converts a URL friendly plot group name to the original group name.
-     * If the given urlGroup doesn't already exist then the empty string will
-     * be returned.
+     * Converts a URL friendly plot group name to the original group name. If
+     * the given urlGroup doesn't already exist then the empty string will be
+     * returned.
      */
     public String urlGroupToOriginalGroup(String urlGroup) {
         if (urlGroup == null || "nogroup".equals(urlGroup)) {
@@ -83,7 +83,8 @@ public class PlotPublisher extends AbstractPlotPublisher {
     /**
      * Replaces the plots managed by this object with the given list.
      *
-     * @param plots the new list of plots
+     * @param plots
+     *            the new list of plots
      */
     public void setPlots(List<Plot> plots) {
         this.plots = new ArrayList<Plot>();
@@ -96,7 +97,8 @@ public class PlotPublisher extends AbstractPlotPublisher {
     /**
      * Adds the new plot to the plot data structures managed by this object.
      *
-     * @param plot the new plot
+     * @param plot
+     *            the new plot
      */
     public void addPlot(Plot plot) {
         // update the plot list
@@ -121,8 +123,8 @@ public class PlotPublisher extends AbstractPlotPublisher {
     }
 
     /**
-     * Returns the list of plots with the given group name.  The given
-     * group must be the URL friendly form of the group name.
+     * Returns the list of plots with the given group name. The given group must
+     * be the URL friendly form of the group name.
      */
     public List<Plot> getPlots(String urlGroup) {
         List<Plot> p = groupMap.get(urlGroup);

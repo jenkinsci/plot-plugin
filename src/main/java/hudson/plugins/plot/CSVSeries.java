@@ -17,16 +17,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 
-import au.com.bytecode.opencsv.CSVReader;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * Represents a plot data series configuration from an CSV file.
@@ -35,75 +35,70 @@ import org.kohsuke.stapler.DataBoundConstructor;
  *
  */
 public class CSVSeries extends Series {
-    private static transient final Logger LOGGER = Logger.getLogger(CSVSeries.class.getName());
+    private static transient final Logger LOGGER = Logger
+            .getLogger(CSVSeries.class.getName());
     // Debugging hack, so I don't have to change FINE/INFO...
     private static transient final Level defaultLogLevel = Level.FINEST;
     private static transient final Pattern PAT_COMMA = Pattern.compile(",");
-	private static transient final Pattern PAT_NAME = Pattern.compile("%name%");
-	private static transient final Pattern PAT_INDEX = Pattern.compile("%index%");
 
-	public static enum InclusionFlag
-	{
-		OFF,
-		INCLUDE_BY_STRING,
-		EXCLUDE_BY_STRING,
-		INCLUDE_BY_COLUMN,
-		EXCLUDE_BY_COLUMN,
-	};
+    public static enum InclusionFlag {
+        OFF, INCLUDE_BY_STRING, EXCLUDE_BY_STRING, INCLUDE_BY_COLUMN, EXCLUDE_BY_COLUMN,
+    };
 
-	/**
-	 * Set for excluding values by column name
-	 */
-	private Set<String> strExclusionSet;
+    /**
+     * Set for excluding values by column name
+     */
+    private Set<String> strExclusionSet;
 
-	/**
-	 * Set for excluding values by column #
-	 */
-	private Set<Integer> colExclusionSet;
+    /**
+     * Set for excluding values by column #
+     */
+    private Set<Integer> colExclusionSet;
 
-	/**
-	 * Flag controlling how values are excluded.
-	 */
-	private InclusionFlag inclusionFlag = InclusionFlag.OFF;
+    /**
+     * Flag controlling how values are excluded.
+     */
+    private InclusionFlag inclusionFlag = InclusionFlag.OFF;
 
-	/**
-	 * Comma separated list of columns to exclude.
-	 */
-	private String exclusionValues;
+    /**
+     * Comma separated list of columns to exclude.
+     */
+    private String exclusionValues;
 
-	/**
-	 * Url to use as a base for mapping points.
-	 */
-	private String url;
+    /**
+     * Url to use as a base for mapping points.
+     */
+    private String url;
 
-	private boolean displayTableFlag;
+    private boolean displayTableFlag;
 
-	/**
-	 *
-	 * @param file
-	 * @param label
-	 * @param req Stapler request
-	 * @param radioButtonId ID used to find the parameters specific to this instance.
-	 * @throws ServletException
-	 */
+    /**
+     *
+     * @param file
+     * @param label
+     * @param req
+     *            Stapler request
+     * @param radioButtonId
+     *            ID used to find the parameters specific to this instance.
+     * @throws ServletException
+     */
     @DataBoundConstructor
-    public CSVSeries(String file, String url, String inclusionFlag, String exclusionValues, boolean displayTableFlag)
-    {
-    	super(file, "", "csv");
+    public CSVSeries(String file, String url, String inclusionFlag,
+            String exclusionValues, boolean displayTableFlag) {
+        super(file, "", "csv");
 
-    	this.url = url;
+        this.url = url;
 
-    	if (exclusionValues == null)
-		{
-			this.inclusionFlag = InclusionFlag.OFF;
-			return;
-		}
+        if (exclusionValues == null) {
+            this.inclusionFlag = InclusionFlag.OFF;
+            return;
+        }
 
-    	this.inclusionFlag = InclusionFlag.valueOf(inclusionFlag);
-    	this.exclusionValues = exclusionValues;
-    	this.displayTableFlag = displayTableFlag;
+        this.inclusionFlag = InclusionFlag.valueOf(inclusionFlag);
+        this.exclusionValues = exclusionValues;
+        this.displayTableFlag = displayTableFlag;
 
-    	loadExclusionSet();
+        loadExclusionSet();
     }
 
     public String getInclusionFlag() {
@@ -119,95 +114,103 @@ public class CSVSeries extends Series {
     }
 
     public boolean getDisplayTableFlag() {
-    	return displayTableFlag;
+        return displayTableFlag;
     }
 
     /**
      * Load the series from a properties file.
      */
-	@Override
-    public List<PlotPoint> loadSeries(FilePath workspaceRootDir, PrintStream logger) {
+    @Override
+    public List<PlotPoint> loadSeries(FilePath workspaceRootDir,
+            int buildNumber, PrintStream logger) {
         CSVReader reader = null;
-		InputStream in = null;
-		InputStreamReader inputReader = null;
+        InputStream in = null;
+        InputStreamReader inputReader = null;
 
         try {
-			List<PlotPoint> ret = new ArrayList<PlotPoint>();
+            List<PlotPoint> ret = new ArrayList<PlotPoint>();
 
-			FilePath[] seriesFiles = null;
-	        try {
-	            seriesFiles = workspaceRootDir.list(getFile());
-	        } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Exception trying to retrieve series files", e);
-	            return null;
-	        }
+            FilePath[] seriesFiles = null;
+            try {
+                seriesFiles = workspaceRootDir.list(getFile());
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE,
+                        "Exception trying to retrieve series files", e);
+                return null;
+            }
 
             if (ArrayUtils.isEmpty(seriesFiles)) {
-	        	LOGGER.info("No plot data file found: " + workspaceRootDir.getName() + " " + getFile());
-	            return null;
-	        }
+                LOGGER.info("No plot data file found: "
+                        + workspaceRootDir.getName() + " " + getFile());
+                return null;
+            }
 
-	        try {
-            	if (LOGGER.isLoggable(defaultLogLevel))
-	        		LOGGER.log(defaultLogLevel,"Loading plot series data from: " + getFile());
+            try {
+                if (LOGGER.isLoggable(defaultLogLevel))
+                    LOGGER.log(defaultLogLevel,
+                            "Loading plot series data from: " + getFile());
 
-	            in = seriesFiles[0].read();
-	        } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Exception reading plot series data from " + seriesFiles[0], e);
-	            return null;
-	        }
+                in = seriesFiles[0].read();
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE,
+                        "Exception reading plot series data from "
+                                + seriesFiles[0], e);
+                return null;
+            }
 
-        	if (LOGGER.isLoggable(defaultLogLevel))
-        		LOGGER.log(defaultLogLevel,"Loaded CSV Plot file: " + getFile());
+            if (LOGGER.isLoggable(defaultLogLevel))
+                LOGGER.log(defaultLogLevel, "Loaded CSV Plot file: "
+                        + getFile());
 
-	        // load existing plot file
-        	inputReader = new InputStreamReader(in);
+            // load existing plot file
+            inputReader = new InputStreamReader(in);
             reader = new CSVReader(inputReader);
             String[] nextLine;
 
             // save the header line to use it for the plot labels.
-            String[] headerLine=reader.readNext();
+            String[] headerLine = reader.readNext();
 
-        	// read each line of the CSV file and add to rawPlotData
-            int lineNum=0;
-            while ((nextLine = reader.readNext()) != null)
-            {
-            	// skip empty lines
-            	if (nextLine.length==1 && nextLine[0].length()==0)
-            		continue;
+            // read each line of the CSV file and add to rawPlotData
+            int lineNum = 0;
+            while ((nextLine = reader.readNext()) != null) {
+                // skip empty lines
+                if (nextLine.length == 1 && nextLine[0].length() == 0)
+                    continue;
 
-            	for (int index = 0; index < nextLine.length; index++)
-            	{
-                	String yvalue;
-                	String label = null;
+                for (int index = 0; index < nextLine.length; index++) {
+                    String yvalue;
+                    String label = null;
 
-                	if (index > nextLine.length)
-                		continue;
+                    if (index > nextLine.length)
+                        continue;
 
-                	yvalue = nextLine[index];
+                    yvalue = nextLine[index];
 
-                	if (index < headerLine.length)
-                		label = headerLine[index];
+                    if (index < headerLine.length)
+                        label = headerLine[index];
 
-                	if (label == null || label.length()<=0)
-                	{
-                		// if there isn't a label, use the index as the label
-                		label = "" + index;
-                	}
+                    if (label == null || label.length() <= 0) {
+                        // if there isn't a label, use the index as the label
+                        label = "" + index;
+                    }
 
-                	//LOGGER.finest("Loaded point: " + point);
+                    // LOGGER.finest("Loaded point: " + point);
 
-            		// create a new point with the yvalue from the csv file and url from the URL_index in the properties file.
-                	if (!excludePoint(label,index)) {
-                		PlotPoint point = new PlotPoint(yvalue, getUrl(label,index), label);
-                    	if (LOGGER.isLoggable(defaultLogLevel))
-                    		LOGGER.log(defaultLogLevel,"CSV Point: [" +index + ":" + lineNum +"]"+ point);
-                		ret.add(point);
-                	} else {
-                    	if (LOGGER.isLoggable(defaultLogLevel))
-                    		LOGGER.log(defaultLogLevel,"excluded CSV Column: " + index + " : " + label);
-                	}
-            	}
+                    // create a new point with the yvalue from the csv file and
+                    // url from the URL_index in the properties file.
+                    if (!excludePoint(label, index)) {
+                        PlotPoint point = new PlotPoint(yvalue, getUrl(url,
+                                label, index, buildNumber), label);
+                        if (LOGGER.isLoggable(defaultLogLevel))
+                            LOGGER.log(defaultLogLevel, "CSV Point: [" + index
+                                    + ":" + lineNum + "]" + point);
+                        ret.add(point);
+                    } else {
+                        if (LOGGER.isLoggable(defaultLogLevel))
+                            LOGGER.log(defaultLogLevel, "excluded CSV Column: "
+                                    + index + " : " + label);
+                    }
+                }
                 lineNum++;
             }
 
@@ -216,11 +219,11 @@ public class CSVSeries extends Series {
         } catch (IOException ioe) {
             LOGGER.log(Level.SEVERE, "Exception loading series", ioe);
         } finally {
-        	if (reader != null) {
+            if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException ignore) {
-                    //ignore
+                    // ignore
                 }
             }
             IOUtils.closeQuietly(inputReader);
@@ -230,136 +233,96 @@ public class CSVSeries extends Series {
         return null;
     }
 
-	/**
-	 * This function checks the exclusion/inclusion filters from the properties file and
-	 * returns true if a point should be excluded.
-	 * @return true if the point should be excluded based on label or column
-	 */
-	private boolean excludePoint(String label,int index)
-	{
-		if (inclusionFlag == null || inclusionFlag == InclusionFlag.OFF)
-			return false;
+    /**
+     * This function checks the exclusion/inclusion filters from the properties
+     * file and returns true if a point should be excluded.
+     * 
+     * @return true if the point should be excluded based on label or column
+     */
+    private boolean excludePoint(String label, int index) {
+        if (inclusionFlag == null || inclusionFlag == InclusionFlag.OFF)
+            return false;
 
-		boolean retVal=false;
+        boolean retVal = false;
 
-		switch (inclusionFlag)
-		{
-			case INCLUDE_BY_STRING:
-				// if the set contains it, don't exclude it.
-				retVal = !(strExclusionSet.contains(label));
-				break;
+        switch (inclusionFlag) {
+        case INCLUDE_BY_STRING:
+            // if the set contains it, don't exclude it.
+            retVal = !(strExclusionSet.contains(label));
+            break;
 
-			case EXCLUDE_BY_STRING:
-				// if the set doesn't contain it, exclude it.
-				retVal = strExclusionSet.contains(label);
-				break;
+        case EXCLUDE_BY_STRING:
+            // if the set doesn't contain it, exclude it.
+            retVal = strExclusionSet.contains(label);
+            break;
 
-			case INCLUDE_BY_COLUMN:
-				// if the set contains it, don't exclude it.
-				retVal = !(colExclusionSet.contains(Integer.valueOf(index)));
-				break;
+        case INCLUDE_BY_COLUMN:
+            // if the set contains it, don't exclude it.
+            retVal = !(colExclusionSet.contains(Integer.valueOf(index)));
+            break;
 
-			case EXCLUDE_BY_COLUMN:
-				// if the set doesn't contain it, don't exclude it.
-				retVal = colExclusionSet.contains(Integer.valueOf(index));
-				break;
-		}
+        case EXCLUDE_BY_COLUMN:
+            // if the set doesn't contain it, don't exclude it.
+            retVal = colExclusionSet.contains(Integer.valueOf(index));
+            break;
+        }
 
-    	if (LOGGER.isLoggable(Level.FINEST))
-    		LOGGER.finest(((retVal)?"excluded":"included") + " CSV Column: " + index + " : " + label);
+        if (LOGGER.isLoggable(Level.FINEST))
+            LOGGER.finest(((retVal) ? "excluded" : "included")
+                    + " CSV Column: " + index + " : " + label);
 
-		return retVal;
-	}
+        return retVal;
+    }
 
-	/**
-	 * This function loads the set of columns that should be included or excluded.
-	 */
-	private void loadExclusionSet()
-	{
-		if (inclusionFlag == InclusionFlag.OFF)
-			return;
+    /**
+     * This function loads the set of columns that should be included or
+     * excluded.
+     */
+    private void loadExclusionSet() {
+        if (inclusionFlag == InclusionFlag.OFF)
+            return;
 
-		if (exclusionValues == null)
-		{
-			inclusionFlag = InclusionFlag.OFF;
-			return;
-		}
+        if (exclusionValues == null) {
+            inclusionFlag = InclusionFlag.OFF;
+            return;
+        }
 
-		switch (inclusionFlag)
-		{
-			case INCLUDE_BY_STRING:
-			case EXCLUDE_BY_STRING:
-				strExclusionSet = new HashSet<String>();
-				break;
+        switch (inclusionFlag) {
+        case INCLUDE_BY_STRING:
+        case EXCLUDE_BY_STRING:
+            strExclusionSet = new HashSet<String>();
+            break;
 
-			case INCLUDE_BY_COLUMN:
-			case EXCLUDE_BY_COLUMN:
-				colExclusionSet = new HashSet<Integer>();
-				break;
-		}
+        case INCLUDE_BY_COLUMN:
+        case EXCLUDE_BY_COLUMN:
+            colExclusionSet = new HashSet<Integer>();
+            break;
+        }
 
-		for (String str : PAT_COMMA.split(exclusionValues))
-		{
-			if (str==null || str.length()<=0)
-				continue;
+        for (String str : PAT_COMMA.split(exclusionValues)) {
+            if (str == null || str.length() <= 0)
+                continue;
 
-			switch (inclusionFlag)
-			{
-				case INCLUDE_BY_STRING:
-				case EXCLUDE_BY_STRING:
-                	if (LOGGER.isLoggable(Level.FINEST))
-                		LOGGER.finest(inclusionFlag + " CSV Column: " + str);
-					strExclusionSet.add(str);
-					break;
+            switch (inclusionFlag) {
+            case INCLUDE_BY_STRING:
+            case EXCLUDE_BY_STRING:
+                if (LOGGER.isLoggable(Level.FINEST))
+                    LOGGER.finest(inclusionFlag + " CSV Column: " + str);
+                strExclusionSet.add(str);
+                break;
 
-				case INCLUDE_BY_COLUMN:
-				case EXCLUDE_BY_COLUMN:
-					try {
-                    	if (LOGGER.isLoggable(Level.FINEST))
-                    		LOGGER.finest(inclusionFlag + " CSV Column: " + str);
-						colExclusionSet.add(Integer.valueOf(str));
-					} catch (NumberFormatException nfe) {
-                        LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
-					}
-					break;
-			}
-		}
-	}
-
-	/**
-	 * Return the url that should be used for this point.
-	 * @param label Name of the column
-	 * @param index Index of the column
-	 * @return url for the label.
-	 */
-	private String getUrl(String label,int index)
-	{
-        String resultUrl = this.url;
-        if (resultUrl != null) {
-            if (label == null) {
-                // This implmentation searches for tokens to replace. If the argument
-                // was NULL then replacing the null with an empty string should still
-                // produce the desired outcome.
-                label = "";
-            }
-            /*
-             * Check the name first, and do replacement upon it.
-             */
-            Matcher nameMatcher = PAT_NAME.matcher(resultUrl);
-            if (nameMatcher.find())
-            {
-                resultUrl = nameMatcher.replaceAll(label);
-            }
-
-            /*
-             * Check the index, and do replacement on it.
-             */
-            Matcher indexMatcher = PAT_INDEX.matcher(resultUrl);
-            if (indexMatcher.find())
-            {
-                resultUrl = indexMatcher.replaceAll(String.valueOf(index));
+            case INCLUDE_BY_COLUMN:
+            case EXCLUDE_BY_COLUMN:
+                try {
+                    if (LOGGER.isLoggable(Level.FINEST))
+                        LOGGER.finest(inclusionFlag + " CSV Column: " + str);
+                    colExclusionSet.add(Integer.valueOf(str));
+                } catch (NumberFormatException nfe) {
+                    LOGGER.log(Level.SEVERE, "Exception converting to integer",
+                            nfe);
+                }
+                break;
             }
         }
-		return resultUrl;
-	}
+    }
 }

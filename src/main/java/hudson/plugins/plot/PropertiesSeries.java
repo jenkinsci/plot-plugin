@@ -24,24 +24,28 @@ import org.kohsuke.stapler.DataBoundConstructor;
  *
  */
 public class PropertiesSeries extends Series {
-    private static transient final Logger LOGGER = Logger.getLogger(PropertiesSeries.class.getName());
+    private static transient final Logger LOGGER = Logger
+            .getLogger(PropertiesSeries.class.getName());
+
     @DataBoundConstructor
     public PropertiesSeries(String file, String label) {
-    	super(file, label, "properties");
+        super(file, label, "properties");
     }
 
     /**
      * Load the series from a properties file.
      */
-	@Override
-    public List<PlotPoint> loadSeries(FilePath workspaceRootDir, PrintStream logger) {
+    @Override
+    public List<PlotPoint> loadSeries(FilePath workspaceRootDir,
+            int buildNumber, PrintStream logger) {
         InputStream in = null;
         FilePath[] seriesFiles = null;
 
         try {
             seriesFiles = workspaceRootDir.list(getFile());
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Exception trying to retrieve series files", e);
+            LOGGER.log(Level.SEVERE,
+                    "Exception trying to retrieve series files", e);
             return null;
         }
 
@@ -56,17 +60,18 @@ public class PropertiesSeries extends Series {
             Properties properties = new Properties();
             properties.load(in);
             String yvalue = properties.getProperty("YVALUE");
-            String url = properties.getProperty("URL","");
-            if (yvalue == null || url == null)
-            {
-            	logger.println("Not creating point with null values: y=" + yvalue + " label=" + getLabel() + " url="+url);
-            	return null;
+            String url = properties.getProperty("URL", "");
+            if (yvalue == null || url == null) {
+                logger.println("Not creating point with null values: y="
+                        + yvalue + " label=" + getLabel() + " url=" + url);
+                return null;
             }
             List<PlotPoint> series = new ArrayList<PlotPoint>();
             series.add(new PlotPoint(yvalue, url, getLabel()));
             return series;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Exception reading plot series data from " + seriesFiles[0], e);
+            LOGGER.log(Level.SEVERE, "Exception reading plot series data from "
+                    + seriesFiles[0], e);
             return null;
         } finally {
             IOUtils.closeQuietly(in);
