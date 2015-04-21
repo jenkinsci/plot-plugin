@@ -688,9 +688,13 @@ public class Plot implements Comparable<Plot> {
                 Messages.Plot_Build() + " {1}: {2}", NumberFormat.getInstance()));
         renderer.setItemURLGenerator(new PointURLGenerator());
         if (renderer instanceof LineAndShapeRenderer) {
+            String s = getUrlStyle();
             LineAndShapeRenderer lasRenderer = (LineAndShapeRenderer) renderer;
-            lasRenderer.setShapesVisible(true); // TODO: deprecated, may be
-                                                // unnecessary
+            if ("lineSimple".equalsIgnoreCase(s)) {
+               lasRenderer.setShapesVisible(false); // TODO: deprecated, may be unnecessary
+            } else {
+               lasRenderer.setShapesVisible(true); // TODO: deprecated, may be unnecessary
+            }
         }
     }
 
@@ -742,6 +746,12 @@ public class Plot implements Comparable<Plot> {
                                                                                  */
                     true, /* url= */false);
         }
+        if ("lineSimple".equalsIgnoreCase(s)) {
+            return ChartFactory.createLineChart(
+                    getURLTitle(), /*categoryAxisLabel=*/null, getYaxis(), dataset,
+                    PlotOrientation.VERTICAL, hasLegend(), /*tooltips=*/true, /*url=*/false);
+        }
+
         if ("stackedarea".equalsIgnoreCase(s)) {
             return ChartFactory.createStackedAreaChart(getURLTitle(), /*
                                                                        * categoryAxisLabel
