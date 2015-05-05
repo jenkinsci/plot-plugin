@@ -22,7 +22,7 @@ public abstract class Series {
     private static transient final Pattern PAT_NAME = Pattern.compile("%name%");
     private static transient final Pattern PAT_INDEX = Pattern
             .compile("%index%");
-    private static final Pattern PAT_BUILD_NUMBER = Pattern.compile("%build%");;
+    private static final Pattern PAT_BUILD_NUMBER = Pattern.compile("%build%");
 
     /**
      * Relative path to the data series property file. Mandatory.

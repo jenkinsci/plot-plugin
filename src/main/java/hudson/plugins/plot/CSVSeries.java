@@ -43,7 +43,7 @@ public class CSVSeries extends Series {
 
     public enum InclusionFlag {
         OFF, INCLUDE_BY_STRING, EXCLUDE_BY_STRING, INCLUDE_BY_COLUMN, EXCLUDE_BY_COLUMN,
-    };
+    }
 
     /**
      * Set for excluding values by column name
