@@ -334,6 +334,7 @@ public class Plot implements Comparable<Plot> {
             try {
                 // simply try and parse the string to see if it's a valid
                 // number, throw away the result.
+                Integer.parseInt(urlNumBuilds);
             } catch (NumberFormatException nfe) {
                 urlNumBuilds = null;
             }
