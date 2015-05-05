@@ -97,8 +97,7 @@ public class PlotCategoryDataset extends AbstractDataset implements
 
     // Values2D interface method
     public int getColumnCount() {
-        int retVal = Math.min(columnKeys.size(), maxColumns);
-        return retVal;
+        return Math.min(columnKeys.size(), maxColumns);
     }
 
     // Values2D interface method
