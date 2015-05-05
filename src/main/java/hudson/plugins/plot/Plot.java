@@ -683,10 +683,10 @@ public class Plot implements Comparable<Plot> {
             renderer.setSeriesPaint(i,
                     new Color(Color.HSBtoRGB((1f / numColors) * i, 1f, 1f)));
         }
-        renderer.setStroke(new BasicStroke(2.0f));
-        renderer.setToolTipGenerator(new StandardCategoryToolTipGenerator(
+        renderer.setBaseStroke(new BasicStroke(2.0f));
+        renderer.setBaseToolTipGenerator(new StandardCategoryToolTipGenerator(
                 Messages.Plot_Build() + " {1}: {2}", NumberFormat.getInstance()));
-        renderer.setItemURLGenerator(new PointURLGenerator());
+        renderer.setBaseItemURLGenerator(new PointURLGenerator());
         if (renderer instanceof LineAndShapeRenderer) {
             String s = getUrlStyle();
             LineAndShapeRenderer lasRenderer = (LineAndShapeRenderer) renderer;
