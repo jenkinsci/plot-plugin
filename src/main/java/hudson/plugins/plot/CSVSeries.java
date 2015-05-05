@@ -41,7 +41,7 @@ public class CSVSeries extends Series {
     private static transient final Level defaultLogLevel = Level.FINEST;
     private static transient final Pattern PAT_COMMA = Pattern.compile(",");
 
-    public static enum InclusionFlag {
+    public enum InclusionFlag {
         OFF, INCLUDE_BY_STRING, EXCLUDE_BY_STRING, INCLUDE_BY_COLUMN, EXCLUDE_BY_COLUMN,
     };
 
