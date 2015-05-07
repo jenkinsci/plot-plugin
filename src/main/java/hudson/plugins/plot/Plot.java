@@ -356,7 +356,7 @@ public class Plot implements Comparable<Plot> {
      */
     private void setRightBuildNum(StaplerRequest req) {
         String build = req.getParameter("rightbuildnum");
-        if (build == null) {
+        if (StringUtils.isBlank(build)) {
             rightBuildNum = Integer.MAX_VALUE;
         } else {
             try {
@@ -634,13 +634,20 @@ public class Plot implements Comparable<Plot> {
                 url = record[4];
             dataset.setValue(value, url, series, xlabel);
         }
+
+        String urlNumBuilds = getURLNumBuilds();
         int numBuilds;
-        try {
-            numBuilds = Integer.parseInt(getURLNumBuilds());
-        } catch (NumberFormatException nfe) {
-            LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
+        if (StringUtils.isBlank(urlNumBuilds)) {
             numBuilds = Integer.MAX_VALUE;
+        } else {
+            try {
+                numBuilds = Integer.parseInt(urlNumBuilds);
+            } catch (NumberFormatException nfe) {
+                LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
+                numBuilds = Integer.MAX_VALUE;
+            }
         }
+
         dataset.clipDataset(numBuilds);
         plot = createChart(dataset);
         CategoryPlot categoryPlot = (CategoryPlot) plot.getPlot();
