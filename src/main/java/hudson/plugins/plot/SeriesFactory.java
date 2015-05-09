@@ -69,4 +69,4 @@ public class SeriesFactory {
         }
         return result;
     }
-};
+}

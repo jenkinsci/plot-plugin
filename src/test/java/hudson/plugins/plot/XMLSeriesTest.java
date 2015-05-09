@@ -55,9 +55,9 @@ public class XMLSeriesTest extends SeriesTestCase {
         assertNotNull(points);
         assertEquals(4, points.size());
         Map<String, Double> map = new HashMap<String, Double>();
-        for (int i = 0; i < points.size(); i++) {
-            map.put(points.get(i).getLabel(),
-                    Double.parseDouble(points.get(i).getYvalue()));
+        for (PlotPoint point : points) {
+            map.put(point.getLabel(),
+                    Double.parseDouble(point.getYvalue()));
         }
 
         assertEquals(7, map.get("AxTermDataService.updateItem").intValue());

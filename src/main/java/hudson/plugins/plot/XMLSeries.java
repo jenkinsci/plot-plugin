@@ -170,8 +170,8 @@ public class XMLSeries extends Series {
             String label = null;
 
             for (Node child : parentNodeMap.get(parent)) {
-                if (null == child.getTextContent().trim()
-                        || "" == child.getTextContent()) {
+                if (null == child.getTextContent()
+                        || child.getTextContent().trim().isEmpty()) {
                     NamedNodeMap attrmap = child.getAttributes();
                     List<Node> attrs = new ArrayList<Node>();
                     for (int i = 0; i < attrmap.getLength(); i++) {

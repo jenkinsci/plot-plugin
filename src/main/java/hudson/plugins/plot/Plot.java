@@ -334,6 +334,7 @@ public class Plot implements Comparable<Plot> {
             try {
                 // simply try and parse the string to see if it's a valid
                 // number, throw away the result.
+                Integer.parseInt(urlNumBuilds);
             } catch (NumberFormatException nfe) {
                 urlNumBuilds = null;
             }
@@ -355,7 +356,7 @@ public class Plot implements Comparable<Plot> {
      */
     private void setRightBuildNum(StaplerRequest req) {
         String build = req.getParameter("rightbuildnum");
-        if (build == null) {
+        if (StringUtils.isBlank(build)) {
             rightBuildNum = Integer.MAX_VALUE;
         } else {
             try {
@@ -633,13 +634,20 @@ public class Plot implements Comparable<Plot> {
                 url = record[4];
             dataset.setValue(value, url, series, xlabel);
         }
+
+        String urlNumBuilds = getURLNumBuilds();
         int numBuilds;
-        try {
-            numBuilds = Integer.parseInt(getURLNumBuilds());
-        } catch (NumberFormatException nfe) {
-            LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
+        if (StringUtils.isBlank(urlNumBuilds)) {
             numBuilds = Integer.MAX_VALUE;
+        } else {
+            try {
+                numBuilds = Integer.parseInt(urlNumBuilds);
+            } catch (NumberFormatException nfe) {
+                LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
+                numBuilds = Integer.MAX_VALUE;
+            }
         }
+
         dataset.clipDataset(numBuilds);
         plot = createChart(dataset);
         CategoryPlot categoryPlot = (CategoryPlot) plot.getPlot();
@@ -683,10 +691,10 @@ public class Plot implements Comparable<Plot> {
             renderer.setSeriesPaint(i,
                     new Color(Color.HSBtoRGB((1f / numColors) * i, 1f, 1f)));
         }
-        renderer.setStroke(new BasicStroke(2.0f));
-        renderer.setToolTipGenerator(new StandardCategoryToolTipGenerator(
+        renderer.setBaseStroke(new BasicStroke(2.0f));
+        renderer.setBaseToolTipGenerator(new StandardCategoryToolTipGenerator(
                 Messages.Plot_Build() + " {1}: {2}", NumberFormat.getInstance()));
-        renderer.setItemURLGenerator(new PointURLGenerator());
+        renderer.setBaseItemURLGenerator(new PointURLGenerator());
         if (renderer instanceof LineAndShapeRenderer) {
             String s = getUrlStyle();
             LineAndShapeRenderer lasRenderer = (LineAndShapeRenderer) renderer;
@@ -896,7 +904,6 @@ public class Plot implements Comparable<Plot> {
     /* package */boolean reportBuild(int buildNumber) {
         int numBuilds;
         try {
-
             numBuilds = Integer.parseInt(this.numBuilds);
         } catch (NumberFormatException ex) {
             // Report all builds
@@ -905,6 +912,7 @@ public class Plot implements Comparable<Plot> {
 
         if (buildNumber < project.getNextBuildNumber() - numBuilds)
             return false;
+
         return keepRecords || project.getBuildByNumber(buildNumber) != null;
     }
 }
