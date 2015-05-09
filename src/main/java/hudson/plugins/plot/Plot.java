@@ -201,11 +201,6 @@ public class Plot implements Comparable<Plot> {
         this.yaxis = yaxis;
         this.group = group;
         this.numBuilds = numBuilds;
-        if (StringUtils.isBlank(csvFileName)) {
-            // TODO: check project dir to ensure uniqueness instead of just
-            // random
-            csvFileName = Math.abs(new Random().nextInt()) + ".csv";
-        }
         this.csvFileName = csvFileName;
         this.style = style;
         this.useDescr = useDescr;
@@ -251,7 +246,7 @@ public class Plot implements Comparable<Plot> {
                 + "),NUMBUILDS(" + numBuilds + "),RIGHTBUILDNUM("
                 + getRightBuildNum() + "),HASLEGEND(" + hasLegend()
                 + "),ISLOGARITHMIC(" + isLogarithmic() + "),FILENAME("
-                + csvFileName + ")";
+                + getCsvFileName() + ")";
     }
 
     public String getYaxis() {
@@ -267,6 +262,13 @@ public class Plot implements Comparable<Plot> {
     }
 
     public String getCsvFileName() {
+        if (StringUtils.isBlank(csvFileName) && project != null) {
+            try {
+                csvFileName = File.createTempFile("plot-", ".csv", project.getRootDir()).getName();
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Unable to create temporary CSV file.", e);
+            }
+        }
         return csvFileName;
     }
 
