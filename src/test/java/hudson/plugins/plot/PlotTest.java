@@ -188,7 +188,7 @@ public class PlotTest {
             boolean keepRecords) {
         final PlotPublisher publisher = new PlotPublisher();
         final Plot plot = new Plot("Title", "Number", "default", count, null,
-                "line", false, keepRecords, false, false);
+                "line", false, keepRecords, false, false, null, null);
         p.getPublishersList().add(publisher);
         publisher.addPlot(plot);
         plot.series = Arrays.<Series> asList(new PropertiesSeries(
@@ -199,7 +199,7 @@ public class PlotTest {
             boolean keepRecords) {
         final MatrixPlotPublisher publisher = new MatrixPlotPublisher();
         final Plot plot = new Plot("Title", "Number", "default", count, null,
-                "line", false, keepRecords, false, false);
+                "line", false, keepRecords, false, false, null, null);
         p.getPublishersList().add(publisher);
         publisher.setPlots(Arrays.asList(plot));
         plot.series = Arrays.<Series> asList(new PropertiesSeries(
