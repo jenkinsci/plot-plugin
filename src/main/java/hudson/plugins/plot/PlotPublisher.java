@@ -156,6 +156,7 @@ public class PlotPublisher extends AbstractPlotPublisher {
         listener.getLogger().println("Recording plot data");
         // add the build to each plot
         for (Plot plot : getPlots()) {
+            plot.expandTokens(build, listener);
             plot.addBuild(build, listener.getLogger());
         }
         // misconfigured plots will not fail a build so always return true
