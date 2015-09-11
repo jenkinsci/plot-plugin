@@ -42,7 +42,7 @@ public class PropertiesSeries extends Series {
         FilePath[] seriesFiles = null;
 
         try {
-            seriesFiles = workspaceRootDir.list(getFile());
+            seriesFiles = workspaceRootDir.list(getRealFile());
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE,
                     "Exception trying to retrieve series files", e);
@@ -50,7 +50,7 @@ public class PropertiesSeries extends Series {
         }
 
         if (ArrayUtils.isEmpty(seriesFiles)) {
-            logger.println("No plot data file found: " + getFile());
+            logger.println("No plot data file found: " + getRealFile());
             return null;
         }
 

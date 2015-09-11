@@ -7,6 +7,7 @@ package hudson.plugins.plot;
 
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
 import hudson.model.Run;
 import hudson.util.ChartUtil;
 import hudson.util.ShiftedCategoryAxis;
@@ -53,6 +54,9 @@ import org.kohsuke.stapler.StaplerResponse;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+
+import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
+import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 
 /**
  * Represents the configuration for a single plot. A plot can have one or more
@@ -497,6 +501,22 @@ public class Plot implements Comparable<Plot> {
         rsp.setContentType("text/plain;charset=UTF-8");
         rsp.getWriter().println(
                 ChartUtilities.getImageMap(getCsvFileName(), info));
+    }
+
+    protected void expandTokens(AbstractBuild<?, ?> build, BuildListener listener) {
+        try {
+            for (Series series : getSeries()) {
+                if (series == null)
+                    continue;
+                String s = series.getFile();
+                series.setRealFile(TokenMacro.expandAll(build, listener, s));
+            }
+        } catch (MacroEvaluationException e) {
+            // log an error but don't abort
+            listener.getLogger().println("Error expanding token: " + e.getMessage());
+        } catch (Exception e) {
+            Logger.getLogger(Plot.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
 
     /**

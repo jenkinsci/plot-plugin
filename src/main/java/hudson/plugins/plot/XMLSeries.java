@@ -212,7 +212,7 @@ public class XMLSeries extends Series {
             FilePath[] seriesFiles = null;
 
             try {
-                seriesFiles = workspaceRootDir.list(getFile());
+                seriesFiles = workspaceRootDir.list(getRealFile());
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE,
                         "Exception trying to retrieve series files", e);
@@ -220,14 +220,14 @@ public class XMLSeries extends Series {
             }
 
             if (ArrayUtils.isEmpty(seriesFiles)) {
-                LOGGER.info("No plot data file found: " + getFile());
+                LOGGER.info("No plot data file found: " + getRealFile());
                 return null;
             }
 
             try {
                 if (LOGGER.isLoggable(defaultLogLevel))
                     LOGGER.log(defaultLogLevel,
-                            "Loading plot series data from: " + getFile());
+                            "Loading plot series data from: " + getRealFile());
 
                 in = seriesFiles[0].read();
                 // load existing plot file
@@ -245,7 +245,7 @@ public class XMLSeries extends Series {
 
             if (LOGGER.isLoggable(defaultLogLevel))
                 LOGGER.log(defaultLogLevel, "Loaded XML Plot file: "
-                        + getFile());
+                        + getRealFile());
 
             XPath xpath = XPathFactory.newInstance().newXPath();
             Object xmlObject = xpath.evaluate(xpathString, inputSource,
