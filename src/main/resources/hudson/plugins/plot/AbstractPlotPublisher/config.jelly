@@ -48,6 +48,12 @@
         <f:entry title="${%Use a logarithmic Y-axis}" help="/plugin/plot/help-logarithmic.html">
           <f:checkbox name="logarithmic" checked="${plot.logarithmic}" />
         </f:entry>
+        <f:entry title="${%Y-axis minimum}" help="/plugin/plot/help-yaxisMinimum.html">
+          <f:textbox name="yaxisMinimum" value="${plot.yaxisMinimum}" />
+        </f:entry>
+        <f:entry title="${%Y-axis maximum}" help="/plugin/plot/help-yaxisMaximum.html">
+          <f:textbox name="yaxisMaximum" value="${plot.yaxisMaximum}" />
+        </f:entry>
 
         <f:entry title="${%Keep records for deleted builds}" help="/plugin/plot/help-keepRecords.html">
           <f:checkbox name="keepRecords" checked="${plot.keepRecords}" />

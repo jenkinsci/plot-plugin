@@ -189,6 +189,10 @@ public class Plot implements Comparable<Plot> {
     /** Use a logarithmic Y-axis. */
     public boolean logarithmic;
 
+    /** Min/max yaxis values, string used so if no value defaults used */
+    public String yaxisMinimum;
+    public String yaxisMaximum;
+
     /**
      * Creates a new plot with the given paramenters. If numBuilds is the empty
      * string, then all builds will be included. Must not be zero.
@@ -196,7 +200,8 @@ public class Plot implements Comparable<Plot> {
     @DataBoundConstructor
     public Plot(String title, String yaxis, String group, String numBuilds,
             String csvFileName, String style, boolean useDescr,
-            boolean keepRecords, boolean exclZero, boolean logarithmic) {
+            boolean keepRecords, boolean exclZero, boolean logarithmic,
+            String yaxisMinimum, String yaxisMaximum) {
         this.title = title;
         this.yaxis = yaxis;
         this.group = group;
@@ -207,6 +212,8 @@ public class Plot implements Comparable<Plot> {
         this.keepRecords = keepRecords;
         this.exclZero = exclZero;
         this.logarithmic = logarithmic;
+        this.yaxisMinimum = yaxisMinimum;
+        this.yaxisMaximum = yaxisMaximum;
     }
 
     /**
@@ -216,7 +223,7 @@ public class Plot implements Comparable<Plot> {
     public Plot(String title, String yaxis, String group, String numBuilds,
             String csvFileName, String style, boolean useDescr) {
         this(title, yaxis, group, numBuilds, csvFileName, style, useDescr,
-                false, false, false);
+                false, false, false, null, null);
     }
 
     // needed for serialization
@@ -235,6 +242,34 @@ public class Plot implements Comparable<Plot> {
         return logarithmic;
     }
 
+    public boolean hasYaxisMinimum() {
+        return (getYaxisMinimum() != null);
+    }
+
+    public Double getYaxisMinimum() {
+        return getDoubleFromString(yaxisMinimum);
+    }
+
+    public boolean hasYaxisMaximum() {
+        return (getYaxisMaximum() != null);
+    }
+
+    public Double getYaxisMaximum() {
+        return getDoubleFromString(yaxisMaximum);
+    }
+
+    public Double getDoubleFromString(String input) {
+        Double result = null;
+        if (input != null) {
+            try {
+                result = Double.parseDouble(input);
+            } catch (NumberFormatException nfe) {
+                // Not a problem, result already set
+            }
+        }
+        return result;
+    }
+
     public int compareTo(Plot o) {
         return title.compareTo(o.getTitle());
     }
@@ -245,8 +280,9 @@ public class Plot implements Comparable<Plot> {
                 + CollectionUtils.size(series) + "),GROUP(" + group
                 + "),NUMBUILDS(" + numBuilds + "),RIGHTBUILDNUM("
                 + getRightBuildNum() + "),HASLEGEND(" + hasLegend()
-                + "),ISLOGARITHMIC(" + isLogarithmic() + "),FILENAME("
-                + getCsvFileName() + ")";
+                + "),ISLOGARITHMIC(" + isLogarithmic() + "),YAXISMINIMUM("
+                + yaxisMinimum + "),YAXISMAXIMUM(" + yaxisMaximum
+                + "),FILENAME(" + getCsvFileName() + ")";
     }
 
     public String getYaxis() {
@@ -683,6 +719,12 @@ public class Plot implements Comparable<Plot> {
         // optionally exclude zero as default y-axis value
         ValueAxis rangeAxis = categoryPlot.getRangeAxis();
         if ((rangeAxis != null) && (rangeAxis instanceof NumberAxis)) {
+            if (hasYaxisMinimum()) {
+                ((NumberAxis) rangeAxis).setLowerBound(getYaxisMinimum());
+            }
+            if (hasYaxisMaximum()) {
+                ((NumberAxis) rangeAxis).setUpperBound(getYaxisMaximum());
+            }
             ((NumberAxis) rangeAxis).setAutoRangeIncludesZero(!getExclZero());
         }
 
