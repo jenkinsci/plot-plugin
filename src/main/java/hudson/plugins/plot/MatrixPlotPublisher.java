@@ -48,15 +48,14 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
         if (urlGroup == null || "nogroup".equals(urlGroup)) {
             return "Plots";
         }
+        if (!plotsOfConfigurations.containsKey(c)) {
+            build(c);
+        }
         if (groupMap.containsKey(urlGroup)) {
-            List<Plot> plots = new ArrayList<Plot>();
             for (Plot plot : groupMap.get(urlGroup)) {
                 if (ObjectUtils.equals(plot.getProject(), c)) {
-                    plots.add(plot);
+                    return plot.getGroup();
                 }
-            }
-            if (plots.size() > 0) {
-                return plots.get(0).group;
             }
         }
         return "";
@@ -68,8 +67,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     public List<String> getOriginalGroups(MatrixConfiguration configuration) {
         List<String> originalGroups = new ArrayList<String>();
         for (String urlGroup : groupMap.keySet()) {
-            originalGroups
-                    .add(urlGroupToOriginalGroup(urlGroup, configuration));
+            originalGroups.add(urlGroupToOriginalGroup(urlGroup, configuration));
         }
         Collections.sort(originalGroups);
         return originalGroups;
@@ -85,6 +83,9 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
         this.plots = plots;
         groupMap = new HashMap<String, List<Plot>>();
         plotsOfConfigurations = new HashMap<MatrixConfiguration, List<Plot>>();
+        for (Plot plot: plots) {
+            addPlot(plot);
+        }
     }
 
     /**
@@ -119,6 +120,9 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
      */
     public List<Plot> getPlots(MatrixConfiguration configuration) {
         List<Plot> p = plotsOfConfigurations.get(configuration);
+        if (p == null) {
+            p = build(configuration);
+        }
         return (p != null) ? p : new ArrayList<Plot>();
     }
 
@@ -132,14 +136,13 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
      */
     public List<Plot> getPlots(String urlGroup,
             MatrixConfiguration configuration) {
-        List<Plot> groupPlots = new ArrayList<Plot>();
-        List<Plot> p = groupMap.get(urlGroup);
-        if (p != null) {
-            for (Plot plot : p) {
-                if (ObjectUtils.equals(plot.getProject(), configuration)) {
-                    groupPlots.add(plot);
-                }
-            }
+        List<Plot> plots = getPlots(configuration);
+        List<Plot> groupPlots = groupMap.get(urlGroup);
+        if (groupPlots == null) {
+            groupPlots = new ArrayList<Plot>();
+        } else {
+            groupPlots = new ArrayList<Plot>(groupPlots);
+            groupPlots.retainAll(plots);
         }
         return groupPlots;
     }
@@ -159,16 +162,23 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
         if (!plotsOfConfigurations.containsKey((MatrixConfiguration) build
                 .getProject())) {
-            for (Plot p : plots) {
-                Plot plot = new Plot(p.title, p.yaxis, p.group, p.numBuilds,
-                        p.csvFileName, p.style, p.useDescr, p.getKeepRecords(),
-                        p.getExclZero(), p.isLogarithmic(), p.yaxisMinimum, p.yaxisMaximum);
-                plot.series = p.series;
-                plot.setProject((MatrixConfiguration) build.getProject());
-                addPlot(plot);
-            }
+            build((MatrixConfiguration) build.getProject());
         }
         return true;
+    }
+
+    private List<Plot> build(MatrixConfiguration configuration) {
+        List<Plot> builtPlots = new ArrayList<Plot>(plots.size());
+        for (Plot p: plots) {
+            Plot plot = new Plot(p.title, p.yaxis, p.group, p.numBuilds,
+                    p.csvFileName, p.style, p.useDescr, p.getKeepRecords(),
+                    p.getExclZero(), p.isLogarithmic(), p.yaxisMinimum, p.yaxisMaximum);
+            plot.series = p.series;
+            plot.setProject(configuration);
+            addPlot(plot);
+            builtPlots.add(plot);
+        }
+        return builtPlots;
     }
 
     @Override
