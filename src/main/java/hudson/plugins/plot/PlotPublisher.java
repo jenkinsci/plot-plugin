@@ -12,7 +12,7 @@ import hudson.model.AbstractProject;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -83,8 +83,7 @@ public class PlotPublisher extends AbstractPlotPublisher {
     /**
      * Replaces the plots managed by this object with the given list.
      *
-     * @param plots
-     *            the new list of plots
+     * @param plots the new list of plots
      */
     public void setPlots(List<Plot> plots) {
         this.plots = new ArrayList<Plot>();
@@ -97,8 +96,7 @@ public class PlotPublisher extends AbstractPlotPublisher {
     /**
      * Adds the new plot to the plot data structures managed by this object.
      *
-     * @param plot
-     *            the new plot
+     * @param plot the new plot
      */
     public void addPlot(Plot plot) {
         // update the plot list
@@ -152,10 +150,79 @@ public class PlotPublisher extends AbstractPlotPublisher {
      */
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-            BuildListener listener) throws IOException, InterruptedException {
+                           BuildListener listener) throws IOException, InterruptedException {
         listener.getLogger().println("Recording plot data");
-        // add the build to each plot
+
+
+        List<Plot> newPlotList = new ArrayList<Plot>();
         for (Plot plot : getPlots()) {
+            BufferedReader reader = null;
+            List<String> groupList = new ArrayList<String>();
+            try {
+                String namePath = new File(build.getWorkspace().toString()).getParentFile().getAbsolutePath() + "/" + plot.group;
+                File identifyNameFile = new File(namePath);
+                if (!identifyNameFile.getParentFile().exists()) {
+                    identifyNameFile.getParentFile().mkdirs();
+                }
+                reader = new BufferedReader(new InputStreamReader(new FileInputStream(identifyNameFile), "utf-8"));
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    groupList.add(line);
+                }
+
+            } catch (IOException e) {
+
+            } finally {
+                try {
+                    reader.close();
+                } catch (Exception e) {
+
+                }
+            }
+
+            for (String group : groupList) {
+                Plot newPlot = new Plot(plot.title, plot.yaxis, group, plot.numBuilds,
+                        plot.csvFileName.replace("plot-", group + "-plot-"), plot.style, plot.useDescr,
+                        plot.getKeepRecords(), plot.exclZero, plot.logarithmic,
+                        plot.yaxisMinimum, plot.yaxisMaximum);
+
+                List<Series> seriesList = new ArrayList<Series>();
+                for (Series seriesItem : plot.series) {
+                    Series series = null;
+                    if ("csv".equals(seriesItem.fileType)) {
+                        CSVSeries temp = (CSVSeries) seriesItem;
+                        series = new CSVSeries(temp.file.replace("${group}", group), temp.getUrl(), temp.getInclusionFlag(), temp.getExclusionValues(), temp.getDisplayTableFlag());
+                    } else if ("xml".equals(seriesItem.fileType)) {
+                        XMLSeries temp = (XMLSeries) seriesItem;
+                        series = new XMLSeries(temp.file.replace("${group}", group), temp.getXpath(), temp.getNodeType(), temp.getUrl());
+                    } else if ("properties".equals(seriesItem.fileType)) {
+                        PropertiesSeries temp = (PropertiesSeries) seriesItem;
+                        series = new PropertiesSeries(temp.file.replace("${group}", group), temp.label);
+                    }
+                    if (series != null) {
+                        seriesList.add(series);
+                    }
+                }
+                newPlot.series = seriesList;
+                newPlotList.add(newPlot);
+            }
+        }
+
+        groupMap = new HashMap<String, List<Plot>>();
+        for (Plot plot : newPlotList) {
+            String urlGroup = originalGroupToUrlEncodedGroup(plot.getGroup());
+            if (groupMap.containsKey(urlGroup)) {
+                List<Plot> list = groupMap.get(urlGroup);
+                list.add(plot);
+            } else {
+                List<Plot> list = new ArrayList<Plot>();
+                list.add(plot);
+                groupMap.put(urlGroup, list);
+            }
+        }
+
+        // add the build to each plot
+        for (Plot plot : newPlotList) {
             plot.addBuild(build, listener.getLogger());
         }
         // misconfigured plots will not fail a build so always return true
