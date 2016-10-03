@@ -186,6 +186,9 @@ public class CSVSeries extends Series {
 
                     yvalue = nextLine[index];
 
+                    if (yvalue.trim().length() == 0) // empty value, caused by e.g. trailing comma in CSV
+                    	continue;
+
                     if (index < headerLine.length)
                         label = headerLine[index];
 

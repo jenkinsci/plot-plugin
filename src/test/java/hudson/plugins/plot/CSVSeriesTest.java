@@ -72,6 +72,31 @@ public class CSVSeriesTest extends SeriesTestCase {
         }
     }
 
+    public void testCSVSeriesWithTrailingSemicolonDoesntCreateExtraneousPoint() {
+        // first create a FilePath to load the test Properties file.
+        File workspaceDirFile = new File("target/test-classes/");
+        FilePath workspaceRootDir = new FilePath(workspaceDirFile);
+        String file = "test_trailing_semicolon.csv";
+        
+        LOGGER.info("workspace File path: "
+                + workspaceDirFile.getAbsolutePath());
+        LOGGER.info("workspace Dir path: " + workspaceRootDir.getName());
+
+        // Create a new CSV series.
+        CSVSeries series = new CSVSeries(file,
+                "http://localhost:8080/%name%/%index%/", "OFF", "", false);
+
+        LOGGER.info("Created series " + series.toString());
+        // test the basic subclass properties.
+        testSeries(series, file, "", "csv");
+
+        // load the series.
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 8);
+    }
+    
     private int getNumColumns(FilePath workspaceRootDir, String file)
             throws IOException, InterruptedException {
         CSVReader csvreader = null;
