@@ -180,7 +180,7 @@ public class Plot implements Comparable<Plot> {
     /** Whether or not to use build descriptions as X-axis labels. Optional. */
     public boolean useDescr;
 
-    /** keep records for builds that was deleted */
+    /** Keep records for builds that were deleted. */
     private boolean keepRecords;
 
     /** Whether or not to exclude zero as default Y-axis value. Optional. */
@@ -347,12 +347,11 @@ public class Plot implements Comparable<Plot> {
     }
 
     /**
-     * Sets the number of builds to plot from the "numbuilds" parameter in the
-     * given StaplerRequest. If the parameter doesn't exist or isn't an integer
-     * then a default is used.
+     * Sets the "hasLegend" parameter in the given StaplerRequest. If the
+     * parameter doesn't exist then a default is used.
      */
     private void setHasLegend(StaplerRequest req) {
-        String legend = req.getParameter("legend");
+        String legend = req.getParameter("haslegend");
         hasLegend = legend == null || "on".equalsIgnoreCase(legend)
                 || "true".equalsIgnoreCase(legend);
     }
@@ -751,7 +750,7 @@ public class Plot implements Comparable<Plot> {
     }
 
     /**
-     * Creates a Chart of the style indicated by getEffStyle() using the given
+     * Creates a Chart of the style indicated by getUrlStyle() using the given
      * dataset. Defaults to using createLineChart.
      */
     private JFreeChart createChart(PlotCategoryDataset dataset) {
