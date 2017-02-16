@@ -28,6 +28,7 @@
         <f:entry title="${%Plot style}" help="/plugin/plot/help-style.html">
           <select name="style">
             <f:option value="area" selected="${plot.style=='area'}">${%Area}</f:option>
+            <f:option value="box" selected="${plot.style=='box'}">${%Box Plot with Whiskers}</f:option>
             <f:option value="bar" selected="${plot.style=='bar'}">${%Bar}</f:option>
             <f:option value="bar3d" selected="${plot.style=='bar3d'}">${%Bar 3D}</f:option>
             <f:option value="line" selected="${plot.style=='line' || plot.style=='' || plot.style==null}">${%Line}</f:option>
