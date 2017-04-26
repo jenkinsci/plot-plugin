@@ -9,7 +9,7 @@
   <artifactId>plot</artifactId>
   <packaging>hpi</packaging>
   <name>Plot plugin</name>
-  <version>1.10</version>
+  <version>1.11-SNAPSHOT</version>
   <url>http://wiki.jenkins-ci.org/display/JENKINS/Plot+Plugin</url>
 
   <developers>
@@ -69,7 +69,7 @@
     <connection>scm:git:ssh://github.com/jenkinsci/plot-plugin.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/jenkinsci/plot-plugin.git</developerConnection>
     <url>https://github.com/jenkinsci/plot-plugin</url>
-    <tag>plot-1.10</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <distributionManagement>
