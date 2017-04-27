@@ -755,6 +755,10 @@ public class Plot implements Comparable<Plot> {
      */
     private JFreeChart createChart(PlotCategoryDataset dataset) {
         String s = getUrlStyle();
+         if ("box".equalsIgnoreCase(s)) {
+            return ChartFactory.createBoxAndWhiskerChart(getURLTitle(),
+                    null, getYaxis(), dataset, hasLegend());
+        }
         if ("area".equalsIgnoreCase(s)) {
             return ChartFactory.createAreaChart(getURLTitle(), /*
                                                                 * categoryAxisLabel=
