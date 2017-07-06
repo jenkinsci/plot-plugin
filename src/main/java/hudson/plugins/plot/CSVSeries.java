@@ -5,8 +5,10 @@
 
 package hudson.plugins.plot;
 
+import hudson.Extension;
 import hudson.FilePath;
 
+import hudson.model.Descriptor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,12 +23,14 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 
+import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import au.com.bytecode.opencsv.CSVReader;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Represents a plot data series configuration from an CSV file.
@@ -326,6 +330,23 @@ public class CSVSeries extends Series {
                 }
                 break;
             }
+        }
+    }
+
+    @Override
+    public Descriptor<Series> getDescriptor() {
+        return new DescriptorImpl();
+    }
+
+    @Extension
+    public static class DescriptorImpl extends Descriptor<Series> {
+        public String getDisplayName() {
+            return "";
+        }
+
+        @Override
+        public Series newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+            return SeriesFactory.createSeries( formData, req );
         }
     }
 }

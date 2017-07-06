@@ -9,6 +9,7 @@ import hudson.Launcher;
 import hudson.Util;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.plugins.plot.Plot;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;

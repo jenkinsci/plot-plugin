@@ -3,6 +3,7 @@ package hudson.plugins.plot.pipeline;
 import hudson.model.Action;
 import hudson.model.InvisibleAction;
 import hudson.model.Run;
+import hudson.plugins.plot.Plot;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

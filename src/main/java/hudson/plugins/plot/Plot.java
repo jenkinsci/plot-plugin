@@ -5,12 +5,14 @@
 
 package hudson.plugins.plot;
 
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
+import hudson.FilePath;
 import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
+import hudson.model.Job;
 import hudson.model.Run;
 import hudson.util.ChartUtil;
 import hudson.util.ShiftedCategoryAxis;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Polygon;
@@ -25,10 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jfree.chart.ChartFactory;
@@ -50,9 +50,6 @@ import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  * Represents the configuration for a single plot. A plot can have one or more
@@ -97,7 +94,7 @@ public class Plot implements Comparable<Plot> {
      * project is needed to retrieve and save the CSV file that is stored in the
      * project's root directory.
      */
-    private transient AbstractProject<?, ?> project;
+    private transient Job<?, ?> project;
 
     /** All plots share the same JFreeChart drawing supplier object. */
     private static final DrawingSupplier supplier = new DefaultDrawingSupplier(
@@ -272,6 +269,14 @@ public class Plot implements Comparable<Plot> {
 
     public int compareTo(Plot o) {
         return title.compareTo(o.getTitle());
+    }
+
+    public boolean equals(Object o) {
+        return o instanceof Plot && this.compareTo((Plot) o) == 0;
+    }
+    @Override
+    public int hashCode() {
+        return this.title.hashCode();
     }
 
     @Override
@@ -455,7 +460,7 @@ public class Plot implements Comparable<Plot> {
         return height;
     }
 
-    public AbstractProject<?, ?> getProject() {
+    public Job<?, ?> getProject() {
         return project;
     }
 
@@ -467,7 +472,7 @@ public class Plot implements Comparable<Plot> {
      * @param project
      *            the project
      */
-    public void setProject(AbstractProject<?, ?> project) {
+    public void setProject(Job<?, ?> project) {
         this.project = project;
     }
 
@@ -563,6 +568,45 @@ public class Plot implements Comparable<Plot> {
                             point.getLabel(),
                             build.getNumber() + "", // convert to a string
                             build.getTimestamp().getTimeInMillis() + "",
+                            point.getUrl() });
+                }
+            }
+        }
+
+        // save the updated plot data to disk
+        savePlotData();
+    }
+
+    /**
+     * Called when a build completes. Adds the finished build to this plot. This
+     * method extracts the data for each data series from the build and saves it
+     * in the plot's CSV file.
+     *
+     * @param run
+     * @param logger
+     * @param workspace
+     */
+    public void addBuild(Run<?, ?> run, PrintStream logger, FilePath workspace) {
+        if (project == null)
+            project = run.getParent();
+
+        // load the existing plot data from disk
+        loadPlotData();
+        // extract the data for each data series
+        for (Series series : getSeries()) {
+            if (series == null)
+                continue;
+            List<PlotPoint> seriesData = series.loadSeries(
+                    workspace, run.getNumber(), logger);
+            if (seriesData != null) {
+                for (PlotPoint point : seriesData) {
+                    if (point == null)
+                        continue;
+
+                    rawPlotData.add(new String[] { point.getYvalue(),
+                            point.getLabel(),
+                            run.getNumber() + "", // convert to a string
+                            run.getTimestamp().getTimeInMillis() + "",
                             point.getUrl() });
                 }
             }

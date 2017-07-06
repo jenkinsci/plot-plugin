@@ -6,6 +6,11 @@ import hudson.Launcher;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.plugins.plot.CSVSeries;
+import hudson.plugins.plot.Plot;
+import hudson.plugins.plot.PropertiesSeries;
+import hudson.plugins.plot.Series;
+import hudson.plugins.plot.XMLSeries;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
@@ -60,7 +65,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
     @DataBoundConstructor
-    public PlotBuilder ( String group, String title, String numBuilds, String yaxis, String style,
+    public PlotBuilder(String group, String title, String numBuilds, String yaxis, String style,
                          Boolean useDescr, Boolean exclZero, Boolean logarithmic, Boolean keepRecords,
                          String yaxisMinimum, String yaxisMaximum, String csvFileName,
                          List<CSVSeries> csvSeries, List<PropertiesSeries> propertiesSeries, List<XMLSeries> xmlSeries) {
@@ -80,9 +85,9 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         this.propertiesSeries = propertiesSeries;
         this.xmlSeries = xmlSeries;
         this.series = new ArrayList<>();
-        if( csvSeries != null ){ this.series.addAll(csvSeries); }
-        if( xmlSeries != null ) { this.series.addAll(xmlSeries); }
-        if( propertiesSeries != null ) { this.series.addAll(propertiesSeries); }
+        if (csvSeries != null){ this.series.addAll(csvSeries); }
+        if (xmlSeries != null) { this.series.addAll(xmlSeries); }
+        if (propertiesSeries != null) { this.series.addAll(propertiesSeries); }
     }
 
     public String getGroup() {
@@ -127,7 +132,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         plot.addBuild(build, listener.getLogger(), workspace);
         plots.add(plot);
         PlotBuildAction buildAction = build.getAction( PlotBuildAction.class );
-        if( buildAction == null ){
+        if (buildAction == null) {
             build.addAction( new PlotBuildAction( build, plots ) );
         } else {
             buildAction.addPlots( plots );

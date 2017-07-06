@@ -4,14 +4,10 @@
  */
 package hudson.plugins.plot;
 
-import hudson.model.Action;
 import hudson.model.AbstractProject;
-import hudson.plugins.plot.Messages;
-
+import hudson.model.Action;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
@@ -24,8 +20,6 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class PlotAction implements Action, StaplerProxy {
 
-    private static final Logger LOGGER = Logger.getLogger(PlotAction.class
-            .getName());
     private final AbstractProject<?, ?> project;
     private final PlotPublisher publisher;
 

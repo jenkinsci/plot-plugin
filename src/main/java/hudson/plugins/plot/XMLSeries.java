@@ -5,8 +5,9 @@
 
 package hudson.plugins.plot;
 
+import hudson.Extension;
 import hudson.FilePath;
-
+import hudson.model.Descriptor;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayDeque;
@@ -19,17 +20,17 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.servlet.ServletException;
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
+import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -37,9 +38,9 @@ import org.xml.sax.InputSource;
 
 /**
  * Represents a plot data series configuration from an XML file.
- * 
+ *
  * @author Allen Reese
- * 
+ *
  */
 public class XMLSeries extends Series {
     private static transient final Logger LOGGER = Logger
@@ -83,7 +84,7 @@ public class XMLSeries extends Series {
     private transient QName nodeType;
 
     /**
-     * 
+     *
      * @param file
      * @param label
      * @param req
@@ -142,10 +143,10 @@ public class XMLSeries extends Series {
      * enabling users to create lists by selecting them such that names and
      * values share a common parent. If a node has attributes and is empty that
      * node will be re-enqueued as a parent to its attributes.
-     * 
+     *
      * @param buildNumber
      *            the build number
-     * 
+     *
      * @returns a list of PlotPoints where the label is the last non numeric
      *          text content and the value is the last numeric text content for
      *          each set of nodes under a given parent.
@@ -320,7 +321,7 @@ public class XMLSeries extends Series {
 
     /**
      * Convert a given object into a String.
-     * 
+     *
      * @param obj
      *            Xpath Object
      * @return String representation of the node
@@ -372,7 +373,7 @@ public class XMLSeries extends Series {
     /**
      * Add a given value to the list of results. This encapsulates some
      * otherwise duplicate logic due to nodeset/!nodeset
-     * 
+     *
      * @param list
      * @param label
      * @param nodeValue
@@ -392,6 +393,24 @@ public class XMLSeries extends Series {
             if (LOGGER.isLoggable(defaultLogLevel))
                 LOGGER.log(defaultLogLevel, "Unable to add node: " + label
                         + " value: " + nodeValue);
+        }
+    }
+
+    @Override
+    public Descriptor<Series> getDescriptor() {
+        return new DescriptorImpl();
+    }
+
+    @Extension
+    public static class DescriptorImpl extends Descriptor<Series> {
+        public String getDisplayName() {
+            return "";
+        }
+
+        @Override
+        public Series newInstance(StaplerRequest req,
+                JSONObject formData) throws FormException {
+            return SeriesFactory.createSeries(formData, req);
         }
     }
 }

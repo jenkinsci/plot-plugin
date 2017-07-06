@@ -2,6 +2,9 @@ package hudson.plugins.plot.pipeline;
 
 import hudson.model.Action;
 import hudson.model.Job;
+import hudson.plugins.plot.Messages;
+import hudson.plugins.plot.Plot;
+import hudson.plugins.plot.PlotReport;
 import java.io.IOException;
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
@@ -10,6 +13,8 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 /**
+ * Project action to display plots.
+ *
  * Created by max on 2016-06-20.
  */
 public class PlotProjectAction implements Action, StaplerProxy {
@@ -20,7 +25,7 @@ public class PlotProjectAction implements Action, StaplerProxy {
     public PlotProjectAction(Job<?, ?> job, List<Plot> plots){
         this.project = job;
         publisher = new PlotPipelinePublisher(true);
-        if( plots != null ) {
+        if(plots != null) {
             publisher.setPlots(plots);
         }
     }
