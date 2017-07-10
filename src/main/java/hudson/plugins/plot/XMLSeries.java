@@ -83,16 +83,6 @@ public class XMLSeries extends Series {
      */
     private transient QName nodeType;
 
-    /**
-     *
-     * @param file
-     * @param label
-     * @param req
-     *            Stapler request
-     * @param radioButtonId
-     *            ID used to find the parameters specific to this instance.
-     * @throws ServletException
-     */
     @DataBoundConstructor
     public XMLSeries(String file, String xpath, String nodeType, String url) {
         super(file, "", "xml");
@@ -189,8 +179,7 @@ public class XMLSeries extends Series {
                 }
             }
             if ((label != null) && (value != null)) {
-                addValueToList(retval, new String(label),
-                        String.valueOf(value), buildNumber);
+                addValueToList(retval, label, String.valueOf(value), buildNumber);
             }
         }
         return retval;

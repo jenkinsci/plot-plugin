@@ -191,7 +191,7 @@ public class PlotReport {
 
     private Plot getPlot(String i) {
         try {
-            return getPlot(Integer.valueOf(i));
+            return getPlot(Integer.parseInt(i));
         } catch (NumberFormatException ignore) {
             LOGGER.log(Level.SEVERE, "Exception converting to integer", ignore);
             return null;

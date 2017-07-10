@@ -692,7 +692,7 @@ public class Plot implements Comparable<Plot> {
             // url
             int buildNum;
             try {
-                buildNum = Integer.valueOf(record[2]);
+                buildNum = Integer.parseInt(record[2]);
                 if (!reportBuild(buildNum) || buildNum > getRightBuildNum()) {
                     continue; // skip this record
                 }
@@ -700,9 +700,9 @@ public class Plot implements Comparable<Plot> {
                 LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
                 continue; // skip this record all together
             }
-            Number value = null;
+            Number value;
             try {
-                value = Integer.valueOf(record[0]);
+                value = Integer.parseInt(record[0]);
             } catch (NumberFormatException nfe) {
                 try {
                     value = Double.valueOf(record[0]);

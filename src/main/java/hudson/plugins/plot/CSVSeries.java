@@ -251,8 +251,7 @@ public class CSVSeries extends Series {
         if (inclusionFlag == null || inclusionFlag == InclusionFlag.OFF)
             return false;
 
-        boolean retVal = false;
-
+        boolean retVal;
         switch (inclusionFlag) {
         case INCLUDE_BY_STRING:
             // if the set contains it, don't exclude it.
@@ -273,6 +272,8 @@ public class CSVSeries extends Series {
             // if the set doesn't contain it, don't exclude it.
             retVal = colExclusionSet.contains(Integer.valueOf(index));
             break;
+        default:
+            retVal = false;
         }
 
         if (LOGGER.isLoggable(Level.FINEST))
@@ -305,6 +306,8 @@ public class CSVSeries extends Series {
         case EXCLUDE_BY_COLUMN:
             colExclusionSet = new HashSet<Integer>();
             break;
+        default:
+            LOGGER.log(Level.SEVERE, "Failed to initialize columns exclusions set.");
         }
 
         for (String str : PAT_COMMA.split(exclusionValues)) {
@@ -326,10 +329,11 @@ public class CSVSeries extends Series {
                         LOGGER.finest(inclusionFlag + " CSV Column: " + str);
                     colExclusionSet.add(Integer.valueOf(str));
                 } catch (NumberFormatException nfe) {
-                    LOGGER.log(Level.SEVERE, "Exception converting to integer",
-                            nfe);
+                    LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
                 }
-                break;
+                    break;
+            default:
+                LOGGER.log(Level.SEVERE, "Failed to identify columns exclusions.");
             }
         }
     }
