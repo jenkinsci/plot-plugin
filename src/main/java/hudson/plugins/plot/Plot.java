@@ -18,10 +18,16 @@ import java.awt.Color;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -926,7 +932,8 @@ public class Plot implements Comparable<Plot> {
         CSVReader reader = null;
         rawPlotData = new ArrayList<String[]>();
         try {
-            reader = new CSVReader(new FileReader(plotFile));
+            reader = new CSVReader(new InputStreamReader(new FileInputStream(plotFile),
+                    Charset.defaultCharset().name()));
             // throw away 2 header lines
             reader.readNext();
             reader.readNext();
@@ -957,7 +964,8 @@ public class Plot implements Comparable<Plot> {
         File plotFile = new File(project.getRootDir(), getCsvFileName());
         CSVWriter writer = null;
         try {
-            writer = new CSVWriter(new FileWriter(plotFile));
+            writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream(plotFile),
+                    Charset.defaultCharset().name()));
             // write 2 header lines
             String[] header1 = new String[] { Messages.Plot_Title(),
                     this.getTitle() };
