@@ -35,7 +35,7 @@ public class PlotDescriptor extends BuildStepDescriptor<Publisher> {
     }
 
     public String getDisplayName() {
-        return Messages.Plot_Publisher_DisplayName();
+        return Messages.Plot_Pipeline_Publisher_DisplayName();
     }
 
     @Override
