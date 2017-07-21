@@ -1,0 +1,82 @@
+<!--
+/*
+ * Copyright (c) 2008-2009 Yahoo! Inc.  All rights reserved.
+ * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+ */
+ -->
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:entry>
+        <input name="csvFileName" type="hidden" value="${descriptor.csvFileName}" />
+
+        <table width="100%">
+            <f:entry title="${%Plot group}" field="group" help="/plugin/plot-pipeline/help-group.html">
+                <f:textbox name="group" value="${plot.group}" clazz="required"/>
+            </f:entry>
+
+            <f:entry title="${%Plot title}" field="title" help="/plugin/plot-pipeline/help-title.html">
+                <f:textbox name="title" value="${plot.title}"/>
+            </f:entry>
+
+            <f:entry title="${%Number of builds to include}" field="numBuilds" help="/plugin/plot-pipeline/help-numbuilds.html">
+                <input class="positive-number" type="text" name="numBuilds"
+                       style="width:20em" value="${plot.numBuilds}"/>
+            </f:entry>
+
+            <f:entry title="${%Plot y-axis label}" field="yaxis" help="/plugin/plot-pipeline/help-yaxis.html">
+                <f:textbox name="yaxis" value="${plot.yaxis}"/>
+            </f:entry>
+
+            <f:entry title="${%Plot style}" field="style" help="/plugin/plot-pipeline/help-style.html">
+                <select name="style">
+                    <f:option value="area" selected="${plot.style=='area'}">${%Area}</f:option>
+                    <f:option value="bar" selected="${plot.style=='bar'}">${%Bar}</f:option>
+                    <f:option value="bar3d" selected="${plot.style=='bar3d'}">${%Bar 3D}</f:option>
+                    <f:option value="line" selected="${plot.style=='line' || plot.style=='' || plot.style==null}">
+                        ${%Line}
+                    </f:option>
+                    <f:option value="lineSimple" selected="${plot.style=='lineSimple'}">${%Line simple}</f:option>
+                    <f:option value="line3d" selected="${plot.style=='line3d'}">${%Line 3D}</f:option>
+                    <f:option value="stackedArea" selected="${plot.style=='stackedArea'}">${%Stacked Area}</f:option>
+                    <f:option value="stackedbar" selected="${plot.style=='stackedbar'}">${%Stacked Bar}</f:option>
+                    <f:option value="stackedbar3d" selected="${plot.style=='stackedbar3d'}">${%Stacked Bar 3D}
+                    </f:option>
+                    <f:option value="waterfall" selected="${plot.style=='waterfall'}">${%Waterfall}</f:option>
+                </select>
+            </f:entry>
+            <f:entry title="${%Build Descriptions as labels}" field="useDescr" help="/plugin/plot-pipeline/help-useDescr.html">
+                <f:checkbox name="useDescr" checked="${plot.useDescr}"/>
+            </f:entry>
+            <f:entry title="${%Exclude zero as default Y-axis value}" field="exclZero"
+                     help="/plugin/plot-pipeline/help-exclZero.html">
+                <f:checkbox name="exclZero" checked="${plot.exclZero}"/>
+            </f:entry>
+            <f:entry title="${%Use a logarithmic Y-axis}" field="logarithmic" help="/plugin/plot-pipeline/help-logarithmic.html">
+                <f:checkbox name="logarithmic" checked="${plot.logarithmic}"/>
+            </f:entry>
+            <f:entry title="${%Keep records for deleted builds}" field="keepRecords"
+                     help="/plugin/plot-pipeline/help-keepRecords.html">
+                <f:checkbox name="keepRecords" checked="${plot.keepRecords}"/>
+            </f:entry>
+            <f:entry title="${%Y-axis minimum}" field="yaxisMinimum" help="/plugin/plot-pipeline/help-yaxisMinimum.html">
+                <f:textbox name="yaxisMinimum" value="${plot.yaxisMinimum}"/>
+            </f:entry>
+            <f:entry title="${%Y-axis maximum}" field="yaxisMaximum" help="/plugin/plot-pipeline/help-yaxisMaximum.html">
+                <f:textbox name="yaxisMaximum" value="${plot.yaxisMaximum}"/>
+            </f:entry>
+
+            <f:entry title="" description="${%A new data series definition}">
+                <f:repeatableProperty field="csvSeries" add="Add CSV series"/>
+            </f:entry>
+            <f:entry title="" description="${%A new data series definition}">
+                <f:repeatableProperty field="propertiesSeries" add="Add properties series"/>
+            </f:entry>
+            <f:entry title="" description="${%A new data series definition}">
+                <f:repeatableProperty field="xmlSeries" add="Add XML series"/>
+            </f:entry>
+
+        </table>
+
+    </f:entry>
+</j:jelly>

@@ -6,14 +6,12 @@ package hudson.plugins.plot.pipeline;
 
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.Util;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.plugins.plot.AbstractPlotPublisher;
 import hudson.plugins.plot.Plot;
 import hudson.tasks.BuildStepDescriptor;
-import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
-import hudson.tasks.Recorder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,21 +22,15 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import jenkins.tasks.SimpleBuildStep;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Records the plotpipeline data for builds.
  *
  * @author Nigel Daley
  */
-public class PlotPipelinePublisher extends Recorder implements SimpleBuildStep {
+public class PlotPublisher extends AbstractPlotPublisher implements SimpleBuildStep {
 
-    @DataBoundConstructor
-    public PlotPipelinePublisher(Boolean enabled) {}
-
-    private static final Logger LOGGER = Logger.getLogger(PlotPipelinePublisher.class
-            .getName());
+    private static final Logger LOGGER = Logger.getLogger(PlotPublisher.class.getName());
     /**
      * Array of Plot objects that represent the job's configured plots; must be
      * non-null
@@ -139,11 +131,6 @@ public class PlotPipelinePublisher extends Recorder implements SimpleBuildStep {
         return (p != null) ? p : new ArrayList<Plot>();
     }
 
-    @Override
-    public BuildStepMonitor getRequiredMonitorService() {
-        return BuildStepMonitor.BUILD;
-    }
-
     /**
      * Called by Jenkins.
      */
@@ -151,18 +138,6 @@ public class PlotPipelinePublisher extends Recorder implements SimpleBuildStep {
     public BuildStepDescriptor<Publisher> getDescriptor() {
         return DESCRIPTOR;
     }
-
-/*    @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-            BuildListener listener) throws IOException, InterruptedException {
-        listener.getLogger().println("Recording plotpipeline data");
-        // add the build to each plotpipeline
-        for (Plot plotpipeline : getPlots()) {
-            plotpipeline.addBuild(build, listener.getLogger());
-        }
-        // misconfigured plots will not fail a build so always return true
-        return true;
-    }*/
 
     /**
      * Called by Jenkins when a build is finishing.
@@ -181,19 +156,5 @@ public class PlotPipelinePublisher extends Recorder implements SimpleBuildStep {
         run.addAction(new PlotBuildAction(run, getPlots()));
     }
 
-    protected String originalGroupToUrlGroup(String originalGroup) {
-        if ( StringUtils.isEmpty(originalGroup)) {
-            return "nogroup";
-        }
-        return originalGroup.replace('/', ' ');
-    }
-
-    /**
-     * Converts the original plotpipeline group name to a URL friendly group name.
-     */
-    public String originalGroupToUrlEncodedGroup(String originalGroup) {
-        return Util.rawEncode(originalGroupToUrlGroup(originalGroup));
-    }
-
-    public static final PlotPipelineDescriptor DESCRIPTOR = new PlotPipelineDescriptor();
+    public static final PlotDescriptor DESCRIPTOR = new PlotDescriptor();
 }

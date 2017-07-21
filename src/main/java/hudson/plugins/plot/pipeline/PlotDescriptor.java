@@ -1,23 +1,24 @@
-package hudson.plugins.plot;
+package hudson.plugins.plot.pipeline;
 
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.matrix.MatrixProject;
 import hudson.model.AbstractProject;
+import hudson.model.Job;
+import hudson.plugins.plot.Messages;
+import hudson.plugins.plot.Plot;
+import hudson.plugins.plot.SeriesFactory;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
-
 import java.io.IOException;
-
 import net.sf.json.JSONObject;
-
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
- * The Descriptor for the plot configuration Extension
+ * The Descriptor for the plotpipeline configuration Extension
  *
  * @author Nigel Daley
  * @author Thomas Fox
@@ -66,8 +67,13 @@ public class PlotDescriptor extends BuildStepDescriptor<Publisher> {
      * Checks if the series file is valid.
      */
     public FormValidation doCheckSeriesFile(
-            @AncestorInPath AbstractProject<?, ?> project,
+            @AncestorInPath Job<?, ?> project,
             @QueryParameter String value) throws IOException {
-        return FilePath.validateFileMask(project.getSomeWorkspace(), value);
+        FilePath fp = new FilePath( new FilePath( project.getRootDir() ), "workspace" );
+        //Check if workspace folder is missing form root directory
+        if ( fp.validateFileMask( value ) == null ) {
+            return new FilePath( project.getRootDir() ).validateFileMask( value );
+        }
+         return fp.validateFileMask( value );
     }
 }

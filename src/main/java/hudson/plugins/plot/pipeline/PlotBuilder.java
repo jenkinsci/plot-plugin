@@ -3,7 +3,10 @@ package hudson.plugins.plot.pipeline;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.matrix.MatrixRun;
+import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.plot.CSVSeries;
@@ -17,6 +20,7 @@ import hudson.util.FormValidation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nonnull;
 import javax.servlet.ServletException;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
@@ -131,7 +135,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         plot.series = series;
         plot.addBuild(build, listener.getLogger(), workspace);
         plots.add(plot);
-        PlotBuildAction buildAction = build.getAction( PlotBuildAction.class );
+        PlotBuildAction buildAction = build.getAction(PlotBuildAction.class);
         if (buildAction == null) {
             build.addAction( new PlotBuildAction( build, plots ) );
         } else {

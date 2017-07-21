@@ -17,14 +17,14 @@ import org.kohsuke.stapler.StaplerResponse;
  *
  * Created by max on 2016-06-20.
  */
-public class PlotProjectAction implements Action, StaplerProxy {
+public class PlotAction implements Action, StaplerProxy {
 
     private final Job<?, ?> project;
-    private PlotPipelinePublisher publisher;
+    private PlotPublisher publisher;
 
-    public PlotProjectAction(Job<?, ?> job, List<Plot> plots){
+    public PlotAction(Job<?, ?> job, List<Plot> plots){
         this.project = job;
-        publisher = new PlotPipelinePublisher(true);
+        publisher = new PlotPublisher();
         if(plots != null) {
             publisher.setPlots(plots);
         }
@@ -42,7 +42,7 @@ public class PlotProjectAction implements Action, StaplerProxy {
 
     @Override
     public String getUrlName() {
-        return "plotpipeline";
+        return Messages.Plot_UrlName();
     }
 
     // called from PlotAction/index.jelly
@@ -55,17 +55,17 @@ public class PlotProjectAction implements Action, StaplerProxy {
         return project;
     }
 
-    // called from PlotProjectAction/index.jelly
+    // called from PlotAction/index.jelly
     public List<String> getOriginalGroups() {
         return publisher.getOriginalGroups();
     }
 
-    // called from PlotProjectAction/index.jelly
+    // called from PlotAction/index.jelly
     public String getUrlGroup(String originalGroup) {
         return publisher.originalGroupToUrlEncodedGroup(originalGroup);
     }
 
-    // called from href created in PlotProjectAction/index.jelly
+    // called from href created in PlotAction/index.jelly
     public PlotReport getDynamic(String group, StaplerRequest req,
                                  StaplerResponse rsp) throws IOException {
         return new PlotReport(project,

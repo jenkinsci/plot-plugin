@@ -15,7 +15,7 @@ import org.kohsuke.stapler.export.ExportedBean;
  * Created by Markus Axelsson on 2016-06-20.
  */
 @ExportedBean
-public class PlotBuildAction extends InvisibleAction implements StaplerProxy, SimpleBuildStep.LastBuildAction{
+public class PlotBuildAction extends InvisibleAction implements StaplerProxy, SimpleBuildStep.LastBuildAction {
 
     private Run<?, ?> run;
     private List<Plot> plots;
@@ -27,7 +27,7 @@ public class PlotBuildAction extends InvisibleAction implements StaplerProxy, Si
 
     @Override
     public Collection<? extends Action> getProjectActions() {
-        return Collections.<Action>singleton(new PlotProjectAction(run.getParent(), plots));
+        return Collections.<Action>singleton(new PlotAction(run.getParent(), plots));
     }
 
     @Override
