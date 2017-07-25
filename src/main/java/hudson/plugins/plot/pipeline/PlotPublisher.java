@@ -6,12 +6,15 @@ package hudson.plugins.plot.pipeline;
 
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.plot.AbstractPlotPublisher;
 import hudson.plugins.plot.Plot;
 import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
+import hudson.tasks.Recorder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,13 +25,14 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import jenkins.tasks.SimpleBuildStep;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Records the plotpipeline data for builds.
  *
  * @author Nigel Daley
  */
-public class PlotPublisher extends AbstractPlotPublisher implements SimpleBuildStep {
+public class PlotPublisher extends Recorder implements SimpleBuildStep {
 
     private static final Logger LOGGER = Logger.getLogger(PlotPublisher.class.getName());
     /**
@@ -66,6 +70,20 @@ public class PlotPublisher extends AbstractPlotPublisher implements SimpleBuildS
             }
         }
         return "";
+    }
+
+    protected String originalGroupToUrlGroup(String originalGroup) {
+        if (StringUtils.isEmpty(originalGroup)) {
+            return "nogroup";
+        }
+        return originalGroup.replace('/', ' ');
+    }
+
+    /**
+     * Converts the original plotpipeline group name to a URL friendly group name.
+     */
+    public String originalGroupToUrlEncodedGroup(String originalGroup) {
+        return Util.rawEncode(originalGroupToUrlGroup(originalGroup));
     }
 
     /**
@@ -154,6 +172,11 @@ public class PlotPublisher extends AbstractPlotPublisher implements SimpleBuildS
             plot.addBuild(run, listener.getLogger(), workspace);
         }
         run.addAction(new PlotBuildAction(run, getPlots()));
+    }
+
+    @Override
+    public BuildStepMonitor getRequiredMonitorService() {
+        return BuildStepMonitor.BUILD;
     }
 
     public static final PlotDescriptor DESCRIPTOR = new PlotDescriptor();

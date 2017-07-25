@@ -4,6 +4,7 @@ import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.plugins.plot.CSVSeries;
+import hudson.plugins.plot.Messages;
 import hudson.plugins.plot.Plot;
 import hudson.plugins.plot.PropertiesSeries;
 import hudson.plugins.plot.Series;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Sample {@link Builder}.
+ * Plot {@link Builder} class for pipeline.
  *
  * <p>
  * When the user configures the project and enables this builder,
@@ -57,11 +58,9 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     public String csvFileName;
     /** List of data series. */
     public List<Series> series;
-
     public List<CSVSeries> csvSeries;
     public List<PropertiesSeries> propertiesSeries;
     public List<XMLSeries> xmlSeries;
-
     private List<Plot> plots;
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
@@ -86,9 +85,9 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         this.propertiesSeries = propertiesSeries;
         this.xmlSeries = xmlSeries;
         this.series = new ArrayList<>();
-        if( csvSeries != null ){ this.series.addAll(csvSeries); }
-        if( xmlSeries != null ) { this.series.addAll(xmlSeries); }
-        if( propertiesSeries != null ) { this.series.addAll(propertiesSeries); }
+        if(csvSeries != null) { this.series.addAll(csvSeries); }
+        if(xmlSeries != null) { this.series.addAll(xmlSeries); }
+        if(propertiesSeries != null) { this.series.addAll(propertiesSeries); }
     }
 
     public String getGroup() {
@@ -132,11 +131,11 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         plot.series = series;
         plot.addBuild(build, listener.getLogger(), workspace);
         plots.add(plot);
-        PlotBuildAction buildAction = build.getAction( PlotBuildAction.class );
-        if( buildAction == null ){
-            build.addAction( new PlotBuildAction( build, plots ) );
+        PlotBuildAction buildAction = build.getAction(PlotBuildAction.class);
+        if(buildAction == null){
+            build.addAction(new PlotBuildAction(build, plots));
         } else {
-            buildAction.addPlots( plots );
+            buildAction.addPlots(plots);
         }
     }
 
@@ -192,7 +191,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
          * This human readable group is used in the configuration screen.
          */
         public String getDisplayName() {
-            return "Plot build for Pipeline";
+            return Messages.Plot_Pipeline_Builder_DisplayName();
         }
 
         @Override
