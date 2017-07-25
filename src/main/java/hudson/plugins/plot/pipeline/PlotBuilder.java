@@ -39,8 +39,6 @@ import java.util.List;
  *
  * <p>
  * When a build is performed, the {@link #perform} method will be invoked.
- *
- * @author Kohsuke Kawaguchi
  */
 public class PlotBuilder extends Builder implements SimpleBuildStep {
 

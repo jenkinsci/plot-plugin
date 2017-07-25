@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.
+ * Copyrights licensed under the MIT License.
+ */
 package hudson.plugins.plot.pipeline;
 
 import hudson.model.Action;
@@ -15,7 +19,7 @@ import org.kohsuke.stapler.StaplerResponse;
 /**
  * Project action to display plots.
  *
- * Created by max on 2016-06-20.
+ * @author Nigel Daley
  */
 public class PlotAction implements Action, StaplerProxy {
 

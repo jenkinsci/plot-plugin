@@ -11,9 +11,6 @@ import jenkins.tasks.SimpleBuildStep;
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.export.ExportedBean;
 
-/**
- * Created by Markus Axelsson on 2016-06-20.
- */
 @ExportedBean
 public class PlotBuildAction extends InvisibleAction implements StaplerProxy, SimpleBuildStep.LastBuildAction {
 
