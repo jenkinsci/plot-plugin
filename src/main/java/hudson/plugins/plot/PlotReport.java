@@ -147,7 +147,7 @@ public class PlotReport {
                 // table row corresponding to the build number not found
                 if (tableRow == null) {
                     // create table row with build number at first column
-                    tableRow = new ArrayList<String>();
+                    tableRow = new ArrayList<>();
                     tableRow.add(buildNumber);
                     tableData.add(tableRow);
                 }

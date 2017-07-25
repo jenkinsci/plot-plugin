@@ -39,23 +39,21 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
- * Records the plotpipeline data for builds.
+ * Records the plot data for builds.
  *
  * @author Nigel Daley
  */
 public class PlotPublisher extends Recorder implements SimpleBuildStep {
-
-    private static final Logger LOGGER = Logger.getLogger(PlotPublisher.class.getName());
     /**
      * Array of Plot objects that represent the job's configured plots; must be
      * non-null
      */
-    private List<Plot> plots = new ArrayList<Plot>();
+    private List<Plot> plots = new ArrayList<>();
     /**
-     * Maps plotpipeline groups to plotpipeline objects; group strings are in a URL friendly
+     * Maps plot groups to plot objects; group strings are in a URL friendly
      * format; map must be non-null
      */
-    transient private Map<String, List<Plot>> groupMap = new HashMap<String, List<Plot>>();
+    transient private Map<String, List<Plot>> groupMap = new HashMap<>();
 
     /**
      * Setup the groupMap upon deserialization.
@@ -66,7 +64,7 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
     }
 
     /**
-     * Converts a URL friendly plotpipeline group name to the original group name. If
+     * Converts a URL friendly plot group name to the original group name. If
      * the given urlGroup doesn't already exist then the empty string will be
      * returned.
      */
@@ -91,7 +89,7 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
     }
 
     /**
-     * Converts the original plotpipeline group name to a URL friendly group name.
+     * Converts the original plot group name to a URL friendly group name.
      */
     public String originalGroupToUrlEncodedGroup(String originalGroup) {
         return Util.rawEncode(originalGroupToUrlGroup(originalGroup));
@@ -116,29 +114,28 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
      *            the new list of plots
      */
     public void setPlots(List<Plot> plots) {
-        this.plots = new ArrayList<Plot>();
-        groupMap = new HashMap<String, List<Plot>>();
+        this.plots = new ArrayList<>();
+        groupMap = new HashMap<>();
         for (Plot plot : plots) {
             addPlot(plot);
         }
     }
 
     /**
-     * Adds the new plotpipeline to the plotpipeline data structures managed by this object.
+     * Adds the new plot to the plot data structures managed by this object.
      *
-     * @param plot
-     *            the new plotpipeline
+     * @param plot the new plot
      */
     public void addPlot(Plot plot) {
-        // update the plotpipeline list
+        // update the plot list
         plots.add(plot);
-        // update the group-to-plotpipeline map
+        // update the group-to-plot map
         String urlGroup = originalGroupToUrlEncodedGroup(plot.getGroup());
         if (groupMap.containsKey(urlGroup)) {
             List<Plot> list = groupMap.get(urlGroup);
             list.add(plot);
         } else {
-            List<Plot> list = new ArrayList<Plot>();
+            List<Plot> list = new ArrayList<>();
             list.add(plot);
             groupMap.put(urlGroup, list);
         }
@@ -169,8 +166,8 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
                         @Nonnull Launcher launcher,
                         @Nonnull TaskListener listener)
             throws InterruptedException, IOException {
-        listener.getLogger().println("Recording plotpipeline data");
-        // add the build to each plotpipeline
+        listener.getLogger().println("Recording plot data");
+        // add the build to each plot
         for (Plot plot : getPlots()) {
             plot.addBuild(run, listener.getLogger(), workspace);
         }
@@ -194,7 +191,7 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
     public static final PlotDescriptor DESCRIPTOR = new PlotDescriptor();
 
     /**
-     * The Descriptor for the plotpipeline configuration Extension
+     * The Descriptor for the plot configuration Extension
      *
      * @author Nigel Daley
      * @author Thomas Fox

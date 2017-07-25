@@ -23,11 +23,9 @@ import au.com.bytecode.opencsv.CSVReader;
  * Test a CSV series.
  *
  * @author Allen Reese
- *
  */
 public class CSVSeriesTest extends SeriesTestCase {
-    private static transient final Logger LOGGER = Logger
-            .getLogger(CSVSeriesTest.class.getName());
+    private static transient final Logger LOGGER = Logger.getLogger(CSVSeriesTest.class.getName());
 
     private static final String[] files = { "test.csv", };
 

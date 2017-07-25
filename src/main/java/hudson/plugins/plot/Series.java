@@ -46,8 +46,6 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
      */
     protected String fileType;
 
-    
-
     protected Series(String file, String label, String fileType) {
         this.file = file;
 
@@ -105,11 +103,9 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
         String resultUrl = baseUrl;
         if (resultUrl != null) {
             if (label == null) {
-                // This implmentation searches for tokens to replace. If the
-                // argument
-                // was NULL then replacing the null with an empty string should
-                // still
-                // produce the desired outcome.
+                // This implementation searches for tokens to replace.
+                // If the argument was NULL then replacing the null with an empty string
+                // should still produce the desired outcome.
                 label = "";
             }
             /*

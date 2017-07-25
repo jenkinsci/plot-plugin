@@ -61,7 +61,7 @@ import org.kohsuke.stapler.StaplerResponse;
  * Represents the configuration for a single plot. A plot can have one or more
  * data series (lines). Each data series has one data point per build. The
  * x-axis is always the build number.
- *
+ * <p>
  * A plot has the following characteristics:
  * <ul>
  * <li>a title (mandatory)
@@ -70,7 +70,7 @@ import org.kohsuke.stapler.StaplerResponse;
  * <li>plot group (defaults to no group)
  * <li>number of builds to show on the plot (defaults to all)
  * </ul>
- *
+ * <p>
  * A plots group effects the way in which plots are displayed. Group names are
  * listed as links on the top-level plot page. The user then clicks on a group
  * and sees the plots that belong to that group.
@@ -109,17 +109,15 @@ public class Plot implements Comparable<Plot> {
             DefaultDrawingSupplier.DEFAULT_STROKE_SEQUENCE,
             DefaultDrawingSupplier.DEFAULT_OUTLINE_STROKE_SEQUENCE,
             // the plot data points are a small diamond shape
-            new Shape[] { new Polygon(new int[] { 3, 0, -3, 0 }, new int[] { 0,
-                    4, 0, -4 }, 4) });
+            new Shape[] {
+                    new Polygon(new int[] { 3, 0, -3, 0 }, new int[] { 0, 4, 0, -4 }, 4)
+            });
 
     /** The default plot width. */
     private static final int DEFAULT_WIDTH = 750;
 
     /** The default plot height. */
     private static final int DEFAULT_HEIGHT = 450;
-
-    /** The default number of builds on plot (all). */
-    private static final String DEFAULT_NUMBUILDS = "";
 
     // Transient values
 
@@ -197,7 +195,7 @@ public class Plot implements Comparable<Plot> {
     public String yaxisMaximum;
 
     /**
-     * Creates a new plot with the given paramenters. If numBuilds is the empty
+     * Creates a new plot with the given parameters. If numBuilds is the empty
      * string, then all builds will be included. Must not be zero.
      */
     @DataBoundConstructor
@@ -280,6 +278,7 @@ public class Plot implements Comparable<Plot> {
     public boolean equals(Object o) {
         return o instanceof Plot && this.compareTo((Plot) o) == 0;
     }
+
     @Override
     public int hashCode() {
         return this.title.hashCode();
@@ -475,8 +474,7 @@ public class Plot implements Comparable<Plot> {
      * directory where the CSV file is located. Unfortunately, a reference to
      * the project is not available when this object is created.
      *
-     * @param project
-     *            the project
+     * @param project the project
      */
     public void setProject(Job<?, ?> project) {
         this.project = project;
@@ -485,10 +483,8 @@ public class Plot implements Comparable<Plot> {
     /**
      * Generates and writes the plot to the response output stream.
      *
-     * @param req
-     *            the incoming request
-     * @param rsp
-     *            the response stream
+     * @param req the incoming request
+     * @param rsp the response stream
      * @throws IOException
      */
     public void plotGraph(StaplerRequest req, StaplerResponse rsp)
@@ -516,10 +512,8 @@ public class Plot implements Comparable<Plot> {
      * Generates and writes the plot's clickable map to the response output
      * stream.
      *
-     * @param req
-     *            the incoming request
-     * @param rsp
-     *            the response stream
+     * @param req the incoming request
+     * @param rsp the response stream
      * @throws IOException
      */
     public void plotGraphMap(StaplerRequest req, StaplerResponse rsp)
@@ -549,32 +543,34 @@ public class Plot implements Comparable<Plot> {
      * Called when a build completes. Adds the finished build to this plot. This
      * method extracts the data for each data series from the build and saves it
      * in the plot's CSV file.
-     *
-     * @param build
-     * @param logger
      */
     public void addBuild(AbstractBuild<?, ?> build, PrintStream logger) {
-        if (project == null)
+        if (project == null) {
             project = build.getProject();
+        }
 
         // load the existing plot data from disk
         loadPlotData();
         // extract the data for each data series
         for (Series series : getSeries()) {
-            if (series == null)
+            if (series == null) {
                 continue;
+            }
             List<PlotPoint> seriesData = series.loadSeries(
                     build.getWorkspace(), build.getNumber(), logger);
             if (seriesData != null) {
                 for (PlotPoint point : seriesData) {
-                    if (point == null)
+                    if (point == null) {
                         continue;
+                    }
 
-                    rawPlotData.add(new String[] { point.getYvalue(),
+                    rawPlotData.add(new String[] {
+                            point.getYvalue(),
                             point.getLabel(),
                             build.getNumber() + "", // convert to a string
                             build.getTimestamp().getTimeInMillis() + "",
-                            point.getUrl() });
+                            point.getUrl()
+                    });
                 }
             }
         }
@@ -587,33 +583,34 @@ public class Plot implements Comparable<Plot> {
      * Called when a build completes. Adds the finished build to this plot. This
      * method extracts the data for each data series from the build and saves it
      * in the plot's CSV file.
-     *
-     * @param run
-     * @param logger
-     * @param workspace
      */
     public void addBuild(Run<?, ?> run, PrintStream logger, FilePath workspace) {
-        if (project == null)
+        if (project == null) {
             project = run.getParent();
+        }
 
         // load the existing plot data from disk
         loadPlotData();
         // extract the data for each data series
         for (Series series : getSeries()) {
-            if (series == null)
+            if (series == null) {
                 continue;
+            }
             List<PlotPoint> seriesData = series.loadSeries(
                     workspace, run.getNumber(), logger);
             if (seriesData != null) {
                 for (PlotPoint point : seriesData) {
-                    if (point == null)
+                    if (point == null) {
                         continue;
+                    }
 
-                    rawPlotData.add(new String[] { point.getYvalue(),
+                    rawPlotData.add(new String[] {
+                            point.getYvalue(),
                             point.getLabel(),
                             run.getNumber() + "", // convert to a string
                             run.getTimestamp().getTimeInMillis() + "",
-                            point.getUrl() });
+                            point.getUrl()
+                    });
                 }
             }
         }
@@ -625,9 +622,8 @@ public class Plot implements Comparable<Plot> {
     /**
      * Generates the plot and stores it in the plot instance variable.
      *
-     * @param forceGenerate
-     *            if true, force the plot to be re-generated even if the on-disk
-     *            data hasn't changed
+     * @param forceGenerate if true, force the plot to be re-generated even if the on-disk
+     * data hasn't changed
      */
     private void generatePlot(boolean forceGenerate) {
         class Label implements Comparable<Label> {
@@ -717,8 +713,9 @@ public class Plot implements Comparable<Plot> {
                     descriptionForBuild(buildNum)) : new Label(record[2],
                     record[3]);
             String url = null;
-            if (record.length >= 5)
+            if (record.length >= 5) {
                 url = record[4];
+            }
             dataset.setValue(value, url, series, xlabel);
         }
 
@@ -792,9 +789,9 @@ public class Plot implements Comparable<Plot> {
             String s = getUrlStyle();
             LineAndShapeRenderer lasRenderer = (LineAndShapeRenderer) renderer;
             if ("lineSimple".equalsIgnoreCase(s)) {
-               lasRenderer.setShapesVisible(false); // TODO: deprecated, may be unnecessary
+                lasRenderer.setShapesVisible(false); // TODO: deprecated, may be unnecessary
             } else {
-               lasRenderer.setShapesVisible(true); // TODO: deprecated, may be unnecessary
+                lasRenderer.setShapesVisible(true); // TODO: deprecated, may be unnecessary
             }
         }
     }
@@ -967,11 +964,15 @@ public class Plot implements Comparable<Plot> {
             writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream(plotFile),
                     Charset.defaultCharset().name()));
             // write 2 header lines
-            String[] header1 = new String[] { Messages.Plot_Title(),
-                    this.getTitle() };
-            String[] header2 = new String[] { Messages.Plot_Value(),
+            String[] header1 = new String[] {
+                    Messages.Plot_Title(),
+                    this.getTitle()
+            };
+            String[] header2 = new String[] {
+                    Messages.Plot_Value(),
                     Messages.Plot_SeriesLabel(), Messages.Plot_BuildNumber(),
-                    Messages.Plot_BuildDate(), Messages.Plot_URL() };
+                    Messages.Plot_BuildDate(), Messages.Plot_URL()
+            };
             writer.writeNext(header1);
             writer.writeNext(header2);
             // write each entry of rawPlotData to a new line in the CSV file
@@ -1005,8 +1006,9 @@ public class Plot implements Comparable<Plot> {
             numBuilds = Integer.MAX_VALUE;
         }
 
-        if (buildNumber < project.getNextBuildNumber() - numBuilds)
+        if (buildNumber < project.getNextBuildNumber() - numBuilds) {
             return false;
+        }
 
         return keepRecords || project.getBuildByNumber(buildNumber) != null;
     }

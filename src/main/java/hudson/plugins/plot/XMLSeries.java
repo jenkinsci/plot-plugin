@@ -153,8 +153,8 @@ public class XMLSeries extends Series {
             parentNodeMap.get(node.getParentNode()).add(node);
         }
 
-        List<PlotPoint> retval = new ArrayList<PlotPoint>();
-        Queue<Node> parents = new ArrayDeque<Node>(parentNodeMap.keySet());
+        List<PlotPoint> retval = new ArrayList<>();
+        Queue<Node> parents = new ArrayDeque<>(parentNodeMap.keySet());
         while (!parents.isEmpty()) {
             Node parent = parents.poll();
             Double value = null;
@@ -164,7 +164,7 @@ public class XMLSeries extends Series {
                 if (null == child.getTextContent()
                         || child.getTextContent().trim().isEmpty()) {
                     NamedNodeMap attrmap = child.getAttributes();
-                    List<Node> attrs = new ArrayList<Node>();
+                    List<Node> attrs = new ArrayList<>();
                     for (int i = 0; i < attrmap.getLength(); i++) {
                         attrs.add(attrmap.item(i));
                     }
@@ -185,9 +185,6 @@ public class XMLSeries extends Series {
         return retval;
     }
 
-    private void addValueToListFromAttributes(List<PlotPoint> retval, Node child) {
-    }
-
     /**
      * Load the series from a properties file.
      */
@@ -195,11 +192,11 @@ public class XMLSeries extends Series {
     public List<PlotPoint> loadSeries(FilePath workspaceRootDir,
             int buildNumber, PrintStream logger) {
         InputStream in = null;
-        InputSource inputSource = null;
+        InputSource inputSource;
 
         try {
-            List<PlotPoint> ret = new ArrayList<PlotPoint>();
-            FilePath[] seriesFiles = null;
+            List<PlotPoint> ret = new ArrayList<>();
+            FilePath[] seriesFiles;
 
             try {
                 seriesFiles = workspaceRootDir.list(getFile());

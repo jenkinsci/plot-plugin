@@ -48,9 +48,9 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
      * Creates a new empty instance.
      */
     public PlotCategoryDataset() {
-        this.rowKeys = new ArrayList<Comparable>();
-        this.columnKeys = new ArrayList<Comparable>();
-        this.data = new ArrayList<Map<Comparable, DataElement>>();
+        this.rowKeys = new ArrayList<>();
+        this.columnKeys = new ArrayList<>();
+        this.data = new ArrayList<>();
     }
 
     /**

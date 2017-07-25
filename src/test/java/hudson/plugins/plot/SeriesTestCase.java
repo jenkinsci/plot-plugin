@@ -24,7 +24,6 @@ public class SeriesTestCase extends HudsonTestCase {
     }
 
     public void testSeries(Series series, String file, String label, String type) {
-
         // verify the properties was created correctly
         assertNotNull(series);
 

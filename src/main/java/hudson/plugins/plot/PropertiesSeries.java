@@ -28,8 +28,8 @@ import org.kohsuke.stapler.StaplerRequest;
  *
  */
 public class PropertiesSeries extends Series {
-    private static transient final Logger LOGGER = Logger
-            .getLogger(PropertiesSeries.class.getName());
+    private static transient final Logger LOGGER =
+            Logger.getLogger(PropertiesSeries.class.getName());
 
     @DataBoundConstructor
     public PropertiesSeries(String file, String label) {
@@ -95,7 +95,7 @@ public class PropertiesSeries extends Series {
 
         @Override
         public Series newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-            return SeriesFactory.createSeries( formData, req );
+            return SeriesFactory.createSeries(formData, req);
         }
     }
 }

@@ -38,7 +38,7 @@ import java.util.List;
  * to remember the configuration.
  *
  * <p>
- * When a build is performed, the {@link #perform} method will be invoked. 
+ * When a build is performed, the {@link #perform} method will be invoked.
  *
  * @author Kohsuke Kawaguchi
  */
@@ -65,10 +65,11 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
     @DataBoundConstructor
-    public PlotBuilder ( String group, String title, String numBuilds, String yaxis, String style,
-                         Boolean useDescr, Boolean exclZero, Boolean logarithmic, Boolean keepRecords,
-                         String yaxisMinimum, String yaxisMaximum, String csvFileName,
-                         List<CSVSeries> csvSeries, List<PropertiesSeries> propertiesSeries, List<XMLSeries> xmlSeries) {
+    public PlotBuilder(String group, String title, String numBuilds, String yaxis, String style,
+            Boolean useDescr, Boolean exclZero, Boolean logarithmic, Boolean keepRecords,
+            String yaxisMinimum, String yaxisMaximum, String csvFileName,
+            List<CSVSeries> csvSeries, List<PropertiesSeries> propertiesSeries,
+            List<XMLSeries> xmlSeries) {
         this.group = group;
         this.title = title;
         this.numBuilds = numBuilds;
@@ -85,9 +86,9 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         this.propertiesSeries = propertiesSeries;
         this.xmlSeries = xmlSeries;
         this.series = new ArrayList<>();
-        if(csvSeries != null) { this.series.addAll(csvSeries); }
-        if(xmlSeries != null) { this.series.addAll(xmlSeries); }
-        if(propertiesSeries != null) { this.series.addAll(propertiesSeries); }
+        if (csvSeries != null) { this.series.addAll(csvSeries); }
+        if (xmlSeries != null) { this.series.addAll(xmlSeries); }
+        if (propertiesSeries != null) { this.series.addAll(propertiesSeries); }
     }
 
     public String getGroup() {
@@ -124,15 +125,13 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
 
     @Override
     public void perform(Run<?,?> build, FilePath workspace, Launcher launcher, TaskListener listener) {
-        // This is where you 'build' the project.
-
         plots = new ArrayList<>();
         Plot plot = new Plot(title, yaxis, group, numBuilds, csvFileName, style, false, false, false, false, yaxisMinimum, yaxisMaximum);
         plot.series = series;
         plot.addBuild(build, listener.getLogger(), workspace);
         plots.add(plot);
         PlotBuildAction buildAction = build.getAction(PlotBuildAction.class);
-        if(buildAction == null){
+        if (buildAction == null) {
             build.addAction(new PlotBuildAction(build, plots));
         } else {
             buildAction.addPlots(plots);
@@ -153,7 +152,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
      */
     @Extension // This indicates to Jenkins that this is an implementation of an extension point.
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
-        /**
+        /*
          * To persist global configuration information,
          * simply store it in a field and call save().
          *
@@ -162,7 +161,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
          */
 
         /**
-         * In order to load the persisted global configuration, you have to 
+         * In order to load the persisted global configuration, you have to
          * call load() in the constructor.
          */
         public DescriptorImpl() {
@@ -196,7 +195,6 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
 
         @Override
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
-
             save();
             return super.configure(req,formData);
         }

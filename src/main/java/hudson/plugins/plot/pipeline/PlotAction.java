@@ -45,27 +45,27 @@ public class PlotAction implements Action, StaplerProxy {
         return Messages.Plot_UrlName();
     }
 
-    // called from PlotAction/index.jelly
+    // called from pipeline/PlotAction/index.jelly
     public boolean hasPlots() throws IOException {
         return CollectionUtils.isNotEmpty(publisher.getPlots());
     }
 
-    // called from PlotReport/index.jelly
+    // called from pipeline/PlotReport/index.jelly
     public Job<?, ?> getProject() {
         return project;
     }
 
-    // called from PlotAction/index.jelly
+    // called from pipeline/PlotAction/index.jelly
     public List<String> getOriginalGroups() {
         return publisher.getOriginalGroups();
     }
 
-    // called from PlotAction/index.jelly
+    // called from pipeline/PlotAction/index.jelly
     public String getUrlGroup(String originalGroup) {
         return publisher.originalGroupToUrlEncodedGroup(originalGroup);
     }
 
-    // called from href created in PlotAction/index.jelly
+    // called from href created in pipeline/PlotAction/index.jelly
     public PlotReport getDynamic(String group, StaplerRequest req,
                                  StaplerResponse rsp) throws IOException {
         return new PlotReport(project,
@@ -74,7 +74,7 @@ public class PlotAction implements Action, StaplerProxy {
     }
 
     /**
-     * If there's only one plotpipeline category, simply display that category of
+     * If there's only one plot category, simply display that category of
      * reports on this view.
      */
     public Object getTarget() {

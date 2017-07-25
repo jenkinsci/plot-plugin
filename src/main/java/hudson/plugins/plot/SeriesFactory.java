@@ -19,9 +19,6 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author areese, Alan.Harder@sun.com
  */
 public class SeriesFactory {
-    // private static final Logger LOGGER =
-    // Logger.getLogger(SeriesFactory.class.getName());
-
     /**
      * Using file and label and the Stapler request, create a subclass of series
      * that can process the type selected.
@@ -48,7 +45,7 @@ public class SeriesFactory {
 
     public static List<Series> createSeriesList(Object data, StaplerRequest req) {
         JSONArray list = getArray(data);
-        List<Series> result = new ArrayList<Series>();
+        List<Series> result = new ArrayList<>();
         for (Object series : list) {
             result.add(createSeries((JSONObject) series, req));
         }

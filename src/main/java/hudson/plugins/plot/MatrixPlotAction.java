@@ -32,22 +32,22 @@ public class MatrixPlotAction implements Action, StaplerProxy {
         return project;
     }
 
-    // called from PlotAction/index.jelly
+    // called from MatrixPlotAction/index.jelly
     public boolean hasPlots() throws IOException {
         return CollectionUtils.isNotEmpty(publisher.getPlots(project));
     }
 
-    // called from PlotAction/index.jelly
+    // called from MatrixPlotAction/index.jelly
     public List<String> getOriginalGroups() {
         return publisher.getOriginalGroups(project);
     }
 
-    // called from PlotAction/index.jelly
+    // called from MatrixPlotAction/index.jelly
     public String getUrlGroup(String originalGroup) {
         return publisher.originalGroupToUrlEncodedGroup(originalGroup);
     }
 
-    // called from href created in PlotAction/index.jelly
+    // called from href created in MatrixPlotAction/index.jelly
     public PlotReport getDynamic(String group, StaplerRequest req,
             StaplerResponse rsp) throws IOException {
         return new PlotReport(project, publisher.urlGroupToOriginalGroup(

@@ -24,8 +24,7 @@ import au.com.bytecode.opencsv.CSVReader;
  *
  */
 public class CSVReaderTest extends SeriesTestCase {
-    private static transient final Logger LOGGER = Logger
-            .getLogger(CSVReaderTest.class.getName());
+    private static transient final Logger LOGGER = Logger.getLogger(CSVReaderTest.class.getName());
 
     private static final String[] files = { "test.csv", };
 
@@ -46,7 +45,7 @@ public class CSVReaderTest extends SeriesTestCase {
         InputStream in = null;
         InputStreamReader inputReader = null;
 
-        FilePath[] seriesFiles = null;
+        FilePath[] seriesFiles;
         try {
             seriesFiles = workspaceRootDir.list(files[0]);
 
