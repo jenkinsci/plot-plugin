@@ -1,0 +1,54 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:entry>
+    <table width="100%" bgcolor="#EEEEEE">
+    <f:entry title="${%Data series file}" help="/plugin/plot/help-series.html">
+        <f:textbox name="file" value="${series.file}"
+                   checkUrl="'descriptorByName/PlotPublisher/checkSeriesFile?value='+toValue(this)" />
+    </f:entry>
+        <f:nested>
+            <div>
+                <table>
+                    <tr>
+                        <td align="center">${%XPath Result type:}</td>
+                        <th align="center">${%Nodeset}</th>
+                        <th align="center">${%Node}</th>
+                        <th align="center">${%String}</th>
+                        <th align="center">${%Boolean}</th>
+                        <th align="center">${%Number}</th>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <f:radio name="nodeType" value="NODESET" checked="${series.nodeType=='NODESET' or series.nodeType==null}" />
+                        </td>
+                        <td>
+                            <f:radio name="nodeType" value="NODE" checked="${series.nodeType=='NODE'}" />
+                        </td>
+                        <td>
+                            <f:radio name="nodeType" value="STRING" checked="${series.nodeType=='STRING'}" />
+                        </td>
+                        <td>
+                            <f:radio name="nodeType" value="BOOLEAN" checked="${series.nodeType=='BOOLEAN'}" />
+                        </td>
+                        <td>
+                            <f:radio name="nodeType" value="NUMBER" checked="${series.nodeType=='NUMBER'}" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <f:entry title="${%XPath Expression}" help="/plugin/plot/help-xml-xpath.html">
+                <f:textbox name="xpath" value="${series.xpath}" />
+            </f:entry>
+            <f:entry title="${%URL}" help="/plugin/plot/help-xml-url.html">
+                <f:textbox name="url" value="${series.url}" />
+            </f:entry>
+            <f:entry title="">
+                <div align="right">
+                    <f:repeatableDeleteButton />
+                </div>
+            </f:entry>
+        </f:nested>
+    </table>
+    </f:entry>
+</j:jelly>

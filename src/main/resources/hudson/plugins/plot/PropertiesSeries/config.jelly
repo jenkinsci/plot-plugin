@@ -1,0 +1,21 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:entry>
+    <table width="100%" bgcolor="#EEEEEE">
+    <f:entry title="${%Data series file}" help="/plugin/plot/help-series.html">
+        <f:textbox name="file" value="${series.file}"
+                   checkUrl="'descriptorByName/PlotPublisher/checkSeriesFile?value='+toValue(this)" />
+    </f:entry>
+        <f:nested>
+            <f:entry title="${%Data series legend label}" help="/plugin/plot/help-legend.html">
+                <f:textbox name="label" value="${series.label}" />
+            </f:entry>
+            <f:entry title="">
+                <div align="right">
+                    <f:repeatableDeleteButton />
+                </div>
+            </f:entry>
+        </f:nested>
+    </table>
+    </f:entry>
+</j:jelly>

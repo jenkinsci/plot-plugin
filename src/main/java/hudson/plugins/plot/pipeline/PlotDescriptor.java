@@ -65,15 +65,16 @@ public class PlotDescriptor extends BuildStepDescriptor<Publisher> {
 
     /**
      * Checks if the series file is valid.
+     * Called from "config.jelly".
      */
     public FormValidation doCheckSeriesFile(
             @AncestorInPath Job<?, ?> project,
             @QueryParameter String value) throws IOException {
-        FilePath fp = new FilePath( new FilePath( project.getRootDir() ), "workspace" );
-        //Check if workspace folder is missing form root directory
-        if ( fp.validateFileMask( value ) == null ) {
-            return new FilePath( project.getRootDir() ).validateFileMask( value );
+        FilePath fp = new FilePath(new FilePath(project.getRootDir()), "workspace" );
+        // Check if workspace folder is missing form root directory
+        if (fp.validateFileMask(value) == null) {
+            return new FilePath(project.getRootDir()).validateFileMask(value);
         }
-         return fp.validateFileMask( value );
+         return fp.validateFileMask(value);
     }
 }

@@ -1,0 +1,65 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:entry>
+        <table width="100%" bgcolor="#EEEEEE">
+            <f:entry title="${%Data series file}" field="file" help="/plugin/plot/help-series.html">
+                <f:textbox name="file" value="${series.file}"
+                           checkUrl="'descriptorByName/PlotPublisher/checkSeriesFile?value='+toValue(this)"/>
+            </f:entry>
+            <f:nested>
+                <div>
+                    <table>
+                        <tr>
+                            <td></td>
+                            <th align="left">${%Include all columns}</th>
+                            <th align="left">${%Include columns by name}</th>
+                            <th align="left">${%Exclude columns by name}</th>
+                            <th align="left">${%Include columns by index}</th>
+                            <th align="left">${%Exclude columns by index}</th>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <f:radio name="inclusionFlag" value="OFF"
+                                         checked="${series.inclusionFlag=='OFF' or series.inclusionFlag==null}"/>
+                            </td>
+                            <td>
+                                <f:radio name="inclusionFlag" value="INCLUDE_BY_STRING"
+                                         checked="${series.inclusionFlag=='INCLUDE_BY_STRING'}"/>
+                            </td>
+                            <td>
+                                <f:radio name="inclusionFlag" value="EXCLUDE_BY_STRING"
+                                         checked="${series.inclusionFlag=='EXCLUDE_BY_STRING'}"/>
+                            </td>
+                            <td>
+                                <f:radio name="inclusionFlag" value="INCLUDE_BY_COLUMN"
+                                         checked="${series.inclusionFlag=='INCLUDE_BY_COLUMN'}"/>
+                            </td>
+                            <td>
+                                <f:radio name="inclusionFlag" value="EXCLUDE_BY_COLUMN"
+                                         checked="${series.inclusionFlag=='EXCLUDE_BY_COLUMN'}"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <f:entry title="${%CSV Exclusion values}" help="/plugin/plot/help-csv-exclusions.html">
+                    <f:textbox name="exclusionValues" value="${series.exclusionValues}"/>
+                </f:entry>
+
+                <f:entry title="${%URL}" help="/plugin/plot/help-csv-url.html">
+                    <f:textbox name="url" value="${series.url}"/>
+                </f:entry>
+
+                <f:entry title="${%Display original csv above plot}" help="/plugin/plot/help-csv-table.html">
+                    <f:checkbox name="displayTableFlag" checked="${series.displayTableFlag}"/>
+                </f:entry>
+                <f:entry title="">
+                    <div align="right">
+                        <f:repeatableDeleteButton/>
+                    </div>
+                </f:entry>
+            </f:nested>
+        </table>
+    </f:entry>
+</j:jelly>
