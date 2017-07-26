@@ -17,6 +17,7 @@ import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
@@ -149,6 +150,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
      * The class is marked as public so that it can be accessed from views.
      */
     @Extension // This indicates to Jenkins that this is an implementation of an extension point.
+    @Symbol("plot")
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
         /*
          * To persist global configuration information,
