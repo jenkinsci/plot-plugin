@@ -30,6 +30,12 @@ public abstract class Series {
     protected String file;
 
     /**
+     * The value of 'file' above after expanding embedded tokens in it.
+     * Token expansion happens just before the series data is read.
+     */
+    protected String realfile;
+
+    /**
      * Data series legend label. Optional.
      */
     protected String label;
@@ -45,6 +51,7 @@ public abstract class Series {
 
     protected Series(String file, String label, String fileType) {
         this.file = file;
+        this.realfile = file;
 
         // TODO: look into this, what do we do if there is no label?
         if (label == null)
@@ -64,6 +71,14 @@ public abstract class Series {
 
     public String getFileType() {
         return fileType;
+    }
+
+    protected void setRealFile(String s) {
+        realfile = s;
+    }
+
+    protected String getRealFile() {
+        return realfile;
     }
 
     /**

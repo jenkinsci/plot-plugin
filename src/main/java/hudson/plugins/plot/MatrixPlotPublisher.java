@@ -182,6 +182,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
         // add the build to each plot
         for (Plot plot : plotsOfConfigurations.get(((MatrixRun) build)
                 .getProject())) {
+            plot.expandTokens(build, listener);
             plot.addBuild(build, listener.getLogger());
         }
         // misconfigured plots will not fail a build so always return true

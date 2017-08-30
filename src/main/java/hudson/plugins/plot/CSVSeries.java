@@ -132,7 +132,7 @@ public class CSVSeries extends Series {
 
             FilePath[] seriesFiles = null;
             try {
-                seriesFiles = workspaceRootDir.list(getFile());
+                seriesFiles = workspaceRootDir.list(getRealFile());
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE,
                         "Exception trying to retrieve series files", e);
@@ -141,14 +141,14 @@ public class CSVSeries extends Series {
 
             if (ArrayUtils.isEmpty(seriesFiles)) {
                 LOGGER.info("No plot data file found: "
-                        + workspaceRootDir.getName() + " " + getFile());
+                        + workspaceRootDir.getName() + " " + getRealFile());
                 return null;
             }
 
             try {
                 if (LOGGER.isLoggable(defaultLogLevel))
                     LOGGER.log(defaultLogLevel,
-                            "Loading plot series data from: " + getFile());
+                            "Loading plot series data from: " + getRealFile());
 
                 in = seriesFiles[0].read();
             } catch (Exception e) {
@@ -160,7 +160,7 @@ public class CSVSeries extends Series {
 
             if (LOGGER.isLoggable(defaultLogLevel))
                 LOGGER.log(defaultLogLevel, "Loaded CSV Plot file: "
-                        + getFile());
+                        + getRealFile());
 
             // load existing plot file
             inputReader = new InputStreamReader(in);
