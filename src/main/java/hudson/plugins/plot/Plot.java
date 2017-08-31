@@ -762,100 +762,43 @@ public class Plot implements Comparable<Plot> {
     private JFreeChart createChart(PlotCategoryDataset dataset) {
         String s = getUrlStyle();
         if ("area".equalsIgnoreCase(s)) {
-            return ChartFactory.createAreaChart(getURLTitle(), /*
-                                                                * categoryAxisLabel=
-                                                                */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
+            return ChartFactory.createAreaChart(getURLTitle(), null,
+                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
         }
         if ("bar".equalsIgnoreCase(s)) {
-            return ChartFactory.createBarChart(getURLTitle(), /*
-                                                               * categoryAxisLabel=
-                                                               */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
+            return ChartFactory.createBarChart(getURLTitle(), null,
+                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
         }
         if ("bar3d".equalsIgnoreCase(s)) {
-            return ChartFactory.createBarChart3D(getURLTitle(), /*
-                                                                 * categoryAxisLabel
-                                                                 * =
-                                                                 */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
+            return ChartFactory.createBarChart3D(getURLTitle(), null,
+                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
         }
         if ("line3d".equalsIgnoreCase(s)) {
-            return ChartFactory.createLineChart3D(getURLTitle(), /*
-                                                                  * categoryAxisLabel
-                                                                  * =
-                                                                  */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
+            return ChartFactory.createLineChart3D(getURLTitle(), null,
+                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
         }
         if ("lineSimple".equalsIgnoreCase(s)) {
-            return ChartFactory.createLineChart(
-                    getURLTitle(), /*categoryAxisLabel=*/null, getYaxis(), dataset,
-                    PlotOrientation.VERTICAL, hasLegend(), /*tooltips=*/true, /*url=*/false);
+            return ChartFactory.createLineChart(getURLTitle(), null,
+                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
         }
-
         if ("stackedarea".equalsIgnoreCase(s)) {
-            return ChartFactory.createStackedAreaChart(getURLTitle(), /*
-                                                                       * categoryAxisLabel
-                                                                       * =
-                                                                       */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
+            return ChartFactory.createStackedAreaChart(getURLTitle(), null,
+                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
         }
         if ("stackedbar".equalsIgnoreCase(s)) {
-            return ChartFactory.createStackedBarChart(getURLTitle(), /*
-                                                                      * categoryAxisLabel
-                                                                      * =
-                                                                      */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
+            return ChartFactory.createStackedBarChart(getURLTitle(), null,
+                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
         }
         if ("stackedbar3d".equalsIgnoreCase(s)) {
-            return ChartFactory.createStackedBarChart3D(getURLTitle(), /*
-                                                                        * categoryAxisLabel
-                                                                        * =
-                                                                        */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
+            return ChartFactory.createStackedBarChart3D(getURLTitle(), null,
+                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
         }
         if ("waterfall".equalsIgnoreCase(s)) {
-            return ChartFactory.createWaterfallChart(getURLTitle(), /*
-                                                                     * categoryAxisLabel
-                                                                     * =
-                                                                     */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
+            return ChartFactory.createWaterfallChart(getURLTitle(), null,
+                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
         }
-        return ChartFactory.createLineChart(getURLTitle(), /* categoryAxisLabel= */
-                null, getYaxis(), dataset, PlotOrientation.VERTICAL,
-                hasLegend(), /* tooltips= */true, /* url= */false);
+        return ChartFactory.createLineChart(getURLTitle(), null,
+                getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
     }
 
     /**
