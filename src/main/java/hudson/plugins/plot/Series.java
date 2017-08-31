@@ -23,8 +23,8 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Allen Reese
  */
 public abstract class Series extends AbstractDescribableImpl<Series> {
-    private static transient final Pattern PAT_NAME = Pattern.compile("%name%");
-    private static transient final Pattern PAT_INDEX = Pattern.compile("%index%");
+    private static final transient Pattern PAT_NAME = Pattern.compile("%name%");
+    private static final transient Pattern PAT_INDEX = Pattern.compile("%index%");
     private static final Pattern PAT_BUILD_NUMBER = Pattern.compile("%build%");
 
     /**

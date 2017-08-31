@@ -41,11 +41,11 @@ import org.xml.sax.InputSource;
  * @author Allen Reese
  */
 public class XMLSeries extends Series {
-    private static transient final Logger LOGGER = Logger.getLogger(XMLSeries.class.getName());
+    private static final transient Logger LOGGER = Logger.getLogger(XMLSeries.class.getName());
     // Debugging hack, so I don't have to change FINE/INFO...
-    private static transient final Level defaultLogLevel = Level.INFO;
+    private static final transient Level defaultLogLevel = Level.INFO;
 
-    private static transient final Map<String, QName> Q_NAME_MAP;
+    private static final transient Map<String, QName> Q_NAME_MAP;
 
     /*
       Fill out the qName map for easy reference.

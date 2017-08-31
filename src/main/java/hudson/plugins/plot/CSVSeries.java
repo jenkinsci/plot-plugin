@@ -34,10 +34,10 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Allen Reese
  */
 public class CSVSeries extends Series {
-    private static transient final Logger LOGGER = Logger.getLogger(CSVSeries.class.getName());
+    private static final transient Logger LOGGER = Logger.getLogger(CSVSeries.class.getName());
     // Debugging hack, so I don't have to change FINE/INFO...
-    private static transient final Level DEFAULT_LOG_LEVEL = Level.FINEST;
-    private static transient final Pattern PAT_COMMA = Pattern.compile(",");
+    private static final transient Level DEFAULT_LOG_LEVEL = Level.FINEST;
+    private static final transient Pattern PAT_COMMA = Pattern.compile(",");
 
     public enum InclusionFlag {
         OFF, INCLUDE_BY_STRING, EXCLUDE_BY_STRING, INCLUDE_BY_COLUMN, EXCLUDE_BY_COLUMN

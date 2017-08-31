@@ -30,9 +30,9 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class MatrixPlotPublisher extends AbstractPlotPublisher {
 
-    transient private Map<MatrixConfiguration, List<Plot>> plotsOfConfigurations = new HashMap<>();
+    private transient Map<MatrixConfiguration, List<Plot>> plotsOfConfigurations = new HashMap<>();
 
-    transient private Map<String, List<Plot>> groupMap = new HashMap<String, List<Plot>>();
+    private transient Map<String, List<Plot>> groupMap = new HashMap<String, List<Plot>>();
 
     /**
      * Configured plots.

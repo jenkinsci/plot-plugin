@@ -29,7 +29,7 @@ public class PlotPublisher extends AbstractPlotPublisher {
      * Maps plot groups to plot objects; group strings are in a URL friendly format;
      * map must be non-null
      */
-    transient private Map<String, List<Plot>> groupMap = new HashMap<>();
+    private transient Map<String, List<Plot>> groupMap = new HashMap<>();
 
     /**
      * Setup the groupMap upon deserialization.

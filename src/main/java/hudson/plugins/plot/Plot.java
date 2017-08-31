@@ -590,9 +590,9 @@ public class Plot implements Comparable<Plot> {
      */
     private void generatePlot(boolean forceGenerate) {
         class Label implements Comparable<Label> {
-            final private Integer buildNum;
-            final private String buildDate;
-            final private String text;
+            private final Integer buildNum;
+            private final String buildDate;
+            private final String text;
 
             public Label(String buildNum, String buildTime, String text) {
                 this.buildNum = Integer.parseInt(buildNum);
