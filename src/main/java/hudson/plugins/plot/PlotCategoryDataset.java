@@ -85,17 +85,17 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
         }
     }
 
-    // Values2D interface method
+    @Override
     public int getRowCount() {
         return rowKeys.size();
     }
 
-    // Values2D interface method
+    @Override
     public int getColumnCount() {
         return Math.min(columnKeys.size(), maxColumns);
     }
 
-    // Values2D interface method
+    @Override
     public Number getValue(int row, int column) {
         // LOGGER.info("("+row+","+column+")");
         if (data.get(row) == null)
@@ -112,22 +112,22 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
         return element.number;
     }
 
-    // KeyedValues2D interface method
+    @Override
     public Comparable getRowKey(int row) {
         return rowKeys.get(row);
     }
 
-    // KeyedValues2D interface method
+    @Override
     public int getRowIndex(Comparable key) {
         return rowKeys.indexOf(key);
     }
 
-    // KeyedValues2D interface method
+    @Override
     public List getRowKeys() {
         return rowKeys;
     }
 
-    // KeyedValues2D interface method
+    @Override
     public Comparable getColumnKey(int column) {
         // make column relative to maxColumns
         int newColumn = column;
@@ -137,19 +137,18 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
         return columnKeys.get(newColumn);
     }
 
-    // KeyedValues2D interface method
+    @Override
     public int getColumnIndex(Comparable key) {
         return columnKeys.indexOf(key);
     }
 
-    // KeyedValues2D interface method
+    @Override
     public List getColumnKeys() {
         int firstIndex = Math.max(0, columnKeys.size() - maxColumns);
         int lastIndex = Math.max(0, columnKeys.size());
         return columnKeys.subList(firstIndex, lastIndex);
     }
 
-    // KeyedValues2D interface method
     /**
      * Gets the value with the given row and column keys.
      *
@@ -159,6 +158,7 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
      *            the column key
      * @return the value with the given row and column keys
      */
+    @Override
     public Number getValue(Comparable rowKey, Comparable columnKey) {
         // LOGGER.info("("+rowKey+","+columnKey+")");
         int rowIndex = rowKeys.indexOf(rowKey);
