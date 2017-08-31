@@ -18,6 +18,10 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author areese, Alan.Harder@sun.com
  */
 public class SeriesFactory {
+
+    private SeriesFactory() {
+    }
+
     /**
      * Using file and label and the Stapler request, create a subclass of series
      * that can process the type selected.
