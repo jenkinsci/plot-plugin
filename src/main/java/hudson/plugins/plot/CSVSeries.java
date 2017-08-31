@@ -36,7 +36,7 @@ import org.kohsuke.stapler.StaplerRequest;
 public class CSVSeries extends Series {
     private static transient final Logger LOGGER = Logger.getLogger(CSVSeries.class.getName());
     // Debugging hack, so I don't have to change FINE/INFO...
-    private static transient final Level defaultLogLevel = Level.FINEST;
+    private static transient final Level DEFAULT_LOG_LEVEL = Level.FINEST;
     private static transient final Pattern PAT_COMMA = Pattern.compile(",");
 
     public enum InclusionFlag {
@@ -133,8 +133,8 @@ public class CSVSeries extends Series {
             }
 
             try {
-                if (LOGGER.isLoggable(defaultLogLevel)) {
-                    LOGGER.log(defaultLogLevel, "Loading plot series data from: " + getFile());
+                if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
+                    LOGGER.log(DEFAULT_LOG_LEVEL, "Loading plot series data from: " + getFile());
                 }
 
                 in = seriesFiles[0].read();
@@ -144,8 +144,8 @@ public class CSVSeries extends Series {
                 return null;
             }
 
-            if (LOGGER.isLoggable(defaultLogLevel)) {
-                LOGGER.log(defaultLogLevel, "Loaded CSV Plot file: " + getFile());
+            if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
+                LOGGER.log(DEFAULT_LOG_LEVEL, "Loaded CSV Plot file: " + getFile());
             }
 
             // load existing plot file
@@ -195,14 +195,14 @@ public class CSVSeries extends Series {
                     if (!excludePoint(label, index)) {
                         PlotPoint point = new PlotPoint(yvalue, getUrl(url,
                                 label, index, buildNumber), label);
-                        if (LOGGER.isLoggable(defaultLogLevel)) {
-                            LOGGER.log(defaultLogLevel, "CSV Point: [" + index
+                        if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
+                            LOGGER.log(DEFAULT_LOG_LEVEL, "CSV Point: [" + index
                                     + ":" + lineNum + "]" + point);
                         }
                         ret.add(point);
                     } else {
-                        if (LOGGER.isLoggable(defaultLogLevel)) {
-                            LOGGER.log(defaultLogLevel, "excluded CSV Column: "
+                        if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
+                            LOGGER.log(DEFAULT_LOG_LEVEL, "excluded CSV Column: "
                                     + index + " : " + label);
                         }
                     }

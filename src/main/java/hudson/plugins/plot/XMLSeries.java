@@ -45,10 +45,10 @@ public class XMLSeries extends Series {
     // Debugging hack, so I don't have to change FINE/INFO...
     private static transient final Level defaultLogLevel = Level.INFO;
 
-    private static transient final Map<String, QName> qNameMap;
+    private static transient final Map<String, QName> Q_NAME_MAP;
 
-    /**
-     * Fill out the qname map for easy reference.
+    /*
+      Fill out the qName map for easy reference.
      */
     static {
         HashMap<String, QName> tempMap = new HashMap<String, QName>();
@@ -57,7 +57,7 @@ public class XMLSeries extends Series {
         tempMap.put("NODESET", XPathConstants.NODESET);
         tempMap.put("NUMBER", XPathConstants.NUMBER);
         tempMap.put("STRING", XPathConstants.STRING);
-        qNameMap = Collections.unmodifiableMap(tempMap);
+        Q_NAME_MAP = Collections.unmodifiableMap(tempMap);
     }
 
     /**
@@ -86,13 +86,13 @@ public class XMLSeries extends Series {
 
         this.xpathString = xpath;
         this.nodeTypeString = nodeType;
-        this.nodeType = qNameMap.get(nodeType);
+        this.nodeType = Q_NAME_MAP.get(nodeType);
         this.url = url;
     }
 
     private Object readResolve() {
         // Set nodeType when deserialized
-        nodeType = qNameMap.get(nodeTypeString);
+        nodeType = Q_NAME_MAP.get(nodeTypeString);
         return this;
     }
 

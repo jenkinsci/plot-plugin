@@ -96,7 +96,7 @@ public class Plot implements Comparable<Plot> {
     private transient Job<?, ?> project;
 
     /** All plots share the same JFreeChart drawing supplier object. */
-    private static final DrawingSupplier supplier = new DefaultDrawingSupplier(
+    private static final DrawingSupplier SUPPLIER = new DefaultDrawingSupplier(
             DefaultDrawingSupplier.DEFAULT_PAINT_SEQUENCE,
             DefaultDrawingSupplier.DEFAULT_OUTLINE_PAINT_SEQUENCE,
             DefaultDrawingSupplier.DEFAULT_STROKE_SEQUENCE,
@@ -695,7 +695,7 @@ public class Plot implements Comparable<Plot> {
         CategoryPlot categoryPlot = (CategoryPlot) plot.getPlot();
         categoryPlot.setDomainGridlinePaint(Color.black);
         categoryPlot.setRangeGridlinePaint(Color.black);
-        categoryPlot.setDrawingSupplier(Plot.supplier);
+        categoryPlot.setDrawingSupplier(Plot.SUPPLIER);
         CategoryAxis domainAxis = new ShiftedCategoryAxis(Messages.Plot_Build());
         categoryPlot.setDomainAxis(domainAxis);
         domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
