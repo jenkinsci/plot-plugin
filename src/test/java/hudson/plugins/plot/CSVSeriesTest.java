@@ -101,7 +101,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         InputStream in = null;
         InputStreamReader inputReader = null;
 
-        FilePath[] seriesFiles = null;
+        FilePath[] seriesFiles;
         try {
             seriesFiles = workspaceRootDir.list(file);
 

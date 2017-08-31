@@ -634,8 +634,7 @@ public class Plot implements Comparable<Plot> {
             public Label(String buildNum, String buildTime, String text) {
                 this.buildNum = Integer.parseInt(buildNum);
                 synchronized (DATE_FORMAT) {
-                    this.buildDate = DATE_FORMAT.format(new Date(Long
-                            .parseLong(buildTime)));
+                    this.buildDate = DATE_FORMAT.format(new Date(Long.parseLong(buildTime)));
                 }
                 this.text = text;
             }
@@ -920,14 +919,14 @@ public class Plot implements Comparable<Plot> {
      * instance variable.
      */
     private void loadPlotData() {
-        rawPlotData = new ArrayList<String[]>();
+        rawPlotData = new ArrayList<>();
         // load existing plot file
         File plotFile = new File(project.getRootDir(), getCsvFileName());
         if (!plotFile.exists()) {
             return;
         }
         CSVReader reader = null;
-        rawPlotData = new ArrayList<String[]>();
+        rawPlotData = new ArrayList<>();
         try {
             reader = new CSVReader(new InputStreamReader(new FileInputStream(plotFile),
                     Charset.defaultCharset().name()));
@@ -1006,10 +1005,7 @@ public class Plot implements Comparable<Plot> {
             numBuilds = Integer.MAX_VALUE;
         }
 
-        if (buildNumber < project.getNextBuildNumber() - numBuilds) {
-            return false;
-        }
-
-        return keepRecords || project.getBuildByNumber(buildNumber) != null;
+        return buildNumber >= project.getNextBuildNumber() - numBuilds
+                && (keepRecords || project.getBuildByNumber(buildNumber) != null);
     }
 }
