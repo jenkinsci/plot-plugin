@@ -128,6 +128,7 @@ public class CSVSeriesTest extends SeriesTestCase {
                 if (csvreader != null)
                     csvreader.close();
             } catch (IOException e) {
+                assertFalse("Exception " + e, true);
             }
             IOUtils.closeQuietly(inputReader);
             IOUtils.closeQuietly(in);
