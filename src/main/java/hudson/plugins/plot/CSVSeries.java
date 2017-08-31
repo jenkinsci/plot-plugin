@@ -217,8 +217,8 @@ public class CSVSeries extends Series {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException ignore) {
-                    // ignore
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Failed to close series reader", e);
                 }
             }
             IOUtils.closeQuietly(inputReader);

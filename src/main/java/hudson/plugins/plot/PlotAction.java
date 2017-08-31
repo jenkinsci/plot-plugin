@@ -9,6 +9,8 @@ import hudson.model.Action;
 import hudson.model.Job;
 import org.apache.commons.collections.CollectionUtils;
 import org.kohsuke.stapler.StaplerProxy;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 import java.io.IOException;
 import java.util.List;

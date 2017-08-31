@@ -299,7 +299,8 @@ public class Plot implements Comparable<Plot> {
             try {
                 result = Double.parseDouble(input);
             } catch (NumberFormatException nfe) {
-                // Not a problem, result already set
+                LOGGER.log(Level.INFO, "Failed to parse Double value from String."
+                        + " Not a problem, result already set", nfe);
             }
         }
         return result;
@@ -844,8 +845,8 @@ public class Plot implements Comparable<Plot> {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException ignore) {
-                    // ignore
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Failed to close plot reader", e);
                 }
             }
         }
@@ -886,8 +887,8 @@ public class Plot implements Comparable<Plot> {
             if (writer != null) {
                 try {
                     writer.close();
-                } catch (IOException ignore) {
-                    // ignore
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Failed to close plot reader", e);
                 }
             }
         }
