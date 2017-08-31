@@ -6,4 +6,5 @@
 
 <suppressions>
     <suppress checks=".*" files="Messages.java"/>
+    <suppress checks=".*" files="test.properties"/>
 </suppressions>
