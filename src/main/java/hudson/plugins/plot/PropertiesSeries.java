@@ -43,7 +43,7 @@ public class PropertiesSeries extends Series {
     public List<PlotPoint> loadSeries(FilePath workspaceRootDir,
             int buildNumber, PrintStream logger) {
         InputStream in = null;
-        FilePath[] seriesFiles = null;
+        FilePath[] seriesFiles;
 
         try {
             seriesFiles = workspaceRootDir.list(getFile());

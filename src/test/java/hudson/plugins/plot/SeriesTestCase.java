@@ -5,11 +5,7 @@
 
 package hudson.plugins.plot;
 
-import hudson.plugins.plot.PlotPoint;
-import hudson.plugins.plot.Series;
-
 import java.util.List;
-
 import org.jvnet.hudson.test.HudsonTestCase;
 
 /**
@@ -40,13 +36,11 @@ public class SeriesTestCase extends HudsonTestCase {
             StringBuilder debug = new StringBuilder();
             int i = 0;
             for (PlotPoint p : points) {
-                debug.append("[").append(i++).append("]").append(p)
-                        .append("\n");
+                debug.append("[").append(i++).append("]").append(p).append("\n");
             }
 
             assertEquals("loadSeries loaded wrong number of points: expected "
-                    + expected + ", got " + points.size() + "\n" + debug,
-                    expected, points.size());
+                    + expected + ", got " + points.size() + "\n" + debug, expected, points.size());
         }
 
         // validate each point.

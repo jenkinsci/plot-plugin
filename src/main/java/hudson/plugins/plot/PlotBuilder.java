@@ -55,7 +55,6 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     public List<CSVSeries> csvSeries;
     public List<PropertiesSeries> propertiesSeries;
     public List<XMLSeries> xmlSeries;
-    private List<Plot> plots;
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
     @DataBoundConstructor
@@ -119,7 +118,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
 
     @Override
     public void perform(Run<?,?> build, FilePath workspace, Launcher launcher, TaskListener listener) {
-        plots = new ArrayList<>();
+        List<Plot> plots = new ArrayList<>();
         Plot plot = new Plot(title, yaxis, group, numBuilds, csvFileName, style, false, false, false, false, yaxisMinimum, yaxisMaximum);
         plot.series = series;
         plot.addBuild(build, listener.getLogger(), workspace);
