@@ -2,16 +2,15 @@
  * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.
  * Copyrights licensed under the MIT License.
  */
-package hudson.plugins.plot;
+package hudson.plugins.plot.pipeline;
 
 import hudson.model.Action;
-import hudson.model.AbstractProject;
+import hudson.model.Job;
 import hudson.plugins.plot.Messages;
-
+import hudson.plugins.plot.Plot;
+import hudson.plugins.plot.PlotReport;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
@@ -24,50 +23,54 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class PlotAction implements Action, StaplerProxy {
 
-    private static final Logger LOGGER = Logger.getLogger(PlotAction.class
-            .getName());
-    private final AbstractProject<?, ?> project;
-    private final PlotPublisher publisher;
+    private final Job<?, ?> project;
+    private PlotPublisher publisher;
 
-    public PlotAction(AbstractProject<?, ?> project, PlotPublisher publisher) {
-        this.project = project;
-        this.publisher = publisher;
+    public PlotAction(Job<?, ?> job, List<Plot> plots) {
+        this.project = job;
+        publisher = new PlotPublisher();
+        if (plots != null) {
+            publisher.setPlots(plots);
+        }
     }
 
-    public AbstractProject<?, ?> getProject() {
-        return project;
-    }
-
-    public String getDisplayName() {
-        return Messages.Plot_Action_DisplayName();
-    }
-
+    @Override
     public String getIconFileName() {
         return "graph.gif";
     }
 
+    @Override
+    public String getDisplayName() {
+        return Messages.Plot_Action_DisplayName();
+    }
+
+    @Override
     public String getUrlName() {
         return Messages.Plot_UrlName();
     }
 
-    // called from PlotAction/index.jelly
+    // called from pipeline/PlotAction/index.jelly
     public boolean hasPlots() throws IOException {
         return CollectionUtils.isNotEmpty(publisher.getPlots());
     }
 
-    // called from PlotAction/index.jelly
+    // called from pipeline/PlotReport/index.jelly
+    public Job<?, ?> getProject() {
+        return project;
+    }
+
+    // called from pipeline/PlotAction/index.jelly
     public List<String> getOriginalGroups() {
         return publisher.getOriginalGroups();
     }
 
-    // called from PlotAction/index.jelly
+    // called from pipeline/PlotAction/index.jelly
     public String getUrlGroup(String originalGroup) {
         return publisher.originalGroupToUrlEncodedGroup(originalGroup);
     }
 
-    // called from href created in PlotAction/index.jelly
-    public PlotReport getDynamic(String group, StaplerRequest req,
-            StaplerResponse rsp) throws IOException {
+    // called from href created in pipeline/PlotAction/index.jelly
+    public PlotReport getDynamic(String group) throws IOException {
         return new PlotReport(project,
                 publisher.urlGroupToOriginalGroup(getUrlGroup(group)),
                 publisher.getPlots(getUrlGroup(group)));

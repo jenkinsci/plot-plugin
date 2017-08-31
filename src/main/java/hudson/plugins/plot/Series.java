@@ -5,12 +5,16 @@
 
 package hudson.plugins.plot;
 
+import hudson.Extension;
 import hudson.FilePath;
-
+import hudson.model.AbstractDescribableImpl;
+import hudson.model.Descriptor;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.sf.json.JSONObject;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Represents a plot data series configuration.
@@ -18,10 +22,9 @@ import java.util.regex.Pattern;
  * @author Nigel Daley
  * @author Allen Reese
  */
-public abstract class Series {
+public abstract class Series extends AbstractDescribableImpl<Series> {
     private static transient final Pattern PAT_NAME = Pattern.compile("%name%");
-    private static transient final Pattern PAT_INDEX = Pattern
-            .compile("%index%");
+    private static transient final Pattern PAT_INDEX = Pattern.compile("%index%");
     private static final Pattern PAT_BUILD_NUMBER = Pattern.compile("%build%");
 
     /**
@@ -41,14 +44,13 @@ public abstract class Series {
      */
     protected String fileType;
 
-    
-
     protected Series(String file, String label, String fileType) {
         this.file = file;
 
         // TODO: look into this, what do we do if there is no label?
-        if (label == null)
+        if (label == null) {
             label = Messages.Plot_Missing();
+        }
 
         this.label = label;
         this.fileType = fileType;
@@ -69,12 +71,9 @@ public abstract class Series {
     /**
      * Retrieves the plot data for one series after a build from the workspace.
      *
-     * @param workspaceRootDir
-     *            the root directory of the workspace
-     * @param buildNumber
-     *            the build Number
-     * @param logger
-     *            the logger to use
+     * @param workspaceRootDir the root directory of the workspace
+     * @param buildNumber the build Number
+     * @param logger the logger to use
      * @return a PlotPoint array of points to plot
      */
     public abstract List<PlotPoint> loadSeries(FilePath workspaceRootDir,
@@ -87,24 +86,19 @@ public abstract class Series {
 
     /**
      * Return the url that should be used for this point.
-     * 
-     * @param label
-     *            Name of the column
-     * @param index
-     *            Index of the column
-     * @param buildNumber
-     *            The build number
+     *
+     * @param label Name of the column
+     * @param index Index of the column
+     * @param buildNumber The build number
      * @return url for the label.
      */
     protected String getUrl(String baseUrl, String label, int index, int buildNumber) {
         String resultUrl = baseUrl;
         if (resultUrl != null) {
             if (label == null) {
-                // This implmentation searches for tokens to replace. If the
-                // argument
-                // was NULL then replacing the null with an empty string should
-                // still
-                // produce the desired outcome.
+                // This implementation searches for tokens to replace.
+                // If the argument was NULL then replacing the null with an empty string
+                // should still produce the desired outcome.
                 label = "";
             }
             /*
@@ -134,5 +128,22 @@ public abstract class Series {
         }
 
         return resultUrl;
+    }
+
+    @Override
+    public Descriptor<Series> getDescriptor() {
+        return new DescriptorImpl();
+    }
+
+    @Extension
+    public static class DescriptorImpl extends Descriptor<Series> {
+        public String getDisplayName() {
+            return "";
+        }
+
+        @Override
+        public Series newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+            return SeriesFactory.createSeries(formData, req);
+        }
     }
 }

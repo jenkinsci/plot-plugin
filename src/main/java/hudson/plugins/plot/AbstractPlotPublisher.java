@@ -3,11 +3,9 @@ package hudson.plugins.plot;
 import hudson.Util;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Recorder;
-
 import org.apache.commons.lang.StringUtils;
 
 /**
- *
  * @author lucinka
  */
 public class AbstractPlotPublisher extends Recorder {
@@ -29,5 +27,4 @@ public class AbstractPlotPublisher extends Recorder {
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
     }
-
 }

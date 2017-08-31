@@ -4,23 +4,22 @@
  */
 package hudson.plugins.plot;
 
-import hudson.model.AbstractProject;
-
+import au.com.bytecode.opencsv.CSVReader;
+import hudson.model.Job;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-
-import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * Represents a plot report for a single group of plots.
@@ -28,10 +27,8 @@ import au.com.bytecode.opencsv.CSVReader;
  * @author Nigel Daley
  */
 public class PlotReport {
-    private static final Logger LOGGER = Logger.getLogger(PlotReport.class
-            .getName());
-
-    private final AbstractProject<?, ?> project;
+    private static final Logger LOGGER = Logger.getLogger(PlotReport.class.getName());
+    private final Job<?, ?> project;
 
     /**
      * The sorted list of plots that belong to the same group.
@@ -43,16 +40,16 @@ public class PlotReport {
      */
     private String group;
 
-    public PlotReport(AbstractProject<?, ?> project, String group,
+    public PlotReport(Job<?, ?> job, String group,
             List<Plot> plots) {
         Collections.sort(plots);
         this.plots = plots;
         this.group = group;
-        this.project = project;
+        this.project = job;
     }
 
     // called from PlotReport/index.jelly
-    public AbstractProject<?, ?> getProject() {
+    public Job<?, ?> getProject() {
         return project;
     }
 
@@ -94,15 +91,14 @@ public class PlotReport {
 
         if (CollectionUtils.isNotEmpty(plot.getSeries())) {
             Series series = plot.getSeries().get(0);
-            return (series instanceof CSVSeries)
-                    && ((CSVSeries) series).getDisplayTableFlag();
+            return (series instanceof CSVSeries) && ((CSVSeries) series).getDisplayTableFlag();
         }
         return false;
     }
 
     // called from PlotReport/index.jelly
     public List<List<String>> getTable(int i) {
-        List<List<String>> tableData = new ArrayList<List<String>>();
+        List<List<String>> tableData = new ArrayList<>();
 
         Plot plot = getPlot(i);
 
@@ -113,12 +109,13 @@ public class PlotReport {
         }
         CSVReader reader = null;
         try {
-            reader = new CSVReader(new FileReader(plotFile));
+            reader = new CSVReader(new InputStreamReader(new FileInputStream(plotFile),
+                    Charset.defaultCharset().name()));
             // throw away 2 header lines
             reader.readNext();
             reader.readNext();
             // array containing header titles
-            List<String> header = new ArrayList<String>();
+            List<String> header = new ArrayList<>();
             header.add(Messages.Plot_Build() + " #");
             tableData.add(header);
             String[] nextLine;
@@ -147,7 +144,7 @@ public class PlotReport {
                 // table row corresponding to the build number not found
                 if (tableRow == null) {
                     // create table row with build number at first column
-                    tableRow = new ArrayList<String>();
+                    tableRow = new ArrayList<>();
                     tableRow.add(buildNumber);
                     tableData.add(tableRow);
                 }
@@ -170,7 +167,6 @@ public class PlotReport {
             }
         } catch (IOException ioe) {
             LOGGER.log(Level.SEVERE, "Exception reading csv file", ioe);
-            // ignore
         } finally {
             if (reader != null) {
                 try {
@@ -191,7 +187,7 @@ public class PlotReport {
 
     private Plot getPlot(String i) {
         try {
-            return getPlot(Integer.valueOf(i));
+            return getPlot(Integer.parseInt(i));
         } catch (NumberFormatException ignore) {
             LOGGER.log(Level.SEVERE, "Exception converting to integer", ignore);
             return null;

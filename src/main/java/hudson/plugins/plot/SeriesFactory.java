@@ -7,10 +7,8 @@ package hudson.plugins.plot;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -19,15 +17,11 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author areese, Alan.Harder@sun.com
  */
 public class SeriesFactory {
-    // private static final Logger LOGGER =
-    // Logger.getLogger(SeriesFactory.class.getName());
-
     /**
      * Using file and label and the Stapler request, create a subclass of series
      * that can process the type selected.
-     * 
-     * @param formData
-     *            JSON data for series
+     *
+     * @param formData JSON data for series
      */
     public static Series createSeries(JSONObject formData, StaplerRequest req) {
         String file = formData.getString("file");
@@ -36,19 +30,20 @@ public class SeriesFactory {
         String type = formData.getString("value");
         Class<? extends Series> typeClass = null;
 
-        if ("properties".equals(type))
+        if ("properties".equals(type)) {
             typeClass = PropertiesSeries.class;
-        else if ("csv".equals(type))
+        } else if ("csv".equals(type)) {
             typeClass = CSVSeries.class;
-        else if ("xml".equals(type))
+        } else if ("xml".equals(type)) {
             typeClass = XMLSeries.class;
+        }
 
         return typeClass != null ? req.bindJSON(typeClass, formData) : null;
     }
 
     public static List<Series> createSeriesList(Object data, StaplerRequest req) {
         JSONArray list = getArray(data);
-        List<Series> result = new ArrayList<Series>();
+        List<Series> result = new ArrayList<>();
         for (Object series : list) {
             result.add(createSeries((JSONObject) series, req));
         }
@@ -60,12 +55,13 @@ public class SeriesFactory {
      */
     public static JSONArray getArray(Object data) {
         JSONArray result;
-        if (data instanceof JSONArray)
+        if (data instanceof JSONArray) {
             result = (JSONArray) data;
-        else {
+        } else {
             result = new JSONArray();
-            if (data != null)
+            if (data != null) {
                 result.add(data);
+            }
         }
         return result;
     }

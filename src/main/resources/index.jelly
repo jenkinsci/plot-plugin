@@ -4,6 +4,7 @@
  * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
  -->
+<?jelly escape-by-default='true'?>
 <div>
   <p>This plugin provides generic plotting (or graphing) capability. Documentation on how to use this plugin with the Jenkins Job Builder is available <a href="http://docs.openstack.org/infra/jenkins-job-builder/publishers.html#publishers.plot">here</a>. There are various supported parameters at this time. For a full list of parameters the best place to view them is <a href="https://github.com/jenkinsci/plot-plugin/blob/master/src/main/java/hudson/plugins/plot/Plot.java">here</a>.</p>
   <p>The currently supported parameters are:</p>
