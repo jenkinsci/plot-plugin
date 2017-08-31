@@ -187,6 +187,47 @@ public class Plot implements Comparable<Plot> {
     public String yaxisMinimum;
     public String yaxisMaximum;
 
+    class Label implements Comparable<Label> {
+        private final Integer buildNum;
+        private final String buildDate;
+        private final String text;
+
+        public Label(String buildNum, String buildTime, String text) {
+            this.buildNum = Integer.parseInt(buildNum);
+            synchronized (DATE_FORMAT) {
+                this.buildDate = DATE_FORMAT.format(new Date(Long.parseLong(buildTime)));
+            }
+            this.text = text;
+        }
+
+        public Label(String buildNum, String buildTime) {
+            this(buildNum, buildTime, null);
+        }
+
+        public int compareTo(Label that) {
+            return this.buildNum - that.buildNum;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof Label && ((Label) o).buildNum.equals(buildNum);
+        }
+
+        @Override
+        public int hashCode() {
+            return buildNum.hashCode();
+        }
+
+        public String numDateString() {
+            return "#" + buildNum + " (" + buildDate + ")";
+        }
+
+        @Override
+        public String toString() {
+            return text != null ? text : numDateString();
+        }
+    }
+
     /**
      * Creates a new plot with the given parameters. If numBuilds is the empty
      * string, then all builds will be included. Must not be zero.
@@ -589,46 +630,6 @@ public class Plot implements Comparable<Plot> {
      * data hasn't changed
      */
     private void generatePlot(boolean forceGenerate) {
-        class Label implements Comparable<Label> {
-            private final Integer buildNum;
-            private final String buildDate;
-            private final String text;
-
-            public Label(String buildNum, String buildTime, String text) {
-                this.buildNum = Integer.parseInt(buildNum);
-                synchronized (DATE_FORMAT) {
-                    this.buildDate = DATE_FORMAT.format(new Date(Long.parseLong(buildTime)));
-                }
-                this.text = text;
-            }
-
-            public Label(String buildNum, String buildTime) {
-                this(buildNum, buildTime, null);
-            }
-
-            public int compareTo(Label that) {
-                return this.buildNum - that.buildNum;
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                return o instanceof Label && ((Label) o).buildNum.equals(buildNum);
-            }
-
-            @Override
-            public int hashCode() {
-                return buildNum.hashCode();
-            }
-
-            public String numDateString() {
-                return "#" + buildNum + " (" + buildDate + ")";
-            }
-
-            @Override
-            public String toString() {
-                return text != null ? text : numDateString();
-            }
-        }
         // LOGGER.info("Determining if we should generate plot " +
         // getCsvFileName());
         File csvFile = new File(project.getRootDir(), getCsvFileName());
