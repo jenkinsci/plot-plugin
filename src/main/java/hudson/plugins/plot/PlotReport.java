@@ -182,8 +182,8 @@ public class PlotReport {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException ignore) {
-                    // ignore
+                } catch (IOException e) {
+                    LOGGER.log(Level.INFO, "Failed to close CSV reader", e);
                 }
             }
         }
