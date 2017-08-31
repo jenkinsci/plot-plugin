@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.AbstractDataset;
 
@@ -56,9 +55,7 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
     /**
      * Truncates the dataset to the <i>last</i> <code>maxColumns</code> columns.
      *
-     * @param maxColumns
-     *            the maximum number columns that will appear to be in the
-     *            dataset.
+     * @param maxColumns the maximum number columns that will appear to be in the dataset.
      */
     public void clipDataset(int maxColumns) {
         this.maxColumns = maxColumns;
@@ -98,8 +95,9 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
     @Override
     public Number getValue(int row, int column) {
         // LOGGER.info("("+row+","+column+")");
-        if (data.get(row) == null)
+        if (data.get(row) == null) {
             return null;
+        }
         // make column relative to maxColumns
         int newColumn = column;
         if (columnKeys.size() > maxColumns) {
@@ -107,8 +105,9 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
         }
         Comparable columnKey = columnKeys.get(newColumn);
         DataElement element = data.get(row).get(columnKey);
-        if (element == null)
+        if (element == null) {
             return null;
+        }
         return element.number;
     }
 
@@ -152,37 +151,36 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
     /**
      * Gets the value with the given row and column keys.
      *
-     * @param rowKey
-     *            the row key
-     * @param columnKey
-     *            the column key
+     * @param rowKey the row key
+     * @param columnKey the column key
      * @return the value with the given row and column keys
      */
     @Override
     public Number getValue(Comparable rowKey, Comparable columnKey) {
         // LOGGER.info("("+rowKey+","+columnKey+")");
         int rowIndex = rowKeys.indexOf(rowKey);
-        if (rowIndex == -1 || data.get(rowIndex) == null)
+        if (rowIndex == -1 || data.get(rowIndex) == null) {
             return null;
+        }
         DataElement element = (DataElement) data.get(rowIndex).get(columnKey);
-        if (element == null)
+        if (element == null) {
             return null;
+        }
         return element.number;
     }
 
     /**
      * Returns the URL at the given row and column.
      *
-     * @param row
-     *            the row index
-     * @param column
-     *            the column index
+     * @param row the row index
+     * @param column the column index
      * @return the URL
      */
     public String getUrl(int row, int column) {
         // LOGGER.info("("+row+","+column+")");
-        if (data.get(row) == null)
+        if (data.get(row) == null) {
             return null;
+        }
         // make column relative to maxColumns
         int newColumn = column;
         if (columnKeys.size() > maxColumns) {
@@ -190,25 +188,21 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
         }
         Comparable columnKey = columnKeys.get(newColumn);
         DataElement element = data.get(row).get(columnKey);
-        if (element == null)
+        if (element == null) {
             return null;
+        }
         return element.url;
     }
 
     /**
      * Adds or updates a value.
      *
-     * @param value
-     *            the value to add
-     * @param url
-     *            the URL to add and associate with the value
-     * @param rowKey
-     *            the row key
-     * @param columnKey
-     *            the column key
+     * @param value the value to add
+     * @param url the URL to add and associate with the value
+     * @param rowKey the row key
+     * @param columnKey the column key
      */
-    public void setValue(Number value, String url, Comparable rowKey,
-            Comparable columnKey) {
+    public void setValue(Number value, String url, Comparable rowKey, Comparable columnKey) {
         // LOGGER.info("Data point:"+value+","+url+","+rowKey+","+columnKey);
         int rowIndex = rowKeys.indexOf(rowKey);
         if (rowIndex == -1) {
@@ -226,8 +220,9 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
                     break;
                 }
             }
-            if (!added)
+            if (!added) {
                 columnKeys.add(columnKey);
+            }
         }
         // LOGGER.info("columnKeys.size():"+columnKeys.size());
         DataElement element = new DataElement(value, url);

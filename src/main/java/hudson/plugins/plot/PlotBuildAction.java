@@ -13,7 +13,8 @@ import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.export.ExportedBean;
 
 @ExportedBean
-public class PlotBuildAction extends InvisibleAction implements StaplerProxy, SimpleBuildStep.LastBuildAction {
+public class PlotBuildAction extends InvisibleAction
+        implements StaplerProxy, SimpleBuildStep.LastBuildAction {
 
     private Run<?, ?> run;
     private List<Plot> plots;

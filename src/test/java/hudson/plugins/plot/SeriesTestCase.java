@@ -45,14 +45,11 @@ public class SeriesTestCase extends HudsonTestCase {
 
         // validate each point.
         for (int i = 0; i < points.size(); i++) {
-            assertNotNull("loadSeries returned null point at index " + i,
-                    points.get(i));
+            assertNotNull("loadSeries returned null point at index " + i, points.get(i));
             assertNotNull("loadSeries returned null yvalue at index " + i,
                     points.get(i).getYvalue());
-            assertNotNull("loadSeries returned null url at index " + i, points
-                    .get(i).getUrl());
-            assertNotNull("loadSeries returned null label at index " + i,
-                    points.get(i).getLabel());
+            assertNotNull("loadSeries returned null url at index " + i, points.get(i).getUrl());
+            assertNotNull("loadSeries returned null label at index " + i, points.get(i).getLabel());
 
             // make sure the yvalue's can be parsed
             try {
