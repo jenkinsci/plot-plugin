@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2007-2009 Yahoo! Inc.  All rights reserved.
- * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+ * The copyrights to the contents of this file are licensed under the MIT License
+ * (http://www.opensource.org/licenses/mit-license.php)
  */
 package hudson.plugins.plot;
 
