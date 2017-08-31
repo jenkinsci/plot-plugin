@@ -43,7 +43,7 @@ import org.xml.sax.InputSource;
 public class XMLSeries extends Series {
     private static final transient Logger LOGGER = Logger.getLogger(XMLSeries.class.getName());
     // Debugging hack, so I don't have to change FINE/INFO...
-    private static final transient Level defaultLogLevel = Level.INFO;
+    private static final transient Level DEFAULT_LOG_LEVEL = Level.INFO;
 
     private static final transient Map<String, QName> Q_NAME_MAP;
 
@@ -202,8 +202,8 @@ public class XMLSeries extends Series {
             }
 
             try {
-                if (LOGGER.isLoggable(defaultLogLevel)) {
-                    LOGGER.log(defaultLogLevel, "Loading plot series data from: " + getFile());
+                if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
+                    LOGGER.log(DEFAULT_LOG_LEVEL, "Loading plot series data from: " + getFile());
                 }
 
                 in = seriesFiles[0].read();
@@ -215,12 +215,12 @@ public class XMLSeries extends Series {
                 return null;
             }
 
-            if (LOGGER.isLoggable(defaultLogLevel)) {
-                LOGGER.log(defaultLogLevel, "NodeType " + nodeTypeString + " : " + nodeType);
+            if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
+                LOGGER.log(DEFAULT_LOG_LEVEL, "NodeType " + nodeTypeString + " : " + nodeType);
             }
 
-            if (LOGGER.isLoggable(defaultLogLevel)) {
-                LOGGER.log(defaultLogLevel, "Loaded XML Plot file: " + getFile());
+            if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
+                LOGGER.log(DEFAULT_LOG_LEVEL, "Loaded XML Plot file: " + getFile());
             }
 
             XPath xpath = XPathFactory.newInstance().newXPath();
@@ -232,8 +232,8 @@ public class XMLSeries extends Series {
              */
             if (nodeType.equals(XPathConstants.NODESET)) {
                 NodeList nl = (NodeList) xmlObject;
-                if (LOGGER.isLoggable(defaultLogLevel)) {
-                    LOGGER.log(defaultLogLevel, "Number of nodes: " + nl.getLength());
+                if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
+                    LOGGER.log(DEFAULT_LOG_LEVEL, "Number of nodes: " + nl.getLength());
                 }
 
                 for (int i = 0; i < nl.getLength(); i++) {
@@ -250,8 +250,8 @@ public class XMLSeries extends Series {
                 if (xmlObject instanceof NodeList) {
                     NodeList nl = (NodeList) xmlObject;
 
-                    if (LOGGER.isLoggable(defaultLogLevel)) {
-                        LOGGER.log(defaultLogLevel, "Number of nodes: " + nl.getLength());
+                    if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
+                        LOGGER.log(DEFAULT_LOG_LEVEL, "Number of nodes: " + nl.getLength());
                     }
 
                     for (int i = 0; i < nl.getLength(); i++) {
@@ -347,14 +347,14 @@ public class XMLSeries extends Series {
         String value = nodeToString(nodeValue);
 
         if (value != null) {
-            if (LOGGER.isLoggable(defaultLogLevel)) {
-                LOGGER.log(defaultLogLevel, "Adding node: " + label + " value: " + value);
+            if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
+                LOGGER.log(DEFAULT_LOG_LEVEL, "Adding node: " + label + " value: " + value);
             }
             list.add(new PlotPoint(value, getUrl(url, label, 0, buildNumber),
                     label));
         } else {
-            if (LOGGER.isLoggable(defaultLogLevel)) {
-                LOGGER.log(defaultLogLevel, "Unable to add node: " + label
+            if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
+                LOGGER.log(DEFAULT_LOG_LEVEL, "Unable to add node: " + label
                         + " value: " + nodeValue);
             }
         }
