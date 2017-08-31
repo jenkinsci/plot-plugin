@@ -4,33 +4,28 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.matrix.MatrixConfiguration;
-import hudson.matrix.MatrixRun;
 import hudson.matrix.MatrixProject;
-import hudson.model.Action;
-import hudson.model.BuildListener;
+import hudson.matrix.MatrixRun;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.plugins.plot.Messages;
+import hudson.model.Action;
+import hudson.model.BuildListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import net.sf.json.JSONObject;
-
 import org.apache.commons.lang.ObjectUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
- *
  * @author lucinka
  */
 public class MatrixPlotPublisher extends AbstractPlotPublisher {
@@ -49,7 +44,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
             return "Plots";
         }
         if (groupMap.containsKey(urlGroup)) {
-            List<Plot> plots = new ArrayList<Plot>();
+            List<Plot> plots = new ArrayList<>();
             for (Plot plot : groupMap.get(urlGroup)) {
                 if (ObjectUtils.equals(plot.getProject(), c)) {
                     plots.add(plot);
@@ -68,8 +63,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     public List<String> getOriginalGroups(MatrixConfiguration configuration) {
         List<String> originalGroups = new ArrayList<>();
         for (String urlGroup : groupMap.keySet()) {
-            originalGroups
-                    .add(urlGroupToOriginalGroup(urlGroup, configuration));
+            originalGroups.add(urlGroupToOriginalGroup(urlGroup, configuration));
         }
         Collections.sort(originalGroups);
         return originalGroups;
@@ -78,8 +72,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     /**
      * Reset Configuration and set plots settings for matrixConfiguration
      *
-     * @param plots
-     *            the new list of plots
+     * @param plots the new list of plots
      */
     public void setPlots(List<Plot> plots) {
         this.plots = plots;
@@ -90,8 +83,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     /**
      * Adds the new plot to the plot data structures managed by this object.
      *
-     * @param plot
-     *            the new plot
+     * @param plot the new plot
      */
     public void addPlot(Plot plot) {
         String urlGroup = originalGroupToUrlEncodedGroup(plot.getGroup());
@@ -104,13 +96,11 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
             groupMap.put(urlGroup, list);
         }
         if (plotsOfConfigurations.get((MatrixConfiguration) plot.getProject()) == null) {
-            List<Plot> list = new ArrayList<Plot>();
+            List<Plot> list = new ArrayList<>();
             list.add(plot);
-            plotsOfConfigurations.put((MatrixConfiguration) plot.getProject(),
-                    list);
+            plotsOfConfigurations.put((MatrixConfiguration) plot.getProject(), list);
         } else {
-            plotsOfConfigurations.get((MatrixConfiguration) plot.getProject())
-                    .add(plot);
+            plotsOfConfigurations.get((MatrixConfiguration) plot.getProject()).add(plot);
         }
     }
 
@@ -157,8 +147,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
 
     @Override
     public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
-        if (!plotsOfConfigurations.containsKey((MatrixConfiguration) build
-                .getProject())) {
+        if (!plotsOfConfigurations.containsKey((MatrixConfiguration) build.getProject())) {
             for (Plot p : plots) {
                 Plot plot = new Plot(p.title, p.yaxis, p.group, p.numBuilds,
                         p.csvFileName, p.style, p.useDescr, p.getKeepRecords(),
@@ -246,8 +235,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
         /**
          * Checks if the series file is valid.
          */
-        public FormValidation doCheckSeriesFile(
-                @AncestorInPath AbstractProject project,
+        public FormValidation doCheckSeriesFile(@AncestorInPath AbstractProject project,
                 @QueryParameter String value) throws IOException {
             return FilePath.validateFileMask(project.getSomeWorkspace(), value);
         }

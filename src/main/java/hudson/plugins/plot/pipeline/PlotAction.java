@@ -26,10 +26,10 @@ public class PlotAction implements Action, StaplerProxy {
     private final Job<?, ?> project;
     private PlotPublisher publisher;
 
-    public PlotAction(Job<?, ?> job, List<Plot> plots){
+    public PlotAction(Job<?, ?> job, List<Plot> plots) {
         this.project = job;
         publisher = new PlotPublisher();
-        if(plots != null) {
+        if (plots != null) {
             publisher.setPlots(plots);
         }
     }
@@ -70,8 +70,7 @@ public class PlotAction implements Action, StaplerProxy {
     }
 
     // called from href created in pipeline/PlotAction/index.jelly
-    public PlotReport getDynamic(String group, StaplerRequest req,
-                                 StaplerResponse rsp) throws IOException {
+    public PlotReport getDynamic(String group) throws IOException {
         return new PlotReport(project,
                 publisher.urlGroupToOriginalGroup(getUrlGroup(group)),
                 publisher.getPlots(getUrlGroup(group)));

@@ -1,43 +1,39 @@
 package hudson.plugins.plot.pipeline;
 
-import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.AbstractProject;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.plugins.plot.CSVSeries;
 import hudson.plugins.plot.Messages;
 import hudson.plugins.plot.Plot;
 import hudson.plugins.plot.PropertiesSeries;
 import hudson.plugins.plot.Series;
 import hudson.plugins.plot.XMLSeries;
-import hudson.util.FormValidation;
-import hudson.model.AbstractProject;
-import hudson.model.Run;
-import hudson.model.TaskListener;
-import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.Builder;
+import hudson.util.FormValidation;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.ServletException;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
-
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Plot {@link Builder} class for pipeline.
- *
  * <p>
  * When the user configures the project and enables this builder,
  * {@link DescriptorImpl#newInstance(StaplerRequest)} is invoked
- * and a new {@link PlotBuilder} is created. The created
- * instance is persisted to the project configuration XML by using
- * XStream, so this allows you to use instance fields (like {@link #group})
- * to remember the configuration.
- *
+ * and a new {@link PlotBuilder} is created.
+ * The created instance is persisted to the project configuration XML by using XStream,
+ * so this allows you to use instance fields (like {@link #group}) to remember the configuration.
  * <p>
  * When a build is performed, the {@link #perform} method will be invoked.
  */
@@ -84,47 +80,83 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         this.propertiesSeries = propertiesSeries;
         this.xmlSeries = xmlSeries;
         this.series = new ArrayList<>();
-        if (csvSeries != null) { this.series.addAll(csvSeries); }
-        if (xmlSeries != null) { this.series.addAll(xmlSeries); }
-        if (propertiesSeries != null) { this.series.addAll(propertiesSeries); }
+        if (csvSeries != null) {
+            this.series.addAll(csvSeries);
+        }
+        if (xmlSeries != null) {
+            this.series.addAll(xmlSeries);
+        }
+        if (propertiesSeries != null) {
+            this.series.addAll(propertiesSeries);
+        }
     }
 
     public String getGroup() {
         return group;
     }
 
-    public String getTitle() { return title; }
+    public String getTitle() {
+        return title;
+    }
 
-    public String getNumBuilds() { return numBuilds; }
+    public String getNumBuilds() {
+        return numBuilds;
+    }
 
-    public String getYaxis() { return yaxis; }
+    public String getYaxis() {
+        return yaxis;
+    }
 
-    public String getStyle() { return style; }
+    public String getStyle() {
+        return style;
+    }
 
-    public Boolean getUseDescr() { return useDescr; }
+    public Boolean getUseDescr() {
+        return useDescr;
+    }
 
-    public Boolean getExclZero() { return exclZero; }
+    public Boolean getExclZero() {
+        return exclZero;
+    }
 
-    public Boolean getLogarithmic() { return logarithmic; }
+    public Boolean getLogarithmic() {
+        return logarithmic;
+    }
 
-    public Boolean getKeepRecords() { return keepRecords; }
+    public Boolean getKeepRecords() {
+        return keepRecords;
+    }
 
-    public String getYaxisMinimum() { return yaxisMinimum; }
+    public String getYaxisMinimum() {
+        return yaxisMinimum;
+    }
 
-    public String getYaxisMaximum() { return yaxisMaximum; }
+    public String getYaxisMaximum() {
+        return yaxisMaximum;
+    }
 
-    public List<Series> getSeries() { return series; }
+    public List<Series> getSeries() {
+        return series;
+    }
 
-    public List<CSVSeries> getCsvSeries() { return csvSeries; }
+    public List<CSVSeries> getCsvSeries() {
+        return csvSeries;
+    }
 
-    public List<PropertiesSeries> getPropertiesSeries() { return propertiesSeries; }
+    public List<PropertiesSeries> getPropertiesSeries() {
+        return propertiesSeries;
+    }
 
-    public List<XMLSeries> getXmlSeries() { return xmlSeries; }
+    public List<XMLSeries> getXmlSeries() {
+        return xmlSeries;
+    }
 
     @Override
-    public void perform(Run<?,?> build, FilePath workspace, Launcher launcher, TaskListener listener) {
+    public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher,
+            TaskListener listener) {
         List<Plot> plots = new ArrayList<>();
-        Plot plot = new Plot(title, yaxis, group, numBuilds, csvFileName, style, false, false, false, false, yaxisMinimum, yaxisMaximum);
+        Plot plot = new Plot(title, yaxis, group, numBuilds, csvFileName, style,
+                false, false, false, false, yaxisMinimum, yaxisMaximum);
         plot.series = series;
         plot.addBuild(build, listener.getLogger(), workspace);
         plots.add(plot);
@@ -137,11 +169,10 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     }
 
     // Overridden for better type safety.
-    // If your plugin doesn't really define any property on Descriptor,
-    // you don't have to do this.
+    // If your plugin doesn't really define any property on Descriptor, you don't have to do this.
     @Override
     public DescriptorImpl getDescriptor() {
-        return (DescriptorImpl)super.getDescriptor();
+        return (DescriptorImpl) super.getDescriptor();
     }
 
     /**
@@ -168,15 +199,17 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         }
 
         public String getCsvFileName() {
-            return "plot-" + String.valueOf( (int)Math.round( Math.random() * 100000000 ) ) + ".csv";
+            return "plot-" + String.valueOf((int) Math.round(Math.random() * 100000000)) + ".csv";
         }
 
         public FormValidation doCheckName(@QueryParameter String value)
                 throws IOException, ServletException {
-            if (value.length() == 0)
+            if (value.length() == 0) {
                 return FormValidation.error("Please set a group");
-            if (value.length() < 4)
+            }
+            if (value.length() < 4) {
                 return FormValidation.warning("Isn't the group too short?");
+            }
             return FormValidation.ok();
         }
 
@@ -195,7 +228,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         @Override
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
             save();
-            return super.configure(req,formData);
+            return super.configure(req, formData);
         }
     }
 }

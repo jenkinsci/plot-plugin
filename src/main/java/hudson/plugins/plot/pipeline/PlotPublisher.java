@@ -13,7 +13,6 @@ import hudson.model.AbstractProject;
 import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.plugins.plot.AbstractPlotPublisher;
 import hudson.plugins.plot.Messages;
 import hudson.plugins.plot.Plot;
 import hudson.plugins.plot.SeriesFactory;
@@ -28,7 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
@@ -45,13 +43,12 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class PlotPublisher extends Recorder implements SimpleBuildStep {
     /**
-     * Array of Plot objects that represent the job's configured plots; must be
-     * non-null
+     * Array of Plot objects that represent the job's configured plots; must be non-null
      */
     private List<Plot> plots = new ArrayList<>();
     /**
-     * Maps plot groups to plot objects; group strings are in a URL friendly
-     * format; map must be non-null
+     * Maps plot groups to plot objects; group strings are in a URL friendly format;
+     * map must be non-null
      */
     transient private Map<String, List<Plot>> groupMap = new HashMap<>();
 
@@ -64,9 +61,8 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
     }
 
     /**
-     * Converts a URL friendly plot group name to the original group name. If
-     * the given urlGroup doesn't already exist then the empty string will be
-     * returned.
+     * Converts a URL friendly plot group name to the original group name.
+     * If the given urlGroup doesn't already exist then the empty string will be returned.
      */
     public String urlGroupToOriginalGroup(String urlGroup) {
         if (urlGroup == null || "nogroup".equals(urlGroup)) {
@@ -110,8 +106,7 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
     /**
      * Replaces the plots managed by this object with the given list.
      *
-     * @param plots
-     *            the new list of plots
+     * @param plots the new list of plots
      */
     public void setPlots(List<Plot> plots) {
         this.plots = new ArrayList<>();
@@ -161,10 +156,8 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
      * Called by Jenkins when a build is finishing.
      */
     @Override
-    public void perform(@Nonnull Run<?, ?> run,
-                        @Nonnull FilePath workspace,
-                        @Nonnull Launcher launcher,
-                        @Nonnull TaskListener listener)
+    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace,
+            @Nonnull Launcher launcher, @Nonnull TaskListener listener)
             throws InterruptedException, IOException {
         listener.getLogger().println("Recording plot data");
         // add the build to each plot
@@ -195,7 +188,6 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
      *
      * @author Nigel Daley
      * @author Thomas Fox
-     *
      */
     public static class PlotDescriptor extends BuildStepDescriptor<Publisher> {
 
@@ -236,10 +228,9 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
          * Checks if the series file is valid.
          * Called from "config.jelly".
          */
-        public FormValidation doCheckSeriesFile(
-                @AncestorInPath Job<?, ?> project,
+        public FormValidation doCheckSeriesFile(@AncestorInPath Job<?, ?> project,
                 @QueryParameter String value) throws IOException {
-            FilePath fp = new FilePath(new FilePath(project.getRootDir()), "workspace" );
+            FilePath fp = new FilePath(new FilePath(project.getRootDir()), "workspace");
             // Check if workspace folder is missing form root directory
             if (fp.validateFileMask(value) == null) {
                 return new FilePath(project.getRootDir()).validateFileMask(value);

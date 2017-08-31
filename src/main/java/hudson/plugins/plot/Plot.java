@@ -20,14 +20,11 @@ import java.awt.Shape;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,8 +76,7 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class Plot implements Comparable<Plot> {
     private static final Logger LOGGER = Logger.getLogger(Plot.class.getName());
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
-            "MMM d");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MMM d");
 
     /**
      * Effectively a 2-dimensional array, where each row is the data for one
@@ -347,8 +343,7 @@ public class Plot implements Comparable<Plot> {
         if (u == null) {
             urlUseDescr = null;
         } else {
-            urlUseDescr = "on".equalsIgnoreCase(u)
-                    || "true".equalsIgnoreCase(u);
+            urlUseDescr = "on".equalsIgnoreCase(u) || "true".equalsIgnoreCase(u);
         }
     }
 
@@ -516,8 +511,7 @@ public class Plot implements Comparable<Plot> {
      * @param rsp the response stream
      * @throws IOException
      */
-    public void plotGraphMap(StaplerRequest req, StaplerResponse rsp)
-            throws IOException {
+    public void plotGraphMap(StaplerRequest req, StaplerResponse rsp) throws IOException {
         if (ChartUtil.awtProblemCause != null) {
             // not available. send out error message
             rsp.sendRedirect2(req.getContextPath() + "/images/headless.png");
@@ -535,8 +529,7 @@ public class Plot implements Comparable<Plot> {
         ChartRenderingInfo info = new ChartRenderingInfo();
         plot.createBufferedImage(getWidth(), getHeight(), info);
         rsp.setContentType("text/plain;charset=UTF-8");
-        rsp.getWriter().println(
-                ChartUtilities.getImageMap(getCsvFileName(), info));
+        rsp.getWriter().println(ChartUtilities.getImageMap(getCsvFileName(), info));
     }
 
     /**
@@ -596,8 +589,7 @@ public class Plot implements Comparable<Plot> {
             if (series == null) {
                 continue;
             }
-            List<PlotPoint> seriesData = series.loadSeries(
-                    workspace, run.getNumber(), logger);
+            List<PlotPoint> seriesData = series.loadSeries(workspace, run.getNumber(), logger);
             if (seriesData != null) {
                 for (PlotPoint point : seriesData) {
                     if (point == null) {
@@ -649,8 +641,7 @@ public class Plot implements Comparable<Plot> {
 
             @Override
             public boolean equals(Object o) {
-                return o instanceof Label
-                        && ((Label) o).buildNum.equals(buildNum);
+                return o instanceof Label && ((Label) o).buildNum.equals(buildNum);
             }
 
             @Override
@@ -670,8 +661,7 @@ public class Plot implements Comparable<Plot> {
         // LOGGER.info("Determining if we should generate plot " +
         // getCsvFileName());
         File csvFile = new File(project.getRootDir(), getCsvFileName());
-        if (csvFile.lastModified() == csvLastModification && plot != null
-                && !forceGenerate) {
+        if (csvFile.lastModified() == csvLastModification && plot != null && !forceGenerate) {
             // data hasn't changed so don't regenerate the plot
             return;
         }
@@ -702,15 +692,13 @@ public class Plot implements Comparable<Plot> {
                 try {
                     value = Double.valueOf(record[0]);
                 } catch (NumberFormatException nfe2) {
-                    LOGGER.log(Level.SEVERE, "Exception converting to number",
-                            nfe2);
+                    LOGGER.log(Level.SEVERE, "Exception converting to number", nfe2);
                     continue; // skip this record all together
                 }
             }
             String series = record[1];
             Label xlabel = getUrlUseDescr() ? new Label(record[2], record[3],
-                    descriptionForBuild(buildNum)) : new Label(record[2],
-                    record[3]);
+                    descriptionForBuild(buildNum)) : new Label(record[2], record[3]);
             String url = null;
             if (record.length >= 5) {
                 url = record[4];
@@ -746,11 +734,9 @@ public class Plot implements Comparable<Plot> {
         for (Object category : dataset.getColumnKeys()) {
             Label label = (Label) category;
             if (label.text != null) {
-                domainAxis
-                        .addCategoryLabelToolTip(label, label.numDateString());
+                domainAxis.addCategoryLabelToolTip(label, label.numDateString());
             } else {
-                domainAxis.addCategoryLabelToolTip(label,
-                        descriptionForBuild(label.buildNum));
+                domainAxis.addCategoryLabelToolTip(label, descriptionForBuild(label.buildNum));
             }
         }
         // Replace the range axis by a logarithmic axis if the option is
@@ -777,8 +763,7 @@ public class Plot implements Comparable<Plot> {
                 .getRenderer();
         int numColors = dataset.getRowCount();
         for (int i = 0; i < numColors; i++) {
-            renderer.setSeriesPaint(i,
-                    new Color(Color.HSBtoRGB((1f / numColors) * i, 1f, 1f)));
+            renderer.setSeriesPaint(i, new Color(Color.HSBtoRGB((1f / numColors) * i, 1f, 1f)));
         }
         renderer.setBaseStroke(new BasicStroke(2.0f));
         renderer.setBaseToolTipGenerator(new StandardCategoryToolTipGenerator(
