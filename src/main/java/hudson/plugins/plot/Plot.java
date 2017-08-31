@@ -232,6 +232,7 @@ public class Plot implements Comparable<Plot> {
      * Creates a new plot with the given parameters. If numBuilds is the empty
      * string, then all builds will be included. Must not be zero.
      */
+    @SuppressWarnings("parameternumber")
     @DataBoundConstructor
     public Plot(String title, String yaxis, String group, String numBuilds,
             String csvFileName, String style, boolean useDescr,

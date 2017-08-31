@@ -56,6 +56,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     public List<XMLSeries> xmlSeries;
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
+    @SuppressWarnings("parameternumber")
     @DataBoundConstructor
     public PlotBuilder(String group, String title, String numBuilds, String yaxis, String style,
                        Boolean useDescr, Boolean exclZero, Boolean logarithmic, Boolean keepRecords,
