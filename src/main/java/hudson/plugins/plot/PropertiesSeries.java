@@ -26,7 +26,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Allen Reese
  */
 public class PropertiesSeries extends Series {
-    private static transient final Logger LOGGER =
+    private static final transient Logger LOGGER =
             Logger.getLogger(PropertiesSeries.class.getName());
 
     @DataBoundConstructor

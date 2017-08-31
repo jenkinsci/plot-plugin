@@ -103,7 +103,7 @@ public class Plot implements Comparable<Plot> {
             DefaultDrawingSupplier.DEFAULT_OUTLINE_STROKE_SEQUENCE,
             // the plot data points are a small diamond shape
             new Shape[] {
-                    new Polygon(new int[] { 3, 0, -3, 0 }, new int[] { 0, 4, 0, -4 }, 4)
+                new Polygon(new int[] {3, 0, -3, 0}, new int[] {0, 4, 0, -4}, 4)
             });
 
     /** The default plot width. */
