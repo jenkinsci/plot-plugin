@@ -22,11 +22,11 @@ import org.apache.commons.io.IOUtils;
 public class CSVReaderTest extends SeriesTestCase {
     private static transient final Logger LOGGER = Logger.getLogger(CSVReaderTest.class.getName());
 
-    private static final String[] files = { "test.csv", };
+    private static final String[] files = { "test.csv" };
 
-    private static final int[] lines = { 2, };
+    private static final int[] lines = { 2 };
 
-    private static final int[] columns = { 8, };
+    private static final int[] columns = { 8 };
 
     public void testCSVReader() {
         // first create a FilePath to load the test Properties file.
@@ -46,8 +46,7 @@ public class CSVReaderTest extends SeriesTestCase {
             seriesFiles = workspaceRootDir.list(files[0]);
 
             if (seriesFiles != null && seriesFiles.length < 1) {
-                LOGGER.info("No plot data file found: "
-                        + workspaceRootDir.getName() + " " + files[0]);
+                LOGGER.info("No plot data file found: " + workspaceRootDir.getName() + " " + files[0]);
                 assertFalse(true);
             }
 
@@ -63,7 +62,7 @@ public class CSVReaderTest extends SeriesTestCase {
             // read each line of the CSV file and add to rawPlotData
             int lineNum = 0;
             while ((nextLine = csvreader.readNext()) != null) {
-                // for some reason csvreader returns an empty line sometimes.
+                // for some reason csv reader returns an empty line sometimes.
                 if (nextLine.length == 1 && nextLine[0].length() == 0) {
                     break;
                 }
@@ -81,8 +80,7 @@ public class CSVReaderTest extends SeriesTestCase {
                 }
                 ++lineNum;
             }
-            assertTrue("Line count is not equal " + lineNum + " expected " + lines[0],
-                    lines[0] == lineNum);
+            assertTrue("Line count is not equal " + lineNum + " expected " + lines[0], lines[0] == lineNum);
         } catch (IOException | InterruptedException e) {
             assertFalse("Exception " + e, true);
         } finally {

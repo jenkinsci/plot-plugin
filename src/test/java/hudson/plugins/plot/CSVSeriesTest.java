@@ -44,8 +44,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         }
 
         // Create a new CSV series.
-        CSVSeries series = new CSVSeries(files[0],
-                "http://localhost:8080/%name%/%index%/", "OFF", "", false);
+        CSVSeries series = new CSVSeries(files[0], "http://localhost:8080/%name%/%index%/", "OFF", "", false);
 
         LOGGER.info("Created series " + series.toString());
         // test the basic subclass properties.
@@ -58,8 +57,7 @@ public class CSVSeriesTest extends SeriesTestCase {
 
         for (int i = 0; i < points.size(); i++) {
             PlotPoint point = points.get(i);
-            assertEquals("http://localhost:8080/" + point.getLabel() + "/" + i + "/",
-                    point.getUrl());
+            assertEquals("http://localhost:8080/" + point.getLabel() + "/" + i + "/", point.getUrl());
         }
     }
 
@@ -86,8 +84,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 8);
     }
 
-    private int getNumColumns(FilePath workspaceRootDir, String file)
-            throws IOException, InterruptedException {
+    private int getNumColumns(FilePath workspaceRootDir, String file) throws IOException, InterruptedException {
         CSVReader csvreader = null;
         InputStream in = null;
         InputStreamReader inputReader = null;
