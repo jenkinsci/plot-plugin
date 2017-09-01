@@ -244,6 +244,22 @@ public class Plot implements Comparable<Plot> {
         }
     }
 
+    private enum ChartStyle {
+        AREA("name"), BAR("bar"), BAR_3D("bar3d"), LINE_3D("line3d"),
+        LINE_SIMPLE("lineSimple"), STACKED_AREA("stackedarea"), STACKED_BAR("stackedbar"),
+        STACKED_BAR_3D("stackedbar3d"), WATERFALL("waterfall");
+
+        private final String name;
+
+        ChartStyle(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
     /**
      * Creates a new plot with the given parameters. If numBuilds is the empty
      * string, then all builds will be included. Must not be zero.
@@ -775,45 +791,38 @@ public class Plot implements Comparable<Plot> {
      * dataset. Defaults to using createLineChart.
      */
     private JFreeChart createChart(PlotCategoryDataset dataset) {
-        String s = getUrlStyle();
-        if ("area".equalsIgnoreCase(s)) {
-            return ChartFactory.createAreaChart(getURLTitle(), null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+        switch (ChartStyle.valueOf(getUrlStyle())) {
+            case AREA:
+                return ChartFactory.createAreaChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case BAR:
+                return ChartFactory.createBarChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case BAR_3D:
+                return ChartFactory.createBarChart3D(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case LINE_3D:
+                return ChartFactory.createLineChart3D(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case LINE_SIMPLE:
+                return ChartFactory.createLineChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case STACKED_AREA:
+                return ChartFactory.createStackedAreaChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case STACKED_BAR:
+                return ChartFactory.createStackedBarChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case STACKED_BAR_3D:
+                return ChartFactory.createStackedBarChart3D(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case WATERFALL:
+                return ChartFactory.createWaterfallChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            default:
+                return ChartFactory.createLineChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
         }
-        if ("bar".equalsIgnoreCase(s)) {
-            return ChartFactory.createBarChart(getURLTitle(), null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-        }
-        if ("bar3d".equalsIgnoreCase(s)) {
-            return ChartFactory.createBarChart3D(getURLTitle(), null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-        }
-        if ("line3d".equalsIgnoreCase(s)) {
-            return ChartFactory.createLineChart3D(getURLTitle(), null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-        }
-        if ("lineSimple".equalsIgnoreCase(s)) {
-            return ChartFactory.createLineChart(getURLTitle(), null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-        }
-        if ("stackedarea".equalsIgnoreCase(s)) {
-            return ChartFactory.createStackedAreaChart(getURLTitle(), null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-        }
-        if ("stackedbar".equalsIgnoreCase(s)) {
-            return ChartFactory.createStackedBarChart(getURLTitle(), null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-        }
-        if ("stackedbar3d".equalsIgnoreCase(s)) {
-            return ChartFactory.createStackedBarChart3D(getURLTitle(), null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-        }
-        if ("waterfall".equalsIgnoreCase(s)) {
-            return ChartFactory.createWaterfallChart(getURLTitle(), null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-        }
-        return ChartFactory.createLineChart(getURLTitle(), null,
-                getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
     }
 
     /**
