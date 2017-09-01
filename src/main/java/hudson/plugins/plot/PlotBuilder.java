@@ -46,13 +46,16 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     private final Boolean keepRecords;
     private final String yaxisMinimum;
     private final String yaxisMaximum;
+    @SuppressWarnings("visibilitymodifier")
     public String csvFileName;
-    /**
-     * List of data series.
-     */
+    /** List of data series. */
+    @SuppressWarnings("visibilitymodifier")
     public List<Series> series;
+    @SuppressWarnings("visibilitymodifier")
     public List<CSVSeries> csvSeries;
+    @SuppressWarnings("visibilitymodifier")
     public List<PropertiesSeries> propertiesSeries;
+    @SuppressWarnings("visibilitymodifier")
     public List<XMLSeries> xmlSeries;
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"

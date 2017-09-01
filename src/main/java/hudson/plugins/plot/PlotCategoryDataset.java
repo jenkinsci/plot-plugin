@@ -22,11 +22,11 @@ import org.jfree.data.general.AbstractDataset;
 public class PlotCategoryDataset extends AbstractDataset implements CategoryDataset {
     private static final long serialVersionUID = 9215482265757674967L;
 
-    static class DataElement {
-        public final Number number;
-        public final String url;
+    private static class DataElement {
+        private final Number number;
+        private final String url;
 
-        public DataElement(Number n, String u) {
+        DataElement(Number n, String u) {
             this.number = n;
             this.url = u;
         }

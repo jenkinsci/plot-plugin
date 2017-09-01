@@ -30,11 +30,13 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
     /**
      * Relative path to the data series property file. Mandatory.
      */
+    @SuppressWarnings("visibilitymodifier")
     protected String file;
 
     /**
      * Data series legend label. Optional.
      */
+    @SuppressWarnings("visibilitymodifier")
     protected String label;
 
     /**
@@ -42,6 +44,7 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
      * This should be an enum, but I am not sure how to support that with
      * stapler at the moment
      */
+    @SuppressWarnings("visibilitymodifier")
     protected String fileType;
 
     protected Series(String file, String label, String fileType) {

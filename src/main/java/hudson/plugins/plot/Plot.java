@@ -127,35 +127,44 @@ public class Plot implements Comparable<Plot> {
     private transient boolean hasLegend = true;
 
     /** Number of builds back to show on this plot from url. */
+    @SuppressWarnings("visibilitymodifier")
     public transient String urlNumBuilds;
 
     /** Title of plot from url. */
+    @SuppressWarnings("visibilitymodifier")
     public transient String urlTitle;
 
     /** Style of plot from url. */
+    @SuppressWarnings("visibilitymodifier")
     public transient String urlStyle;
 
     /** Use description flag from url. */
+    @SuppressWarnings("visibilitymodifier")
     public transient Boolean urlUseDescr;
 
     // Configuration values
 
     /** Title of plot. Mandatory. */
+    @SuppressWarnings("visibilitymodifier")
     public String title;
 
     /** Y-axis label. Optional. */
+    @SuppressWarnings("visibilitymodifier")
     public String yaxis;
 
     /** List of data series. */
+    @SuppressWarnings("visibilitymodifier")
     public List<Series> series;
 
     /** Group name that this plot belongs to. */
+    @SuppressWarnings("visibilitymodifier")
     public String group;
 
     /**
      * Number of builds back to show on this plot. Empty string means all
      * builds. Must not be "0".
      */
+    @SuppressWarnings("visibilitymodifier")
     public String numBuilds;
 
     /**
@@ -163,28 +172,35 @@ public class Plot implements Comparable<Plot> {
      * stored in the projects root directory. This is different from the source
      * csv file that can be used as a source for the plot.
      */
+    @SuppressWarnings("visibilitymodifier")
     public String csvFileName;
 
     /** The date of the last change to the CSV file. */
     private long csvLastModification;
 
     /** Optional style of plot: line, line3d, stackedArea, stackedBar, etc. */
+    @SuppressWarnings("visibilitymodifier")
     public String style;
 
     /** Whether or not to use build descriptions as X-axis labels. Optional. */
+    @SuppressWarnings("visibilitymodifier")
     public boolean useDescr;
 
     /** Keep records for builds that were deleted. */
     private boolean keepRecords;
 
     /** Whether or not to exclude zero as default Y-axis value. Optional. */
+    @SuppressWarnings("visibilitymodifier")
     public boolean exclZero;
 
     /** Use a logarithmic Y-axis. */
+    @SuppressWarnings("visibilitymodifier")
     public boolean logarithmic;
 
     /** Min/max yaxis values, string used so if no value defaults used */
+    @SuppressWarnings("visibilitymodifier")
     public String yaxisMinimum;
+    @SuppressWarnings("visibilitymodifier")
     public String yaxisMaximum;
 
     class Label implements Comparable<Label> {
