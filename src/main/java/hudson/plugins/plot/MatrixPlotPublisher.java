@@ -44,14 +44,14 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
             return "Plots";
         }
         if (groupMap.containsKey(urlGroup)) {
-            List<Plot> plots = new ArrayList<>();
+            List<Plot> plotList = new ArrayList<>();
             for (Plot plot : groupMap.get(urlGroup)) {
                 if (ObjectUtils.equals(plot.getProject(), c)) {
-                    plots.add(plot);
+                    plotList.add(plot);
                 }
             }
-            if (plots.size() > 0) {
-                return plots.get(0).group;
+            if (plotList.size() > 0) {
+                return plotList.get(0).group;
             }
         }
         return "";

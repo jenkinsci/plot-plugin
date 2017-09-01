@@ -615,11 +615,11 @@ public class Plot implements Comparable<Plot> {
         // load the existing plot data from disk
         loadPlotData();
         // extract the data for each data series
-        for (Series series : getSeries()) {
-            if (series == null) {
+        for (Series s : getSeries()) {
+            if (s == null) {
                 continue;
             }
-            List<PlotPoint> seriesData = series.loadSeries(workspace, run.getNumber(), logger);
+            List<PlotPoint> seriesData = s.loadSeries(workspace, run.getNumber(), logger);
             if (seriesData != null) {
                 for (PlotPoint point : seriesData) {
                     if (point == null) {
@@ -686,30 +686,30 @@ public class Plot implements Comparable<Plot> {
                     continue; // skip this record all together
                 }
             }
-            String series = record[1];
-            Label xlabel = getUrlUseDescr() ? new Label(record[2], record[3],
-                    descriptionForBuild(buildNum)) : new Label(record[2], record[3]);
+            Label columnXLabel = getUrlUseDescr() ? new Label(record[2], record[3], descriptionForBuild(buildNum))
+                    : new Label(record[2], record[3]);
             String url = null;
             if (record.length >= 5) {
                 url = record[4];
             }
-            dataset.setValue(value, url, series, xlabel);
+            String rowSeries = record[1];
+            dataset.setValue(value, url, rowSeries, columnXLabel);
         }
 
-        String urlNumBuilds = getURLNumBuilds();
-        int numBuilds;
-        if (StringUtils.isBlank(urlNumBuilds)) {
-            numBuilds = Integer.MAX_VALUE;
+        String builds = getURLNumBuilds();
+        int buildsNumber;
+        if (StringUtils.isBlank(builds)) {
+            buildsNumber = Integer.MAX_VALUE;
         } else {
             try {
-                numBuilds = Integer.parseInt(urlNumBuilds);
+                buildsNumber = Integer.parseInt(builds);
             } catch (NumberFormatException nfe) {
                 LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
-                numBuilds = Integer.MAX_VALUE;
+                buildsNumber = Integer.MAX_VALUE;
             }
         }
 
-        dataset.clipDataset(numBuilds);
+        dataset.clipDataset(buildsNumber);
         plot = createChart(dataset);
         CategoryPlot categoryPlot = (CategoryPlot) plot.getPlot();
         categoryPlot.setDomainGridlinePaint(Color.black);
@@ -915,15 +915,15 @@ public class Plot implements Comparable<Plot> {
      * @return true if the build should be part of the graph.
      */
     /* package */boolean reportBuild(int buildNumber) {
-        int numBuilds;
+        int buildsNumber;
         try {
-            numBuilds = Integer.parseInt(this.numBuilds);
+            buildsNumber = Integer.parseInt(this.numBuilds);
         } catch (NumberFormatException ex) {
             // Report all builds
-            numBuilds = Integer.MAX_VALUE;
+            buildsNumber = Integer.MAX_VALUE;
         }
 
-        return buildNumber >= project.getNextBuildNumber() - numBuilds
+        return buildNumber >= project.getNextBuildNumber() - buildsNumber
                 && (keepRecords || project.getBuildByNumber(buildNumber) != null);
     }
 }
