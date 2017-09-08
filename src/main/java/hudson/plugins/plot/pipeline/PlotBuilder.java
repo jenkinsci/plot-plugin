@@ -174,7 +174,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
 
         public FormValidation doCheckName(@QueryParameter String value)
                 throws IOException, ServletException {
-            if (value.length() == 0)
+            if (value == null || value.isEmpty())
                 return FormValidation.error("Please set a group");
             if (value.length() < 4)
                 return FormValidation.warning("Isn't the group too short?");
