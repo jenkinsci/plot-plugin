@@ -16,8 +16,6 @@
     <!-- Jenkins Test Harness version you use to test the plugin. -->
     <!-- For Jenkins version >= 1.580.1 use JTH 2.x or higher. -->
     <jenkins-test-harness.version>2.1</jenkins-test-harness.version>
-    <!-- Skip javadoc generator -->
-    <maven.javadoc.skip>true</maven.javadoc.skip>
   </properties>
 
   <artifactId>plot</artifactId>
