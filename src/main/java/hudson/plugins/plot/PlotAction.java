@@ -2,8 +2,9 @@
  * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.
  * Copyrights licensed under the MIT License.
  */
-package hudson.plugins.plot.pipeline;
+package hudson.plugins.plot;
 
+import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Job;
 import hudson.plugins.plot.Messages;
@@ -26,10 +27,15 @@ public class PlotAction implements Action, StaplerProxy {
     private final Job<?, ?> project;
     private PlotPublisher publisher;
 
+    public PlotAction(AbstractProject<?, ?> project, PlotPublisher publisher) {
+        this.project = project;
+        this.publisher = publisher;
+    }
+
     public PlotAction(Job<?, ?> job, List<Plot> plots){
         this.project = job;
         publisher = new PlotPublisher();
-        if(plots != null) {
+        if (plots != null) {
             publisher.setPlots(plots);
         }
     }
@@ -49,27 +55,27 @@ public class PlotAction implements Action, StaplerProxy {
         return Messages.Plot_UrlName();
     }
 
-    // called from pipeline/PlotAction/index.jelly
+    // called from PlotAction/index.jelly
     public boolean hasPlots() throws IOException {
         return CollectionUtils.isNotEmpty(publisher.getPlots());
     }
 
-    // called from pipeline/PlotReport/index.jelly
-    public Job<?, ?> getProject() {
-        return project;
+    // called from PlotAction/index.jelly
+    public AbstractProject<?, ?> getProject() {
+        return (AbstractProject<?, ?>) project;
     }
 
-    // called from pipeline/PlotAction/index.jelly
+    // called from PlotAction/index.jelly
     public List<String> getOriginalGroups() {
         return publisher.getOriginalGroups();
     }
 
-    // called from pipeline/PlotAction/index.jelly
+    // called from PlotAction/index.jelly
     public String getUrlGroup(String originalGroup) {
         return publisher.originalGroupToUrlEncodedGroup(originalGroup);
     }
 
-    // called from href created in pipeline/PlotAction/index.jelly
+    // called from href created in PlotAction/index.jelly
     public PlotReport getDynamic(String group, StaplerRequest req,
                                  StaplerResponse rsp) throws IOException {
         return new PlotReport(project,

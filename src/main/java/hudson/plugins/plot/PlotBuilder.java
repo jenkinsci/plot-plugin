@@ -1,14 +1,8 @@
-package hudson.plugins.plot.pipeline;
+package hudson.plugins.plot;
 
 import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
-import hudson.plugins.plot.CSVSeries;
-import hudson.plugins.plot.Messages;
-import hudson.plugins.plot.Plot;
-import hudson.plugins.plot.PropertiesSeries;
-import hudson.plugins.plot.Series;
-import hudson.plugins.plot.XMLSeries;
 import hudson.util.FormValidation;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
@@ -184,14 +178,14 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
 
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
             // Indicates that this builder can be used with all kinds of project types 
-            return false;
+            return true;
         }
 
         /**
          * This human readable group is used in the configuration screen.
          */
         public String getDisplayName() {
-            return Messages.Plot_Pipeline_Builder_DisplayName();
+            return Messages.Plot_Publisher_DisplayName();
         }
 
         @Override

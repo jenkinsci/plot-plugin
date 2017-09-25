@@ -1,9 +1,8 @@
-package hudson.plugins.plot.pipeline;
+package hudson.plugins.plot;
 
 import hudson.model.Action;
 import hudson.model.InvisibleAction;
 import hudson.model.Run;
-import hudson.plugins.plot.Plot;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +16,7 @@ public class PlotBuildAction extends InvisibleAction implements StaplerProxy, Si
     private Run<?, ?> run;
     private List<Plot> plots;
 
-    PlotBuildAction(Run<?, ?> run, List<Plot> plots) {
+    public PlotBuildAction(Run<?, ?> run, List<Plot> plots) {
         this.run = run;
         this.plots = plots;
     }
@@ -32,7 +31,7 @@ public class PlotBuildAction extends InvisibleAction implements StaplerProxy, Si
         return null;
     }
 
-    void addPlots(List<Plot> plots) {
+    public void addPlots(List<Plot> plots) {
         this.plots.addAll(plots);
     }
 }

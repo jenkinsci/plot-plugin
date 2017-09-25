@@ -2,48 +2,35 @@
  * Copyright (c) 2007-2009 Yahoo! Inc.  All rights reserved.
  * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-package hudson.plugins.plot.pipeline;
+package hudson.plugins.plot;
 
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
-import hudson.matrix.MatrixProject;
-import hudson.model.AbstractProject;
-import hudson.model.Job;
-import hudson.model.Run;
-import hudson.model.TaskListener;
-import hudson.plugins.plot.AbstractPlotPublisher;
+import hudson.model.*;
 import hudson.plugins.plot.Messages;
-import hudson.plugins.plot.Plot;
-import hudson.plugins.plot.SeriesFactory;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
-import hudson.util.FormValidation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import jenkins.tasks.SimpleBuildStep;
-import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Records the plot data for builds.
  *
  * @author Nigel Daley
  */
-public class PlotPublisher extends Recorder implements SimpleBuildStep {
+public class PlotPublisher extends AbstractPlotPublisher implements SimpleBuildStep {
     /**
      * Array of Plot objects that represent the job's configured plots; must be
      * non-null
@@ -79,20 +66,6 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
             }
         }
         return "";
-    }
-
-    protected String originalGroupToUrlGroup(String originalGroup) {
-        if (StringUtils.isEmpty(originalGroup)) {
-            return "nogroup";
-        }
-        return originalGroup.replace('/', ' ');
-    }
-
-    /**
-     * Converts the original plot group name to a URL friendly group name.
-     */
-    public String originalGroupToUrlEncodedGroup(String originalGroup) {
-        return Util.rawEncode(originalGroupToUrlGroup(originalGroup));
     }
 
     /**
@@ -142,6 +115,14 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
     }
 
     /**
+     * Called by Jenkins.
+     */
+    @Override
+    public Action getProjectAction(AbstractProject<?, ?> project) {
+        return new PlotAction(project, this);
+    }
+
+    /**
      * Returns the entire list of plots managed by this object.
      */
     public List<Plot> getPlots() {
@@ -161,17 +142,32 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
      * Called by Jenkins when a build is finishing.
      */
     @Override
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
+                           BuildListener listener) throws IOException, InterruptedException {
+        recordPlotData(build, listener);
+        // misconfigured plots will not fail a build so always return true
+        return true;
+    }
+
+    /**
+     * Called by Jenkins when a build is finishing.
+     */
+    @Override
     public void perform(@Nonnull Run<?, ?> run,
                         @Nonnull FilePath workspace,
                         @Nonnull Launcher launcher,
                         @Nonnull TaskListener listener)
             throws InterruptedException, IOException {
+        recordPlotData(run, listener);
+        run.addAction(new PlotBuildAction(run, getPlots()));
+    }
+
+    private void recordPlotData(Run<?, ?> build, TaskListener listener) {
         listener.getLogger().println("Recording plot data");
         // add the build to each plot
         for (Plot plot : getPlots()) {
-            plot.addBuild(run, listener.getLogger(), workspace);
+            plot.addBuild((AbstractBuild<?, ?>) build, listener.getLogger());
         }
-        run.addAction(new PlotBuildAction(run, getPlots()));
     }
 
     @Override
@@ -189,62 +185,4 @@ public class PlotPublisher extends Recorder implements SimpleBuildStep {
 
     @Extension
     public static final PlotDescriptor DESCRIPTOR = new PlotDescriptor();
-
-    /**
-     * The Descriptor for the plot configuration Extension
-     *
-     * @author Nigel Daley
-     * @author Thomas Fox
-     *
-     */
-    public static class PlotDescriptor extends BuildStepDescriptor<Publisher> {
-
-        public PlotDescriptor() {
-            super(PlotPublisher.class);
-        }
-
-        public String getDisplayName() {
-            return Messages.Plot_Pipeline_Publisher_DisplayName();
-        }
-
-        @Override
-        public boolean isApplicable(Class<? extends AbstractProject> jobType) {
-            return AbstractProject.class.isAssignableFrom(jobType)
-                    && !MatrixProject.class.isAssignableFrom(jobType);
-        }
-
-        /**
-         * Called when the user saves the project configuration.
-         */
-        @Override
-        public Publisher newInstance(StaplerRequest req, JSONObject formData)
-                throws FormException {
-            PlotPublisher publisher = new PlotPublisher();
-            for (Object data : SeriesFactory.getArray(formData.get("plots"))) {
-                publisher.addPlot(bindPlot((JSONObject) data, req));
-            }
-            return publisher;
-        }
-
-        private static Plot bindPlot(JSONObject data, StaplerRequest req) {
-            Plot p = req.bindJSON(Plot.class, data);
-            p.series = SeriesFactory.createSeriesList(data.get("series"), req);
-            return p;
-        }
-
-        /**
-         * Checks if the series file is valid.
-         * Called from "config.jelly".
-         */
-        public FormValidation doCheckSeriesFile(
-                @AncestorInPath Job<?, ?> project,
-                @QueryParameter String value) throws IOException {
-            FilePath fp = new FilePath(new FilePath(project.getRootDir()), "workspace" );
-            // Check if workspace folder is missing form root directory
-            if (fp.validateFileMask(value) == null) {
-                return new FilePath(project.getRootDir()).validateFileMask(value);
-            }
-            return fp.validateFileMask(value);
-        }
-    }
 }

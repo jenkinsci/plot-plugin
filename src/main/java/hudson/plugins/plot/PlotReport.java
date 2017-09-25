@@ -5,6 +5,7 @@
 package hudson.plugins.plot;
 
 import au.com.bytecode.opencsv.CSVReader;
+import hudson.model.AbstractProject;
 import hudson.model.Job;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +43,11 @@ public class PlotReport {
      */
     private String group;
 
+    public PlotReport(AbstractProject<?, ?> project, String group,
+                      List<Plot> plots) {
+        this((Job)project, group, plots);
+    }
+
     public PlotReport(Job<?, ?> job, String group,
             List<Plot> plots) {
         Collections.sort(plots);
@@ -51,8 +57,8 @@ public class PlotReport {
     }
 
     // called from PlotReport/index.jelly
-    public Job<?, ?> getProject() {
-        return project;
+    public AbstractProject<?, ?> getProject() {
+        return (AbstractProject<?, ?>) project;
     }
 
     // called from PlotReport/index.jelly

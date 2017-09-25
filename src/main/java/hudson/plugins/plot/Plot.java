@@ -451,8 +451,8 @@ public class Plot implements Comparable<Plot> {
         return height;
     }
 
-    public Job<?, ?> getProject() {
-        return project;
+    public AbstractProject<?, ?> getProject() {
+        return (AbstractProject<?, ?>) project;
     }
 
     /**
@@ -531,43 +531,10 @@ public class Plot implements Comparable<Plot> {
     }
 
     /**
-     * Called when a build completes. Adds the finished build to this plot. This
-     * method extracts the data for each data series from the build and saves it
-     * in the plot's CSV file.
+     * @see #addBuild(Run, PrintStream, FilePath)
      */
     public void addBuild(AbstractBuild<?, ?> build, PrintStream logger) {
-        if (project == null) {
-            project = build.getProject();
-        }
-
-        // load the existing plot data from disk
-        loadPlotData();
-        // extract the data for each data series
-        for (Series series : getSeries()) {
-            if (series == null) {
-                continue;
-            }
-            List<PlotPoint> seriesData = series.loadSeries(
-                    build.getWorkspace(), build.getNumber(), logger);
-            if (seriesData != null) {
-                for (PlotPoint point : seriesData) {
-                    if (point == null) {
-                        continue;
-                    }
-
-                    rawPlotData.add(new String[] {
-                            point.getYvalue(),
-                            point.getLabel(),
-                            build.getNumber() + "", // convert to a string
-                            build.getTimestamp().getTimeInMillis() + "",
-                            point.getUrl()
-                    });
-                }
-            }
-        }
-
-        // save the updated plot data to disk
-        savePlotData();
+        addBuild(build, logger, build.getWorkspace());
     }
 
     /**
