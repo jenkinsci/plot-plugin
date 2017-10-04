@@ -8,8 +8,6 @@ import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Job;
 import hudson.plugins.plot.Messages;
-import hudson.plugins.plot.Plot;
-import hudson.plugins.plot.PlotReport;
 import java.io.IOException;
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
@@ -61,8 +59,8 @@ public class PlotAction implements Action, StaplerProxy {
     }
 
     // called from PlotAction/index.jelly
-    public AbstractProject<?, ?> getProject() {
-        return (AbstractProject<?, ?>) project;
+    public Job<?, ?> getProject() {
+        return project;
     }
 
     // called from PlotAction/index.jelly

@@ -451,8 +451,8 @@ public class Plot implements Comparable<Plot> {
         return height;
     }
 
-    public AbstractProject<?, ?> getProject() {
-        return (AbstractProject<?, ?>) project;
+    public Job<?, ?> getProject() {
+        return project;
     }
 
     /**
