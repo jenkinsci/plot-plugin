@@ -57,8 +57,8 @@ public class PlotReport {
     }
 
     // called from PlotReport/index.jelly
-    public AbstractProject<?, ?> getProject() {
-        return (AbstractProject<?, ?>) project;
+    public Job<?, ?> getProject() {
+        return project;
     }
 
     // called from PlotReport/index.jelly
