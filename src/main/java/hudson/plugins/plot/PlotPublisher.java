@@ -170,6 +170,5 @@ public class PlotPublisher extends AbstractPlotPublisher {
         return DESCRIPTOR;
     }
 
-    @Extension
     public static final PlotDescriptor DESCRIPTOR = new PlotDescriptor();
 }
