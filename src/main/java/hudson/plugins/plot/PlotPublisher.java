@@ -30,7 +30,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author Nigel Daley
  */
-public class PlotPublisher extends AbstractPlotPublisher implements SimpleBuildStep {
+public class PlotPublisher extends AbstractPlotPublisher {
     /**
      * Array of Plot objects that represent the job's configured plots; must be
      * non-null
@@ -147,19 +147,6 @@ public class PlotPublisher extends AbstractPlotPublisher implements SimpleBuildS
         recordPlotData(build, listener);
         // misconfigured plots will not fail a build so always return true
         return true;
-    }
-
-    /**
-     * Called by Jenkins when a build is finishing.
-     */
-    @Override
-    public void perform(@Nonnull Run<?, ?> run,
-                        @Nonnull FilePath workspace,
-                        @Nonnull Launcher launcher,
-                        @Nonnull TaskListener listener)
-            throws InterruptedException, IOException {
-        recordPlotData(run, listener);
-        run.addAction(new PlotBuildAction(run, getPlots()));
     }
 
     private void recordPlotData(Run<?, ?> build, TaskListener listener) {
