@@ -3,6 +3,8 @@ package hudson.plugins.plot;
 import hudson.model.Action;
 import hudson.model.InvisibleAction;
 import hudson.model.Run;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -16,13 +18,13 @@ public class PlotBuildAction extends InvisibleAction implements StaplerProxy, Si
     private Run<?, ?> run;
     private List<Plot> plots;
 
-    public PlotBuildAction(Run<?, ?> run, List<Plot> plots) {
+    PlotBuildAction(Run<?, ?> run, List<Plot> plots) {
         this.run = run;
         this.plots = plots;
     }
 
     @Override
-    public Collection<? extends Action> getProjectActions() {
+    public synchronized Collection<? extends Action> getProjectActions() {
         return Collections.<Action>singleton(new PlotAction(run.getParent(), plots));
     }
 
@@ -31,7 +33,10 @@ public class PlotBuildAction extends InvisibleAction implements StaplerProxy, Si
         return null;
     }
 
-    public void addPlots(List<Plot> plots) {
+    synchronized void addPlots(List<Plot> plots) {
+        if (this.plots == null) {
+            this.plots = new ArrayList<>();
+        }
         this.plots.addAll(plots);
     }
 }
