@@ -59,7 +59,12 @@ public class PlotAction implements Action, StaplerProxy {
     }
 
     // called from PlotAction/index.jelly
-    public Job<?, ?> getProject() {
+    public AbstractProject<?, ?> getProject() {
+        return project instanceof AbstractProject ? (AbstractProject<?, ?>) project : null;
+    }
+
+    // called from PlotAction/index.jelly
+    public Job<?, ?> getJob() {
         return project;
     }
 

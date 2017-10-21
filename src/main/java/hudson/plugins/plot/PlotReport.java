@@ -57,7 +57,12 @@ public class PlotReport {
     }
 
     // called from PlotReport/index.jelly
-    public Job<?, ?> getProject() {
+    public AbstractProject<?, ?> getProject() {
+        return project instanceof AbstractProject ? (AbstractProject<?, ?>) project : null;
+    }
+
+    // called from PlotReport/index.jelly
+    public Job<?, ?> getJob() {
         return project;
     }
 
@@ -191,7 +196,7 @@ public class PlotReport {
 
     private Plot getPlot(int i) {
         Plot p = plots.get(i);
-        p.setProject(project);
+        p.setJob(project);
         return p;
     }
 

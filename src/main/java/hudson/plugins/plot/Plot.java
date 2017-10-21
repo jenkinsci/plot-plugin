@@ -451,15 +451,16 @@ public class Plot implements Comparable<Plot> {
         return height;
     }
 
-    public Job<?, ?> getProject() {
+    public Job<?, ?> getJob() {
         return project;
     }
 
-    /**
-     * @see #setProject(Job)
-     */
-    public void setProject(AbstractProject<?, ?> project) {
-        setProject((Job) project);
+    public void setJob(Job<?, ?> job) {
+        this.project = job;
+    }
+
+    public AbstractProject<?, ?> getProject() {
+        return (AbstractProject<?, ?>) project;
     }
 
     /**
@@ -467,7 +468,7 @@ public class Plot implements Comparable<Plot> {
      * directory where the CSV file is located. Unfortunately, a reference to
      * the project is not available when this object is created.
      */
-    public void setProject(Job<?, ?> project) {
+    public void setProject(AbstractProject<?, ?> project) {
         this.project = project;
     }
 

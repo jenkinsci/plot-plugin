@@ -6,8 +6,8 @@
  -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  <l:layout title="${it.project.displayName} plots">
-    <st:include it="${it.project}" page="sidepanel.jelly" />
+  <l:layout title="${it.job.displayName} plots">
+    <st:include it="${it.job}" page="sidepanel.jelly" />
     <l:main-panel>
       <h1>${%Plot Groups}</h1>
 

@@ -42,7 +42,7 @@
   </d:taglib>
 
   <l:layout title="${it.group}">
-    <st:include it="${it.project}" page="sidepanel.jelly" optional="true" />
+    <st:include it="${it.job}" page="sidepanel.jelly" optional="true" />
     <l:main-panel>
       <h1><img src="${rootURL}/images/32x32/graph.gif"/>${it.group}</h1>
       <div>
