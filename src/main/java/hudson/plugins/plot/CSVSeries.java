@@ -336,7 +336,7 @@ public class CSVSeries extends Series {
     @Extension
     public static class DescriptorImpl extends Descriptor<Series> {
         public String getDisplayName() {
-            return "";
+            return Messages.Plot_CsvSeries();
         }
 
         @Override

@@ -90,7 +90,7 @@ public class PropertiesSeries extends Series {
     @Extension
     public static class DescriptorImpl extends Descriptor<Series> {
         public String getDisplayName() {
-            return "";
+            return Messages.Plot_PropertiesSeries();
         }
 
         @Override
