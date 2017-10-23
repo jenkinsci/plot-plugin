@@ -459,6 +459,7 @@ public class Plot implements Comparable<Plot> {
         this.project = job;
     }
 
+    @Deprecated
     public AbstractProject<?, ?> getProject() {
         return (AbstractProject<?, ?>) project;
     }

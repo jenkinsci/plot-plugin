@@ -56,7 +56,7 @@ public class PlotReport {
         this.project = job;
     }
 
-    // called from PlotReport/index.jelly
+    @Deprecated
     public AbstractProject<?, ?> getProject() {
         return project instanceof AbstractProject ? (AbstractProject<?, ?>) project : null;
     }

@@ -58,7 +58,7 @@ public class PlotAction implements Action, StaplerProxy {
         return CollectionUtils.isNotEmpty(publisher.getPlots());
     }
 
-    // called from PlotAction/index.jelly
+    @Deprecated
     public AbstractProject<?, ?> getProject() {
         return project instanceof AbstractProject ? (AbstractProject<?, ?>) project : null;
     }
