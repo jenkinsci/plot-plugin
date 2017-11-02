@@ -35,7 +35,7 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class MatrixPlotPublisher extends AbstractPlotPublisher {
 
-    transient private Map<MatrixConfiguration, List<Plot>> plotsOfConfigurations = new HashMap<MatrixConfiguration, List<Plot>>();
+    transient private Map<MatrixConfiguration, List<Plot>> plotsOfConfigurations = new HashMap<>();
 
     transient private Map<String, List<Plot>> groupMap = new HashMap<String, List<Plot>>();
 
@@ -66,7 +66,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
      * Returns all group names as the original user specified strings.
      */
     public List<String> getOriginalGroups(MatrixConfiguration configuration) {
-        List<String> originalGroups = new ArrayList<String>();
+        List<String> originalGroups = new ArrayList<>();
         for (String urlGroup : groupMap.keySet()) {
             originalGroups
                     .add(urlGroupToOriginalGroup(urlGroup, configuration));
@@ -83,8 +83,8 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
      */
     public void setPlots(List<Plot> plots) {
         this.plots = plots;
-        groupMap = new HashMap<String, List<Plot>>();
-        plotsOfConfigurations = new HashMap<MatrixConfiguration, List<Plot>>();
+        groupMap = new HashMap<>();
+        plotsOfConfigurations = new HashMap<>();
     }
 
     /**
@@ -99,7 +99,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
             List<Plot> list = groupMap.get(urlGroup);
             list.add(plot);
         } else {
-            List<Plot> list = new ArrayList<Plot>();
+            List<Plot> list = new ArrayList<>();
             list.add(plot);
             groupMap.put(urlGroup, list);
         }
@@ -132,7 +132,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
      */
     public List<Plot> getPlots(String urlGroup,
             MatrixConfiguration configuration) {
-        List<Plot> groupPlots = new ArrayList<Plot>();
+        List<Plot> groupPlots = new ArrayList<>();
         List<Plot> p = groupMap.get(urlGroup);
         if (p != null) {
             for (Plot plot : p) {

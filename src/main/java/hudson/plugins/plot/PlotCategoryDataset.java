@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.AbstractDataset;
@@ -20,14 +19,10 @@ import org.jfree.data.general.AbstractDataset;
  *
  * @author Nigel Daley
  */
-public class PlotCategoryDataset extends AbstractDataset implements
-        CategoryDataset {
+public class PlotCategoryDataset extends AbstractDataset implements CategoryDataset {
     private static final long serialVersionUID = 9215482265757674967L;
 
-    private static final Logger LOGGER = Logger
-            .getLogger(PlotCategoryDataset.class.getName());
-
-    class DataElement {
+    static class DataElement {
         public final Number number;
         public final String url;
 
@@ -38,24 +33,24 @@ public class PlotCategoryDataset extends AbstractDataset implements
     }
 
     /** The row keys */
-    private List<Comparable> rowKeys;
+    private transient List<Comparable> rowKeys;
 
     /** The column keys */
-    private List<Comparable> columnKeys;
+    private transient List<Comparable> columnKeys;
 
     /** The row data */
-    private List<Map<Comparable, DataElement>> data;
+    private transient List<Map<Comparable, DataElement>> data;
 
     /** The max number of builds to plot */
-    private int maxColumns;
+    private transient int maxColumns;
 
     /**
      * Creates a new empty instance.
      */
     public PlotCategoryDataset() {
-        this.rowKeys = new ArrayList<Comparable>();
-        this.columnKeys = new ArrayList<Comparable>();
-        this.data = new ArrayList<Map<Comparable, DataElement>>();
+        this.rowKeys = new ArrayList<>();
+        this.columnKeys = new ArrayList<>();
+        this.data = new ArrayList<>();
     }
 
     /**

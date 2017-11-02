@@ -5,12 +5,17 @@
 
 package hudson.plugins.plot;
 
+import hudson.Extension;
 import hudson.FilePath;
 
+import hudson.model.AbstractDescribableImpl;
+import hudson.model.Descriptor;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.sf.json.JSONObject;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Represents a plot data series configuration.
@@ -18,7 +23,7 @@ import java.util.regex.Pattern;
  * @author Nigel Daley
  * @author Allen Reese
  */
-public abstract class Series {
+public abstract class Series extends AbstractDescribableImpl<Series> {
     private static transient final Pattern PAT_NAME = Pattern.compile("%name%");
     private static transient final Pattern PAT_INDEX = Pattern
             .compile("%index%");
@@ -40,8 +45,6 @@ public abstract class Series {
      * stapler at the moment
      */
     protected String fileType;
-
-    
 
     protected Series(String file, String label, String fileType) {
         this.file = file;
@@ -100,11 +103,9 @@ public abstract class Series {
         String resultUrl = baseUrl;
         if (resultUrl != null) {
             if (label == null) {
-                // This implmentation searches for tokens to replace. If the
-                // argument
-                // was NULL then replacing the null with an empty string should
-                // still
-                // produce the desired outcome.
+                // This implementation searches for tokens to replace.
+                // If the argument was NULL then replacing the null with an empty string
+                // should still produce the desired outcome.
                 label = "";
             }
             /*
@@ -134,5 +135,22 @@ public abstract class Series {
         }
 
         return resultUrl;
+    }
+
+    @Override
+    public Descriptor<Series> getDescriptor() {
+        return new DescriptorImpl();
+    }
+
+    @Extension
+    public static class DescriptorImpl extends Descriptor<Series> {
+        public String getDisplayName() {
+            return Messages.Plot_Series();
+        }
+
+        @Override
+        public Series newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+            return SeriesFactory.createSeries(formData, req);
+        }
     }
 }

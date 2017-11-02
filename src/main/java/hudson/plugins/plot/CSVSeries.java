@@ -5,12 +5,15 @@
 
 package hudson.plugins.plot;
 
+import hudson.Extension;
 import hudson.FilePath;
 
+import hudson.model.Descriptor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,12 +24,14 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 
+import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import au.com.bytecode.opencsv.CSVReader;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Represents a plot data series configuration from an CSV file.
@@ -72,16 +77,6 @@ public class CSVSeries extends Series {
 
     private boolean displayTableFlag;
 
-    /**
-     *
-     * @param file
-     * @param label
-     * @param req
-     *            Stapler request
-     * @param radioButtonId
-     *            ID used to find the parameters specific to this instance.
-     * @throws ServletException
-     */
     @DataBoundConstructor
     public CSVSeries(String file, String url, String inclusionFlag,
             String exclusionValues, boolean displayTableFlag) {
@@ -128,9 +123,9 @@ public class CSVSeries extends Series {
         InputStreamReader inputReader = null;
 
         try {
-            List<PlotPoint> ret = new ArrayList<PlotPoint>();
+            List<PlotPoint> ret = new ArrayList<>();
 
-            FilePath[] seriesFiles = null;
+            FilePath[] seriesFiles;
             try {
                 seriesFiles = workspaceRootDir.list(getFile());
             } catch (Exception e) {
@@ -163,7 +158,7 @@ public class CSVSeries extends Series {
                         + getFile());
 
             // load existing plot file
-            inputReader = new InputStreamReader(in);
+            inputReader = new InputStreamReader(in, Charset.defaultCharset().name());
             reader = new CSVReader(inputReader);
             String[] nextLine;
 
@@ -239,15 +234,14 @@ public class CSVSeries extends Series {
     /**
      * This function checks the exclusion/inclusion filters from the properties
      * file and returns true if a point should be excluded.
-     * 
+     *
      * @return true if the point should be excluded based on label or column
      */
     private boolean excludePoint(String label, int index) {
         if (inclusionFlag == null || inclusionFlag == InclusionFlag.OFF)
             return false;
 
-        boolean retVal = false;
-
+        boolean retVal;
         switch (inclusionFlag) {
         case INCLUDE_BY_STRING:
             // if the set contains it, don't exclude it.
@@ -268,6 +262,8 @@ public class CSVSeries extends Series {
             // if the set doesn't contain it, don't exclude it.
             retVal = colExclusionSet.contains(Integer.valueOf(index));
             break;
+        default:
+            retVal = false;
         }
 
         if (LOGGER.isLoggable(Level.FINEST))
@@ -293,13 +289,15 @@ public class CSVSeries extends Series {
         switch (inclusionFlag) {
         case INCLUDE_BY_STRING:
         case EXCLUDE_BY_STRING:
-            strExclusionSet = new HashSet<String>();
+            strExclusionSet = new HashSet<>();
             break;
 
         case INCLUDE_BY_COLUMN:
         case EXCLUDE_BY_COLUMN:
-            colExclusionSet = new HashSet<Integer>();
+            colExclusionSet = new HashSet<>();
             break;
+        default:
+            LOGGER.log(Level.SEVERE, "Failed to initialize columns exclusions set.");
         }
 
         for (String str : PAT_COMMA.split(exclusionValues)) {
@@ -321,11 +319,29 @@ public class CSVSeries extends Series {
                         LOGGER.finest(inclusionFlag + " CSV Column: " + str);
                     colExclusionSet.add(Integer.valueOf(str));
                 } catch (NumberFormatException nfe) {
-                    LOGGER.log(Level.SEVERE, "Exception converting to integer",
-                            nfe);
+                    LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
                 }
-                break;
+                    break;
+            default:
+                LOGGER.log(Level.SEVERE, "Failed to identify columns exclusions.");
             }
+        }
+    }
+
+    @Override
+    public Descriptor<Series> getDescriptor() {
+        return new DescriptorImpl();
+    }
+
+    @Extension
+    public static class DescriptorImpl extends Descriptor<Series> {
+        public String getDisplayName() {
+            return Messages.Plot_CsvSeries();
+        }
+
+        @Override
+        public Series newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+            return SeriesFactory.createSeries(formData, req);
         }
     }
 }

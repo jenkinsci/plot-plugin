@@ -16,12 +16,10 @@ import java.util.List;
  * Test a Properties file series.
  *
  * @author Allen Reese
- *
  */
 public class PropertiesSeriesTest extends SeriesTestCase {
-    private static final String[] files = { "test.properties", };
-
-    private static final String[] labels = { "testLabel", };
+    private static final String[] files = { "test.properties" };
+    private static final String[] labels = { "testLabel" };
 
     public void testPropertiesSeries() {
         // first create a FilePath to load the test Properties file.

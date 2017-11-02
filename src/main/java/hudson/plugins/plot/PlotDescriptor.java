@@ -7,28 +7,22 @@ import hudson.model.AbstractProject;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
-
-import java.io.IOException;
-
 import net.sf.json.JSONObject;
-
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+
+import java.io.IOException;
 
 /**
  * The Descriptor for the plot configuration Extension
  *
  * @author Nigel Daley
  * @author Thomas Fox
- *
  */
 @Extension
 public class PlotDescriptor extends BuildStepDescriptor<Publisher> {
 
-    /**
-     * Standard Constructor.
-     */
     public PlotDescriptor() {
         super(PlotPublisher.class);
     }
@@ -68,6 +62,10 @@ public class PlotDescriptor extends BuildStepDescriptor<Publisher> {
     public FormValidation doCheckSeriesFile(
             @AncestorInPath AbstractProject<?, ?> project,
             @QueryParameter String value) throws IOException {
+        // we don't have a workspace while in Pipeline editor
+        if (project == null || project.getRootDir() == null) {
+            return FormValidation.ok();
+        }
         return FilePath.validateFileMask(project.getSomeWorkspace(), value);
     }
 }

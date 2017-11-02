@@ -177,7 +177,8 @@ public class PlotTest {
     }
 
     private MatrixProject matrixJobArchivingBuilds(int count) throws Exception {
-        MatrixProject p = j.createMatrixProject();
+        MatrixProject p = j.createProject(MatrixProject.class);
+
         p.getBuildersList().add(new PlotBuildNumber());
         p.setBuildDiscarder(new LogRotator(-1, count, -1, -1));
 

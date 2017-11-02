@@ -4,14 +4,12 @@
  */
 package hudson.plugins.plot;
 
-import hudson.model.Action;
 import hudson.model.AbstractProject;
+import hudson.model.Action;
+import hudson.model.Job;
 import hudson.plugins.plot.Messages;
-
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
@@ -24,28 +22,33 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class PlotAction implements Action, StaplerProxy {
 
-    private static final Logger LOGGER = Logger.getLogger(PlotAction.class
-            .getName());
-    private final AbstractProject<?, ?> project;
-    private final PlotPublisher publisher;
+    private final Job<?, ?> project;
+    private PlotPublisher publisher;
 
     public PlotAction(AbstractProject<?, ?> project, PlotPublisher publisher) {
         this.project = project;
         this.publisher = publisher;
     }
 
-    public AbstractProject<?, ?> getProject() {
-        return project;
+    public PlotAction(Job<?, ?> job, List<Plot> plots){
+        this.project = job;
+        publisher = new PlotPublisher();
+        if (plots != null) {
+            publisher.setPlots(plots);
+        }
     }
 
-    public String getDisplayName() {
-        return Messages.Plot_Action_DisplayName();
-    }
-
+    @Override
     public String getIconFileName() {
         return "graph.gif";
     }
 
+    @Override
+    public String getDisplayName() {
+        return Messages.Plot_Action_DisplayName();
+    }
+
+    @Override
     public String getUrlName() {
         return Messages.Plot_UrlName();
     }
@@ -53,6 +56,16 @@ public class PlotAction implements Action, StaplerProxy {
     // called from PlotAction/index.jelly
     public boolean hasPlots() throws IOException {
         return CollectionUtils.isNotEmpty(publisher.getPlots());
+    }
+
+    @Deprecated
+    public AbstractProject<?, ?> getProject() {
+        return project instanceof AbstractProject ? (AbstractProject<?, ?>) project : null;
+    }
+
+    // called from PlotAction/index.jelly
+    public Job<?, ?> getJob() {
+        return project;
     }
 
     // called from PlotAction/index.jelly
@@ -67,7 +80,7 @@ public class PlotAction implements Action, StaplerProxy {
 
     // called from href created in PlotAction/index.jelly
     public PlotReport getDynamic(String group, StaplerRequest req,
-            StaplerResponse rsp) throws IOException {
+                                 StaplerResponse rsp) throws IOException {
         return new PlotReport(project,
                 publisher.urlGroupToOriginalGroup(getUrlGroup(group)),
                 publisher.getPlots(getUrlGroup(group)));

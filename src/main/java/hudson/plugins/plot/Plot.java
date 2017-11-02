@@ -5,41 +5,22 @@
 
 package hudson.plugins.plot;
 
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
+import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.Job;
 import hudson.model.Run;
 import hudson.util.ChartUtil;
 import hudson.util.ShiftedCategoryAxis;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Polygon;
-import java.awt.Shape;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.CategoryLabelPositions;
-import org.jfree.chart.axis.LogarithmicAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.axis.*;
 import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.DefaultDrawingSupplier;
@@ -51,14 +32,22 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
+import java.awt.*;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents the configuration for a single plot. A plot can have one or more
  * data series (lines). Each data series has one data point per build. The
  * x-axis is always the build number.
- *
+ * <p>
  * A plot has the following characteristics:
  * <ul>
  * <li>a title (mandatory)
@@ -67,7 +56,7 @@ import au.com.bytecode.opencsv.CSVWriter;
  * <li>plot group (defaults to no group)
  * <li>number of builds to show on the plot (defaults to all)
  * </ul>
- *
+ * <p>
  * A plots group effects the way in which plots are displayed. Group names are
  * listed as links on the top-level plot page. The user then clicks on a group
  * and sees the plots that belong to that group.
@@ -97,7 +86,7 @@ public class Plot implements Comparable<Plot> {
      * project is needed to retrieve and save the CSV file that is stored in the
      * project's root directory.
      */
-    private transient AbstractProject<?, ?> project;
+    private transient Job<?, ?> project;
 
     /** All plots share the same JFreeChart drawing supplier object. */
     private static final DrawingSupplier supplier = new DefaultDrawingSupplier(
@@ -106,17 +95,15 @@ public class Plot implements Comparable<Plot> {
             DefaultDrawingSupplier.DEFAULT_STROKE_SEQUENCE,
             DefaultDrawingSupplier.DEFAULT_OUTLINE_STROKE_SEQUENCE,
             // the plot data points are a small diamond shape
-            new Shape[] { new Polygon(new int[] { 3, 0, -3, 0 }, new int[] { 0,
-                    4, 0, -4 }, 4) });
+            new Shape[] {
+                    new Polygon(new int[] { 3, 0, -3, 0 }, new int[] { 0, 4, 0, -4 }, 4)
+            });
 
     /** The default plot width. */
     private static final int DEFAULT_WIDTH = 750;
 
     /** The default plot height. */
     private static final int DEFAULT_HEIGHT = 450;
-
-    /** The default number of builds on plot (all). */
-    private static final String DEFAULT_NUMBUILDS = "";
 
     // Transient values
 
@@ -194,7 +181,7 @@ public class Plot implements Comparable<Plot> {
     public String yaxisMaximum;
 
     /**
-     * Creates a new plot with the given paramenters. If numBuilds is the empty
+     * Creates a new plot with the given parameters. If numBuilds is the empty
      * string, then all builds will be included. Must not be zero.
      */
     @DataBoundConstructor
@@ -272,6 +259,15 @@ public class Plot implements Comparable<Plot> {
 
     public int compareTo(Plot o) {
         return title.compareTo(o.getTitle());
+    }
+
+    public boolean equals(Object o) {
+        return o instanceof Plot && this.compareTo((Plot) o) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.title.hashCode();
     }
 
     @Override
@@ -455,17 +451,23 @@ public class Plot implements Comparable<Plot> {
         return height;
     }
 
-    public AbstractProject<?, ?> getProject() {
+    public Job<?, ?> getJob() {
         return project;
+    }
+
+    public void setJob(Job<?, ?> job) {
+        this.project = job;
+    }
+
+    @Deprecated
+    public AbstractProject<?, ?> getProject() {
+        return (AbstractProject<?, ?>) project;
     }
 
     /**
      * A reference to the project is needed to retrieve the project's root
      * directory where the CSV file is located. Unfortunately, a reference to
      * the project is not available when this object is created.
-     *
-     * @param project
-     *            the project
      */
     public void setProject(AbstractProject<?, ?> project) {
         this.project = project;
@@ -474,10 +476,8 @@ public class Plot implements Comparable<Plot> {
     /**
      * Generates and writes the plot to the response output stream.
      *
-     * @param req
-     *            the incoming request
-     * @param rsp
-     *            the response stream
+     * @param req the incoming request
+     * @param rsp the response stream
      * @throws IOException
      */
     public void plotGraph(StaplerRequest req, StaplerResponse rsp)
@@ -505,10 +505,8 @@ public class Plot implements Comparable<Plot> {
      * Generates and writes the plot's clickable map to the response output
      * stream.
      *
-     * @param req
-     *            the incoming request
-     * @param rsp
-     *            the response stream
+     * @param req the incoming request
+     * @param rsp the response stream
      * @throws IOException
      */
     public void plotGraphMap(StaplerRequest req, StaplerResponse rsp)
@@ -535,35 +533,44 @@ public class Plot implements Comparable<Plot> {
     }
 
     /**
+     * @see #addBuild(Run, PrintStream, FilePath)
+     */
+    public void addBuild(AbstractBuild<?, ?> build, PrintStream logger) {
+        addBuild(build, logger, build.getWorkspace());
+    }
+
+    /**
      * Called when a build completes. Adds the finished build to this plot. This
      * method extracts the data for each data series from the build and saves it
      * in the plot's CSV file.
-     *
-     * @param build
-     * @param logger
      */
-    public void addBuild(AbstractBuild<?, ?> build, PrintStream logger) {
-        if (project == null)
-            project = build.getProject();
+    public void addBuild(Run<?, ?> run, PrintStream logger, FilePath workspace) {
+        if (project == null) {
+            project = run.getParent();
+        }
 
         // load the existing plot data from disk
         loadPlotData();
         // extract the data for each data series
         for (Series series : getSeries()) {
-            if (series == null)
+            if (series == null) {
                 continue;
+            }
             List<PlotPoint> seriesData = series.loadSeries(
-                    build.getWorkspace(), build.getNumber(), logger);
+                    workspace, run.getNumber(), logger);
             if (seriesData != null) {
                 for (PlotPoint point : seriesData) {
-                    if (point == null)
+                    if (point == null) {
                         continue;
+                    }
 
-                    rawPlotData.add(new String[] { point.getYvalue(),
+                    rawPlotData.add(new String[] {
+                            point.getYvalue(),
                             point.getLabel(),
-                            build.getNumber() + "", // convert to a string
-                            build.getTimestamp().getTimeInMillis() + "",
-                            point.getUrl() });
+                            run.getNumber() + "", // convert to a string
+                            run.getTimestamp().getTimeInMillis() + "",
+                            point.getUrl()
+                    });
                 }
             }
         }
@@ -575,9 +582,8 @@ public class Plot implements Comparable<Plot> {
     /**
      * Generates the plot and stores it in the plot instance variable.
      *
-     * @param forceGenerate
-     *            if true, force the plot to be re-generated even if the on-disk
-     *            data hasn't changed
+     * @param forceGenerate if true, force the plot to be re-generated even if the on-disk
+     * data hasn't changed
      */
     private void generatePlot(boolean forceGenerate) {
         class Label implements Comparable<Label> {
@@ -642,7 +648,7 @@ public class Plot implements Comparable<Plot> {
             // url
             int buildNum;
             try {
-                buildNum = Integer.valueOf(record[2]);
+                buildNum = Integer.parseInt(record[2]);
                 if (!reportBuild(buildNum) || buildNum > getRightBuildNum()) {
                     continue; // skip this record
                 }
@@ -650,9 +656,9 @@ public class Plot implements Comparable<Plot> {
                 LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
                 continue; // skip this record all together
             }
-            Number value = null;
+            Number value;
             try {
-                value = Integer.valueOf(record[0]);
+                value = Integer.parseInt(record[0]);
             } catch (NumberFormatException nfe) {
                 try {
                     value = Double.valueOf(record[0]);
@@ -667,8 +673,9 @@ public class Plot implements Comparable<Plot> {
                     descriptionForBuild(buildNum)) : new Label(record[2],
                     record[3]);
             String url = null;
-            if (record.length >= 5)
+            if (record.length >= 5) {
                 url = record[4];
+            }
             dataset.setValue(value, url, series, xlabel);
         }
 
@@ -742,9 +749,9 @@ public class Plot implements Comparable<Plot> {
             String s = getUrlStyle();
             LineAndShapeRenderer lasRenderer = (LineAndShapeRenderer) renderer;
             if ("lineSimple".equalsIgnoreCase(s)) {
-               lasRenderer.setShapesVisible(false); // TODO: deprecated, may be unnecessary
+                lasRenderer.setShapesVisible(false); // TODO: deprecated, may be unnecessary
             } else {
-               lasRenderer.setShapesVisible(true); // TODO: deprecated, may be unnecessary
+                lasRenderer.setShapesVisible(true); // TODO: deprecated, may be unnecessary
             }
         }
     }
@@ -882,7 +889,8 @@ public class Plot implements Comparable<Plot> {
         CSVReader reader = null;
         rawPlotData = new ArrayList<String[]>();
         try {
-            reader = new CSVReader(new FileReader(plotFile));
+            reader = new CSVReader(new InputStreamReader(new FileInputStream(plotFile),
+                    Charset.defaultCharset().name()));
             // throw away 2 header lines
             reader.readNext();
             reader.readNext();
@@ -913,13 +921,18 @@ public class Plot implements Comparable<Plot> {
         File plotFile = new File(project.getRootDir(), getCsvFileName());
         CSVWriter writer = null;
         try {
-            writer = new CSVWriter(new FileWriter(plotFile));
+            writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream(plotFile),
+                    Charset.defaultCharset().name()));
             // write 2 header lines
-            String[] header1 = new String[] { Messages.Plot_Title(),
-                    this.getTitle() };
-            String[] header2 = new String[] { Messages.Plot_Value(),
+            String[] header1 = new String[] {
+                    Messages.Plot_Title(),
+                    this.getTitle()
+            };
+            String[] header2 = new String[] {
+                    Messages.Plot_Value(),
                     Messages.Plot_SeriesLabel(), Messages.Plot_BuildNumber(),
-                    Messages.Plot_BuildDate(), Messages.Plot_URL() };
+                    Messages.Plot_BuildDate(), Messages.Plot_URL()
+            };
             writer.writeNext(header1);
             writer.writeNext(header2);
             // write each entry of rawPlotData to a new line in the CSV file
@@ -953,8 +966,9 @@ public class Plot implements Comparable<Plot> {
             numBuilds = Integer.MAX_VALUE;
         }
 
-        if (buildNumber < project.getNextBuildNumber() - numBuilds)
+        if (buildNumber < project.getNextBuildNumber() - numBuilds) {
             return false;
+        }
 
         return keepRecords || project.getBuildByNumber(buildNumber) != null;
     }

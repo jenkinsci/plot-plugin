@@ -4,6 +4,7 @@
  * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
  -->
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:c="chart">
   
   <d:taglib uri="chart">
@@ -41,7 +42,7 @@
   </d:taglib>
 
   <l:layout title="${it.group}">
-    <st:include it="${it.project}" page="sidepanel.jelly" />
+    <st:include it="${it.job}" page="sidepanel.jelly" optional="true" />
     <l:main-panel>
       <h1><img src="${rootURL}/images/32x32/graph.gif"/>${it.group}</h1>
       <div>
