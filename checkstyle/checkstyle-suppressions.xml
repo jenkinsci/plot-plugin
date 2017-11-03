@@ -5,4 +5,9 @@
 <suppressions>
     <suppress checks=".*" files="Messages.java"/>
     <suppress checks=".*" files="test.properties"/>
+    <suppress checks="LineLength" files=".*Test\.java"/>
+    <!-- test methods names can contain "_" character -->
+    <suppress checks="MethodNameCheck" files=".*Test\.java"/>
+    <!-- validation the @Rule must be public -->
+    <suppress checks="VisibilityModifier" files=".*Test\.java"/>
 </suppressions>

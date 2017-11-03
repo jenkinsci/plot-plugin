@@ -20,9 +20,9 @@ import org.apache.commons.io.IOUtils;
  * @author Allen Reese
  */
 public class CSVSeriesTest extends SeriesTestCase {
-    private static transient final Logger LOGGER = Logger.getLogger(CSVSeriesTest.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CSVSeriesTest.class.getName());
 
-    private static final String[] files = {"test.csv"};
+    private static final String[] FILES = {"test.csv"};
 
     public void testCSVSeriesWithNoExclusions() {
         // first create a FilePath to load the test Properties file.
@@ -36,7 +36,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         int columns = -1;
 
         try {
-            columns = getNumColumns(workspaceRootDir, files[0]);
+            columns = getNumColumns(workspaceRootDir, FILES[0]);
         } catch (IOException e) {
             assertFalse(true);
         } catch (InterruptedException e) {
@@ -44,11 +44,11 @@ public class CSVSeriesTest extends SeriesTestCase {
         }
 
         // Create a new CSV series.
-        CSVSeries series = new CSVSeries(files[0], "http://localhost:8080/%name%/%index%/", "OFF", "", false);
+        CSVSeries series = new CSVSeries(FILES[0], "http://localhost:8080/%name%/%index%/", "OFF", "", false);
 
         LOGGER.info("Created series " + series.toString());
         // test the basic subclass properties.
-        testSeries(series, files[0], "", "csv");
+        testSeries(series, FILES[0], "", "csv");
 
         // load the series.
         List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);

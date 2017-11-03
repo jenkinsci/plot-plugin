@@ -63,7 +63,7 @@ Check [checkstyle/checkstyle.xml](https://github.com/jenkinsci/plot-plugin/blob/
 
 - "hungarian" notation is banned
 - ALL_CAPS for static final fields
-- camelCase for naming
+- camelCase for naming (`_` tolerable in test names)
 
 **Imports**
 

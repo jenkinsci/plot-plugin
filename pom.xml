@@ -109,6 +109,7 @@
           <suppressionsLocation>
             checkstyle/checkstyle-suppressions.xml
           </suppressionsLocation>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
         </configuration>
       </plugin>
     </plugins>
