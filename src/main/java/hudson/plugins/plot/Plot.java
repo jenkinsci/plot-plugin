@@ -750,7 +750,8 @@ public class Plot implements Comparable<Plot> {
                     continue; // skip this record all together
                 }
             }
-            Label columnXLabel = getUrlUseDescr() ? new Label(record[2], record[3], descriptionForBuild(buildNum))
+            Label columnXLabel = getUrlUseDescr()
+                    ? new Label(record[2], record[3], descriptionForBuild(buildNum))
                     : new Label(record[2], record[3]);
             String url = null;
             if (record.length >= 5) {
