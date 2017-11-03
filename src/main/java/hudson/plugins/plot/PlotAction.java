@@ -79,7 +79,7 @@ public class PlotAction implements Action, StaplerProxy {
 
     // called from href created in PlotAction/index.jelly
     public PlotReport getDynamic(String group, StaplerRequest req,
-            StaplerResponse rsp) throws IOException {
+                                 StaplerResponse rsp) throws IOException {
         return new PlotReport(project,
                 publisher.urlGroupToOriginalGroup(getUrlGroup(group)),
                 publisher.getPlots(getUrlGroup(group)));

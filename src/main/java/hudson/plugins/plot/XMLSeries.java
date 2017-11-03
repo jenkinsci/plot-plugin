@@ -114,7 +114,7 @@ public class XMLSeries extends Series {
      * value is the node content.
      */
     private List<PlotPoint> mapNodeNameAsLabelTextContentAsValueStrategy(NodeList nodeList,
-            int buildNumber) {
+                                                                         int buildNumber) {
         List<PlotPoint> retval = new ArrayList<>();
         for (int i = 0; i < nodeList.getLength(); i++) {
             this.addNodeToList(retval, nodeList.item(i), buildNumber);
@@ -178,7 +178,7 @@ public class XMLSeries extends Series {
      */
     @Override
     public List<PlotPoint> loadSeries(FilePath workspaceRootDir, int buildNumber,
-            PrintStream logger) {
+                                      PrintStream logger) {
         InputStream in = null;
         InputSource inputSource;
 
@@ -340,7 +340,7 @@ public class XMLSeries extends Series {
      * otherwise duplicate logic due to nodeset/!nodeset
      */
     private void addValueToList(List<PlotPoint> list, String label,
-            Object nodeValue, int buildNumber) {
+                                Object nodeValue, int buildNumber) {
         String value = nodeToString(nodeValue);
 
         if (value != null) {

@@ -121,7 +121,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
      * be the URL friendly form of the group name.
      */
     public List<Plot> getPlots(String urlGroup,
-            MatrixConfiguration configuration) {
+                               MatrixConfiguration configuration) {
         List<Plot> groupPlots = new ArrayList<>();
         List<Plot> p = groupMap.get(urlGroup);
         if (p != null) {
@@ -162,7 +162,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-            BuildListener listener) throws IOException, InterruptedException {
+                           BuildListener listener) throws IOException, InterruptedException {
         if (!(build instanceof MatrixRun)) {
             return true;
         }
@@ -236,7 +236,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
          * Checks if the series file is valid.
          */
         public FormValidation doCheckSeriesFile(@AncestorInPath AbstractProject project,
-                @QueryParameter String value) throws IOException {
+                                                @QueryParameter String value) throws IOException {
             return FilePath.validateFileMask(project.getSomeWorkspace(), value);
         }
     }

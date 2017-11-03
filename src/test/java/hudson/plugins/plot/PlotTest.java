@@ -214,7 +214,7 @@ public class PlotTest {
 
         @Override
         public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-                BuildListener listener) throws InterruptedException,
+                               BuildListener listener) throws InterruptedException,
                 IOException {
             build.getWorkspace()
                     .child("src.properties")

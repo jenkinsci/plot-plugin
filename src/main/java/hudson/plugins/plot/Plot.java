@@ -315,9 +315,9 @@ public class Plot implements Comparable<Plot> {
     @SuppressWarnings("parameternumber")
     @DataBoundConstructor
     public Plot(String title, String yaxis, String group, String numBuilds,
-            String csvFileName, String style, boolean useDescr,
-            boolean keepRecords, boolean exclZero, boolean logarithmic,
-            String yaxisMinimum, String yaxisMaximum) {
+                String csvFileName, String style, boolean useDescr,
+                boolean keepRecords, boolean exclZero, boolean logarithmic,
+                String yaxisMinimum, String yaxisMaximum) {
         this.title = title;
         this.yaxis = yaxis;
         this.group = group;
@@ -337,7 +337,7 @@ public class Plot implements Comparable<Plot> {
      */
     @Deprecated
     public Plot(String title, String yaxis, String group, String numBuilds,
-            String csvFileName, String style, boolean useDescr) {
+                String csvFileName, String style, boolean useDescr) {
         this(title, yaxis, group, numBuilds, csvFileName, style, useDescr,
                 false, false, false, null, null);
     }

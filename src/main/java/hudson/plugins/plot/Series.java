@@ -80,7 +80,7 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
      * @return a PlotPoint array of points to plot
      */
     public abstract List<PlotPoint> loadSeries(FilePath workspaceRootDir,
-            int buildNumber, PrintStream logger);
+                                               int buildNumber, PrintStream logger);
 
     // Convert data from before version 1.3
     private Object readResolve() {

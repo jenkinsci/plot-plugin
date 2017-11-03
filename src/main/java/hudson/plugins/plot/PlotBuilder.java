@@ -63,10 +63,10 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     @SuppressWarnings("parameternumber")
     @DataBoundConstructor
     public PlotBuilder(String group, String title, String numBuilds, String yaxis, String style,
-            Boolean useDescr, Boolean exclZero, Boolean logarithmic, Boolean keepRecords,
-            String yaxisMinimum, String yaxisMaximum, String csvFileName,
-            List<CSVSeries> csvSeries, List<PropertiesSeries> propertiesSeries,
-            List<XMLSeries> xmlSeries) {
+                       Boolean useDescr, Boolean exclZero, Boolean logarithmic, Boolean keepRecords,
+                       String yaxisMinimum, String yaxisMaximum, String csvFileName,
+                       List<CSVSeries> csvSeries, List<PropertiesSeries> propertiesSeries,
+                       List<XMLSeries> xmlSeries) {
         this.group = group;
         this.title = title;
         this.numBuilds = numBuilds;
@@ -156,7 +156,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
 
     @Override
     public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher,
-            TaskListener listener) {
+                        TaskListener listener) {
         List<Plot> plots = new ArrayList<>();
         Plot plot = new Plot(title, yaxis, group, numBuilds, csvFileName, style,
                 false, false, false, false, yaxisMinimum, yaxisMaximum);

@@ -72,7 +72,7 @@ public class CSVSeries extends Series {
 
     @DataBoundConstructor
     public CSVSeries(String file, String url, String inclusionFlag,
-            String exclusionValues, boolean displayTableFlag) {
+                     String exclusionValues, boolean displayTableFlag) {
         super(file, "", "csv");
 
         this.url = url;
@@ -110,7 +110,7 @@ public class CSVSeries extends Series {
      */
     @Override
     public List<PlotPoint> loadSeries(FilePath workspaceRootDir,
-            int buildNumber, PrintStream logger) {
+                                      int buildNumber, PrintStream logger) {
         CSVReader reader = null;
         InputStream in = null;
         InputStreamReader inputReader = null;

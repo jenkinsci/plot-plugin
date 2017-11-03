@@ -72,3 +72,4 @@ Check [checkstyle/checkstyle.xml](https://github.com/jenkinsci/plot-plugin/blob/
 **General**
 
 - use interfaces only as types (no interface for constants)
+- method declaration parameters = `Align when multiline`
