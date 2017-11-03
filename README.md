@@ -51,7 +51,7 @@ Alternatively, other port can be specified by adding a parameter:
 ## Code style
 
 [Checkstyle](http://checkstyle.sourceforge.net/) plugin is used to validate code style.
-Check [checkstyle/checkstyle.xml](https://github.com/jenkinsci/plot-plugin/blob/master/checkstyle/checkstyle.xml) for more details
+Check [checkstyle/checkstyle.xml](https://github.com/jenkinsci/plot-plugin/blob/master/checkstyle/checkstyle.xml) for more details.
 
 ### Few important notes about the style:
 **Indentation**
