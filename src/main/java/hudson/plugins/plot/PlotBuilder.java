@@ -9,18 +9,17 @@ import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import javax.servlet.ServletException;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
-
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * Plot {@link Builder} class for pipeline.
@@ -48,7 +47,9 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     private final String yaxisMaximum;
     @SuppressWarnings("visibilitymodifier")
     public String csvFileName;
-    /** List of data series. */
+    /**
+     * List of data series.
+     */
     @SuppressWarnings("visibilitymodifier")
     public List<Series> series;
     @SuppressWarnings("visibilitymodifier")
@@ -62,10 +63,10 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     @SuppressWarnings("parameternumber")
     @DataBoundConstructor
     public PlotBuilder(String group, String title, String numBuilds, String yaxis, String style,
-                       Boolean useDescr, Boolean exclZero, Boolean logarithmic, Boolean keepRecords,
-                       String yaxisMinimum, String yaxisMaximum, String csvFileName,
-                       List<CSVSeries> csvSeries, List<PropertiesSeries> propertiesSeries,
-                       List<XMLSeries> xmlSeries) {
+            Boolean useDescr, Boolean exclZero, Boolean logarithmic, Boolean keepRecords,
+            String yaxisMinimum, String yaxisMaximum, String csvFileName,
+            List<CSVSeries> csvSeries, List<PropertiesSeries> propertiesSeries,
+            List<XMLSeries> xmlSeries) {
         this.group = group;
         this.title = title;
         this.numBuilds = numBuilds;
@@ -155,7 +156,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
 
     @Override
     public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher,
-                        TaskListener listener) {
+            TaskListener listener) {
         List<Plot> plots = new ArrayList<>();
         Plot plot = new Plot(title, yaxis, group, numBuilds, csvFileName, style,
                 false, false, false, false, yaxisMinimum, yaxisMaximum);

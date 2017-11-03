@@ -6,14 +6,22 @@
 package hudson.plugins.plot;
 
 import hudson.Launcher;
-import hudson.model.*;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.Action;
+import hudson.model.BuildListener;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
-import org.apache.commons.collections.CollectionUtils;
-
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * Records the plot data for builds.
@@ -130,7 +138,7 @@ public class PlotPublisher extends AbstractPlotPublisher {
      */
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-                           BuildListener listener) throws IOException, InterruptedException {
+            BuildListener listener) throws IOException, InterruptedException {
         recordPlotData(build, listener);
         // misconfigured plots will not fail a build so always return true
         return true;

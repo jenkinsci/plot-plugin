@@ -75,8 +75,8 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
      * Retrieves the plot data for one series after a build from the workspace.
      *
      * @param workspaceRootDir the root directory of the workspace
-     * @param buildNumber the build Number
-     * @param logger the logger to use
+     * @param buildNumber      the build Number
+     * @param logger           the logger to use
      * @return a PlotPoint array of points to plot
      */
     public abstract List<PlotPoint> loadSeries(FilePath workspaceRootDir,
@@ -90,8 +90,8 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
     /**
      * Return the url that should be used for this point.
      *
-     * @param label Name of the column
-     * @param index Index of the column
+     * @param label       Name of the column
+     * @param index       Index of the column
      * @param buildNumber The build number
      * @return url for the label.
      */

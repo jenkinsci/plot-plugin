@@ -109,10 +109,9 @@ public class XMLSeries extends Series {
     }
 
     /**
-     * @param buildNumber
-     *            the build number
-     * @returns a List of PlotPoints where the label is the element name and the
-     *          value is the node content.
+     * @param buildNumber the build number
+     * @return a List of PlotPoints where the label is the element name and the
+     * value is the node content.
      */
     private List<PlotPoint> mapNodeNameAsLabelTextContentAsValueStrategy(NodeList nodeList,
             int buildNumber) {
@@ -129,12 +128,10 @@ public class XMLSeries extends Series {
      * values share a common parent. If a node has attributes and is empty that
      * node will be re-enqueued as a parent to its attributes.
      *
-     * @param buildNumber
-     *            the build number
-     *
-     * @returns a list of PlotPoints where the label is the last non numeric
-     *          text content and the value is the last numeric text content for
-     *          each set of nodes under a given parent.
+     * @param buildNumber the build number
+     * @return a list of PlotPoints where the label is the last non numeric
+     * text content and the value is the last numeric text content for
+     * each set of nodes under a given parent.
      */
     private List<PlotPoint> coalesceTextnodesAsLabelsStrategy(NodeList nodeList, int buildNumber) {
         Map<Node, List<Node>> parentNodeMap = new HashMap<>();

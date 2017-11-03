@@ -22,7 +22,7 @@ import org.apache.commons.io.IOUtils;
 public class CSVSeriesTest extends SeriesTestCase {
     private static transient final Logger LOGGER = Logger.getLogger(CSVSeriesTest.class.getName());
 
-    private static final String[] files = { "test.csv", };
+    private static final String[] files = {"test.csv"};
 
     public void testCSVSeriesWithNoExclusions() {
         // first create a FilePath to load the test Properties file.

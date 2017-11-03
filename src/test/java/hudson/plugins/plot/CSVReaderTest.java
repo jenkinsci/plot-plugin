@@ -22,11 +22,11 @@ import org.apache.commons.io.IOUtils;
 public class CSVReaderTest extends SeriesTestCase {
     private static transient final Logger LOGGER = Logger.getLogger(CSVReaderTest.class.getName());
 
-    private static final String[] files = { "test.csv" };
+    private static final String[] files = {"test.csv"};
 
-    private static final int[] lines = { 2 };
+    private static final int[] lines = {2};
 
-    private static final int[] columns = { 8 };
+    private static final int[] columns = {8};
 
     public void testCSVReader() {
         // first create a FilePath to load the test Properties file.

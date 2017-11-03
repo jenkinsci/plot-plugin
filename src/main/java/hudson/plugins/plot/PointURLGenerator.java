@@ -20,8 +20,8 @@ public class PointURLGenerator implements CategoryURLGenerator {
      * series. If the given dataset isn't a PlotCategoryDataset, then null is
      * returned.
      *
-     * @param dataset the dataset
-     * @param series the series index (zero-based)
+     * @param dataset  the dataset
+     * @param series   the series index (zero-based)
      * @param category the category index (zero-based)
      * @return the generated URL
      */

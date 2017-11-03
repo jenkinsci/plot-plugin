@@ -119,7 +119,9 @@
         </module>
 
         <!--http://checkstyle.sourceforge.net/config_misc.html#Indentation-->
-        <module name="Indentation"/>
+        <module name="Indentation">
+            <property name="arrayInitIndent" value="8"/>
+        </module>
 
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->

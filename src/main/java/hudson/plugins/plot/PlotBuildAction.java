@@ -3,7 +3,6 @@ package hudson.plugins.plot;
 import hudson.model.Action;
 import hudson.model.InvisibleAction;
 import hudson.model.Run;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

@@ -42,8 +42,8 @@ public class PlotReport {
     private String group;
 
     public PlotReport(AbstractProject<?, ?> project, String group,
-                      List<Plot> plots) {
-        this((Job)project, group, plots);
+            List<Plot> plots) {
+        this((Job) project, group, plots);
     }
 
     public PlotReport(Job<?, ?> job, String group,

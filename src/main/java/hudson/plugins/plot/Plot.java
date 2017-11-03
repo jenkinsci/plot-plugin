@@ -39,7 +39,11 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.*;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.LogarithmicAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.DefaultDrawingSupplier;
@@ -95,68 +99,98 @@ public class Plot implements Comparable<Plot> {
      */
     private transient Job<?, ?> project;
 
-    /** All plots share the same JFreeChart drawing supplier object. */
+    /**
+     * All plots share the same JFreeChart drawing supplier object.
+     */
     private static final DrawingSupplier SUPPLIER = new DefaultDrawingSupplier(
             DefaultDrawingSupplier.DEFAULT_PAINT_SEQUENCE,
             DefaultDrawingSupplier.DEFAULT_OUTLINE_PAINT_SEQUENCE,
             DefaultDrawingSupplier.DEFAULT_STROKE_SEQUENCE,
             DefaultDrawingSupplier.DEFAULT_OUTLINE_STROKE_SEQUENCE,
             // the plot data points are a small diamond shape
-            new Shape[] {
-                new Polygon(new int[] {3, 0, -3, 0}, new int[] {0, 4, 0, -4}, 4)
+            new Shape[]{
+                    new Polygon(new int[]{3, 0, -3, 0}, new int[]{0, 4, 0, -4}, 4)
             });
 
-    /** The default plot width. */
+    /**
+     * The default plot width.
+     */
     private static final int DEFAULT_WIDTH = 750;
 
-    /** The default plot height. */
+    /**
+     * The default plot height.
+     */
     private static final int DEFAULT_HEIGHT = 450;
 
     // Transient values
 
-    /** The width of the plot. */
+    /**
+     * The width of the plot.
+     */
     private transient int width;
 
-    /** The height of the plot. */
+    /**
+     * The height of the plot.
+     */
     private transient int height;
 
-    /** The right-most build number on the plot. */
+    /**
+     * The right-most build number on the plot.
+     */
     private transient int rightBuildNum;
 
-    /** Whether or not the plot has a legend. */
+    /**
+     * Whether or not the plot has a legend.
+     */
     private transient boolean hasLegend = true;
 
-    /** Number of builds back to show on this plot from url. */
+    /**
+     * Number of builds back to show on this plot from url.
+     */
     @SuppressWarnings("visibilitymodifier")
     public transient String urlNumBuilds;
 
-    /** Title of plot from url. */
+    /**
+     * Title of plot from url.
+     */
     @SuppressWarnings("visibilitymodifier")
     public transient String urlTitle;
 
-    /** Style of plot from url. */
+    /**
+     * Style of plot from url.
+     */
     @SuppressWarnings("visibilitymodifier")
     public transient String urlStyle;
 
-    /** Use description flag from url. */
+    /**
+     * Use description flag from url.
+     */
     @SuppressWarnings("visibilitymodifier")
     public transient Boolean urlUseDescr;
 
     // Configuration values
 
-    /** Title of plot. Mandatory. */
+    /**
+     * Title of plot. Mandatory.
+     */
     @SuppressWarnings("visibilitymodifier")
     public String title;
 
-    /** Y-axis label. Optional. */
+    /**
+     * Y-axis label. Optional.
+     */
     @SuppressWarnings("visibilitymodifier")
     public String yaxis;
 
-    /** List of data series. */
+    /**
+     * List of data series.
+     */
     @SuppressWarnings("visibilitymodifier")
     public List<Series> series;
 
-    /** Group name that this plot belongs to. */
+    /**
+     * Group name that this plot belongs to.
+     */
     @SuppressWarnings("visibilitymodifier")
     public String group;
 
@@ -175,35 +209,49 @@ public class Plot implements Comparable<Plot> {
     @SuppressWarnings("visibilitymodifier")
     public String csvFileName;
 
-    /** The date of the last change to the CSV file. */
+    /**
+     * The date of the last change to the CSV file.
+     */
     private long csvLastModification;
 
-    /** Optional style of plot: line, line3d, stackedArea, stackedBar, etc. */
+    /**
+     * Optional style of plot: line, line3d, stackedArea, stackedBar, etc.
+     */
     @SuppressWarnings("visibilitymodifier")
     public String style;
 
-    /** Whether or not to use build descriptions as X-axis labels. Optional. */
+    /**
+     * Whether or not to use build descriptions as X-axis labels. Optional.
+     */
     @SuppressWarnings("visibilitymodifier")
     public boolean useDescr;
 
-    /** Keep records for builds that were deleted. */
+    /**
+     * Keep records for builds that were deleted.
+     */
     private boolean keepRecords;
 
-    /** Whether or not to exclude zero as default Y-axis value. Optional. */
+    /**
+     * Whether or not to exclude zero as default Y-axis value. Optional.
+     */
     @SuppressWarnings("visibilitymodifier")
     public boolean exclZero;
 
-    /** Use a logarithmic Y-axis. */
+    /**
+     * Use a logarithmic Y-axis.
+     */
     @SuppressWarnings("visibilitymodifier")
     public boolean logarithmic;
 
-    /** Min/max yaxis values, string used so if no value defaults used */
+    /**
+     * Min/max yaxis values, string used so if no value defaults used
+     */
     @SuppressWarnings("visibilitymodifier")
     public String yaxisMinimum;
     @SuppressWarnings("visibilitymodifier")
     public String yaxisMaximum;
 
-    class Label implements Comparable<Label> {
+    static class Label implements Comparable<Label> {
         private final Integer buildNum;
         private final String buildDate;
         private final String text;
@@ -642,7 +690,7 @@ public class Plot implements Comparable<Plot> {
                         continue;
                     }
 
-                    rawPlotData.add(new String[] {
+                    rawPlotData.add(new String[]{
                             point.getYvalue(),
                             point.getLabel(),
                             run.getNumber() + "", // convert to a string
@@ -661,7 +709,7 @@ public class Plot implements Comparable<Plot> {
      * Generates the plot and stores it in the plot instance variable.
      *
      * @param forceGenerate if true, force the plot to be re-generated even if the on-disk
-     * data hasn't changed
+     *                      data hasn't changed
      */
     private void generatePlot(boolean forceGenerate) {
         // LOGGER.info("Determining if we should generate plot " +
@@ -890,11 +938,11 @@ public class Plot implements Comparable<Plot> {
             writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream(plotFile),
                     Charset.defaultCharset().name()));
             // write 2 header lines
-            String[] header1 = new String[] {
+            String[] header1 = new String[]{
                     Messages.Plot_Title(),
                     this.getTitle()
             };
-            String[] header2 = new String[] {
+            String[] header2 = new String[]{
                     Messages.Plot_Value(),
                     Messages.Plot_SeriesLabel(), Messages.Plot_BuildNumber(),
                     Messages.Plot_BuildDate(), Messages.Plot_URL()

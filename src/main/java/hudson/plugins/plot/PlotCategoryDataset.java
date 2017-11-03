@@ -32,16 +32,24 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
         }
     }
 
-    /** The row keys */
+    /**
+     * The row keys
+     */
     private transient List<Comparable> rowKeys;
 
-    /** The column keys */
+    /**
+     * The column keys
+     */
     private transient List<Comparable> columnKeys;
 
-    /** The row data */
+    /**
+     * The row data
+     */
     private transient List<Map<Comparable, DataElement>> data;
 
-    /** The max number of builds to plot */
+    /**
+     * The max number of builds to plot
+     */
     private transient int maxColumns;
 
     /**
@@ -152,7 +160,7 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
     /**
      * Gets the value with the given row and column keys.
      *
-     * @param rowKey the row key
+     * @param rowKey    the row key
      * @param columnKey the column key
      * @return the value with the given row and column keys
      */
@@ -173,7 +181,7 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
     /**
      * Returns the URL at the given row and column.
      *
-     * @param row the row index
+     * @param row    the row index
      * @param column the column index
      * @return the URL
      */
@@ -198,9 +206,9 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
     /**
      * Adds or updates a value.
      *
-     * @param value the value to add
-     * @param url the URL to add and associate with the value
-     * @param rowKey the row key
+     * @param value     the value to add
+     * @param url       the URL to add and associate with the value
+     * @param rowKey    the row key
      * @param columnKey the column key
      */
     public void setValue(Number value, String url, Comparable rowKey, Comparable columnKey) {

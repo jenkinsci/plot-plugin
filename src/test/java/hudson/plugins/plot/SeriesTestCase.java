@@ -12,7 +12,6 @@ import org.jvnet.hudson.test.HudsonTestCase;
  * Stub to hold common series test functionality.
  *
  * @author Allen Reese
- *
  */
 public class SeriesTestCase extends HudsonTestCase {
     public void testDummy() {

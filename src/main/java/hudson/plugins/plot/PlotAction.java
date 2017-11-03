@@ -7,13 +7,12 @@ package hudson.plugins.plot;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Job;
+import java.io.IOException;
+import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Project action to display plots.
@@ -80,7 +79,7 @@ public class PlotAction implements Action, StaplerProxy {
 
     // called from href created in PlotAction/index.jelly
     public PlotReport getDynamic(String group, StaplerRequest req,
-                                 StaplerResponse rsp) throws IOException {
+            StaplerResponse rsp) throws IOException {
         return new PlotReport(project,
                 publisher.urlGroupToOriginalGroup(getUrlGroup(group)),
                 publisher.getPlots(getUrlGroup(group)));
