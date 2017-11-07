@@ -16,15 +16,15 @@
         <j:if test="${it.getDisplayTableFlag(index)}">
           <div>
           <p>
-          <table border="1">
+          <table class="stripped" style="text-align: right; border: 1px solid lightgray;border-collapse: collapse;">
           <j:forEach var="tuple" items="${it.getTable(index)}" varStatus="loopStat3">
-            <tr>
+            <tr style="border: 1px solid lightgray;">
             <j:forEach var="col" items="${tuple}">
               <j:if test="${loopStat3.index==0}">
-                <th> ${col} </th>
+                <th style="border: 1px solid lightgray;"> ${col} </th>
               </j:if>
               <j:if test="${loopStat3.index>0}">
-                <td> ${col} </td>
+                <td style="border: 1px solid lightgray;"> ${it.formatNumber(col)} </td>
               </j:if>
             </j:forEach>
             </tr>

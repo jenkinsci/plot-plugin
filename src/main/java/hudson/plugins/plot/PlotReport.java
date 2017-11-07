@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.NumberFormat;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,6 +75,11 @@ public class PlotReport {
     // called from PlotReport/index.jelly
     public List<Plot> getPlots() {
         return plots;
+    }
+
+    // called from PlotReport/index.jelly
+    public String formatNumber(String number) {
+        return NumberFormat.getIntegerInstance().format(Integer.parseInt(number));
     }
 
     // called from PlotReport/index.jelly
