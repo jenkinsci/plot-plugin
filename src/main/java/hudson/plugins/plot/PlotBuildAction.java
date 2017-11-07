@@ -3,7 +3,6 @@ package hudson.plugins.plot;
 import hudson.model.Action;
 import hudson.model.InvisibleAction;
 import hudson.model.Run;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +12,8 @@ import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.export.ExportedBean;
 
 @ExportedBean
-public class PlotBuildAction extends InvisibleAction implements StaplerProxy, SimpleBuildStep.LastBuildAction {
+public class PlotBuildAction extends InvisibleAction
+        implements StaplerProxy, SimpleBuildStep.LastBuildAction {
 
     private Run<?, ?> run;
     private List<Plot> plots;

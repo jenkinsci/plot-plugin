@@ -9,7 +9,6 @@ import hudson.model.AbstractProject;
 import hudson.model.Job;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -30,7 +29,6 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class PlotReport {
     private static final Logger LOGGER = Logger.getLogger(PlotReport.class.getName());
-
     private final Job<?, ?> project;
 
     /**
@@ -45,11 +43,11 @@ public class PlotReport {
 
     public PlotReport(AbstractProject<?, ?> project, String group,
                       List<Plot> plots) {
-        this((Job)project, group, plots);
+        this((Job) project, group, plots);
     }
 
     public PlotReport(Job<?, ?> job, String group,
-            List<Plot> plots) {
+                      List<Plot> plots) {
         Collections.sort(plots);
         this.plots = plots;
         this.group = group;
@@ -104,15 +102,14 @@ public class PlotReport {
 
         if (CollectionUtils.isNotEmpty(plot.getSeries())) {
             Series series = plot.getSeries().get(0);
-            return (series instanceof CSVSeries)
-                    && ((CSVSeries) series).getDisplayTableFlag();
+            return (series instanceof CSVSeries) && ((CSVSeries) series).getDisplayTableFlag();
         }
         return false;
     }
 
     // called from PlotReport/index.jelly
     public List<List<String>> getTable(int i) {
-        List<List<String>> tableData = new ArrayList<List<String>>();
+        List<List<String>> tableData = new ArrayList<>();
 
         Plot plot = getPlot(i);
 
@@ -129,7 +126,7 @@ public class PlotReport {
             reader.readNext();
             reader.readNext();
             // array containing header titles
-            List<String> header = new ArrayList<String>();
+            List<String> header = new ArrayList<>();
             header.add(Messages.Plot_Build() + " #");
             tableData.add(header);
             String[] nextLine;
@@ -181,13 +178,12 @@ public class PlotReport {
             }
         } catch (IOException ioe) {
             LOGGER.log(Level.SEVERE, "Exception reading csv file", ioe);
-            // ignore
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException ignore) {
-                    // ignore
+                } catch (IOException e) {
+                    LOGGER.log(Level.INFO, "Failed to close CSV reader", e);
                 }
             }
         }

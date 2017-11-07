@@ -1,29 +1,27 @@
 /*
  * Copyright (c) 2007-2009 Yahoo! Inc.  All rights reserved.
- * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+ * The copyrights to the contents of this file are licensed under the MIT License
+ * (http://www.opensource.org/licenses/mit-license.php)
  */
 package hudson.plugins.plot;
 
-import hudson.Extension;
-import hudson.FilePath;
 import hudson.Launcher;
-import hudson.Util;
-import hudson.model.*;
-import hudson.plugins.plot.Messages;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.Action;
+import hudson.model.BuildListener;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
-import hudson.tasks.Recorder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nonnull;
-import jenkins.tasks.SimpleBuildStep;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Records the plot data for builds.
@@ -32,15 +30,14 @@ import org.apache.commons.lang.StringUtils;
  */
 public class PlotPublisher extends AbstractPlotPublisher {
     /**
-     * Array of Plot objects that represent the job's configured plots; must be
-     * non-null
+     * Array of Plot objects that represent the job's configured plots; must be non-null
      */
     private List<Plot> plots = new ArrayList<>();
     /**
-     * Maps plot groups to plot objects; group strings are in a URL friendly
-     * format; map must be non-null
+     * Maps plot groups to plot objects; group strings are in a URL friendly format;
+     * map must be non-null
      */
-    transient private Map<String, List<Plot>> groupMap = new HashMap<>();
+    private transient Map<String, List<Plot>> groupMap = new HashMap<>();
 
     /**
      * Setup the groupMap upon deserialization.
@@ -51,18 +48,17 @@ public class PlotPublisher extends AbstractPlotPublisher {
     }
 
     /**
-     * Converts a URL friendly plot group name to the original group name. If
-     * the given urlGroup doesn't already exist then the empty string will be
-     * returned.
+     * Converts a URL friendly plot group name to the original group name.
+     * If the given urlGroup doesn't already exist then the empty string will be returned.
      */
     public String urlGroupToOriginalGroup(String urlGroup) {
         if (urlGroup == null || "nogroup".equals(urlGroup)) {
             return "Plots";
         }
         if (groupMap.containsKey(urlGroup)) {
-            List<Plot> plots = groupMap.get(urlGroup);
-            if (CollectionUtils.isNotEmpty(plots)) {
-                return plots.get(0).group;
+            List<Plot> plotList = groupMap.get(urlGroup);
+            if (CollectionUtils.isNotEmpty(plotList)) {
+                return plotList.get(0).group;
             }
         }
         return "";
@@ -83,8 +79,7 @@ public class PlotPublisher extends AbstractPlotPublisher {
     /**
      * Replaces the plots managed by this object with the given list.
      *
-     * @param plots
-     *            the new list of plots
+     * @param plots the new list of plots
      */
     public void setPlots(List<Plot> plots) {
         this.plots = new ArrayList<>();

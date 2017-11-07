@@ -1,14 +1,10 @@
 package hudson.plugins.plot;
 
 import hudson.FilePath;
-import hudson.plugins.plot.PlotPoint;
-import hudson.plugins.plot.XMLSeries;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -17,7 +13,6 @@ import org.junit.Ignore;
  * Test an XML series.
  *
  * @author Brian Roe
- *
  */
 public class XMLSeriesTest extends SeriesTestCase {
     private static final String TEST_XML_FILE = "test.xml";
@@ -52,7 +47,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
         assertNotNull(points);
         assertEquals(4, points.size());
-        Map<String, Double> map = new HashMap<String, Double>();
+        Map<String, Double> map = new HashMap<>();
         for (PlotPoint point : points) {
             map.put(point.getLabel(), Double.parseDouble(point.getYvalue()));
         }
@@ -64,7 +59,8 @@ public class XMLSeriesTest extends SeriesTestCase {
 
     public void testXMLSeries_WhenNodesHaveNoContent_ThenCoalesceForAttributes() {
         // Create a new XML series.
-        String xpath = "//testcase[@name='testOne'] | //testcase[@name='testTwo'] | //testcase[@name='testThree']";
+        String xpath =
+                "//testcase[@name='testOne'] | //testcase[@name='testTwo'] | //testcase[@name='testThree']";
 
         XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NODESET", null);
 
@@ -168,7 +164,8 @@ public class XMLSeriesTest extends SeriesTestCase {
 
     public void testXMLSeriesNumber() {
         // Create a new XML series.
-        String xpath = "concat(//testcase[@name='testOne']/@name, '=', //testcase[@name='testOne']/@time)";
+        String xpath =
+                "concat(//testcase[@name='testOne']/@name, '=', //testcase[@name='testOne']/@time)";
         xpath = "//testcase[@name='testOne']/@time";
         XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NUMBER",
                 "splunge");
@@ -214,5 +211,4 @@ public class XMLSeriesTest extends SeriesTestCase {
         assertNotNull(points);
         testPlotPoints(points, 1);
     }
-
 }

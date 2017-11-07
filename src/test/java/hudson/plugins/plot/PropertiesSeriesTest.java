@@ -6,9 +6,6 @@
 package hudson.plugins.plot;
 
 import hudson.FilePath;
-import hudson.plugins.plot.PlotPoint;
-import hudson.plugins.plot.PropertiesSeries;
-
 import java.io.File;
 import java.util.List;
 
@@ -18,26 +15,24 @@ import java.util.List;
  * @author Allen Reese
  */
 public class PropertiesSeriesTest extends SeriesTestCase {
-    private static final String[] files = { "test.properties" };
-    private static final String[] labels = { "testLabel" };
+    private static final String[] FILES = {"test.properties"};
+    private static final String[] LABELS = {"testLabel"};
 
     public void testPropertiesSeries() {
         // first create a FilePath to load the test Properties file.
         File workspaceDirFile = new File("target/test-classes/");
         FilePath workspaceRootDir = new FilePath(workspaceDirFile);
 
-        System.out.println("workspace path path: "
-                + workspaceDirFile.getAbsolutePath());
+        System.out.println("workspace path path: " + workspaceDirFile.getAbsolutePath());
 
         // Create a new properties series.
-        PropertiesSeries propSeries = new PropertiesSeries(files[0], labels[0]);
+        PropertiesSeries propSeries = new PropertiesSeries(FILES[0], LABELS[0]);
 
         // test the basic subclass properties.
-        testSeries(propSeries, files[0], labels[0], "properties");
+        testSeries(propSeries, FILES[0], LABELS[0], "properties");
 
         // load the series.
-        List<PlotPoint> points = propSeries.loadSeries(workspaceRootDir, 0,
-                System.err);
+        List<PlotPoint> points = propSeries.loadSeries(workspaceRootDir, 0, System.err);
         testPlotPoints(points, 1);
     }
 }

@@ -8,7 +8,7 @@ import junit.framework.TestCase;
 
 /**
  * Test a SeriesFactory verify it returns the corrected
- * 
+ *
  * @author Allen Reese
  */
 public class SeriesFactoryTest extends TestCase {

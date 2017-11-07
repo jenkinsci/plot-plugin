@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.  
- * Copyrights licensed under the MIT License.
+ * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.
+ * The copyrights to the contents of this file are licensed under the MIT License
+ * (http://www.opensource.org/licenses/mit-license.php)
  */
 package hudson.plugins.plot;
 
@@ -19,13 +20,9 @@ public class PointURLGenerator implements CategoryURLGenerator {
      * series. If the given dataset isn't a PlotCategoryDataset, then null is
      * returned.
      *
-     * @param dataset
-     *            the dataset
-     * @param series
-     *            the series index (zero-based)
-     * @param category
-     *            the category index (zero-based)
-     *
+     * @param dataset  the dataset
+     * @param series   the series index (zero-based)
+     * @param category the category index (zero-based)
      * @return the generated URL
      */
     public String generateURL(CategoryDataset dataset, int series, int category) {

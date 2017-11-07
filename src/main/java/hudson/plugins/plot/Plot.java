@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2007-2009 Yahoo! Inc.  All rights reserved.
- * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+ * The copyrights to the contents of this file are licensed under the MIT License
+ * (http://www.opensource.org/licenses/mit-license.php)
  */
-
 package hudson.plugins.plot;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -14,13 +14,36 @@ import hudson.model.Job;
 import hudson.model.Run;
 import hudson.util.ChartUtil;
 import hudson.util.ShiftedCategoryAxis;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Polygon;
+import java.awt.Shape;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.nio.charset.Charset;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.*;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.LogarithmicAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.DefaultDrawingSupplier;
@@ -31,17 +54,6 @@ import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-
-import java.awt.*;
-import java.io.*;
-import java.nio.charset.Charset;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Represents the configuration for a single plot. A plot can have one or more
@@ -65,8 +77,7 @@ import java.util.logging.Logger;
  */
 public class Plot implements Comparable<Plot> {
     private static final Logger LOGGER = Logger.getLogger(Plot.class.getName());
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
-            "MMM d");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MMM d");
 
     /**
      * Effectively a 2-dimensional array, where each row is the data for one
@@ -88,67 +99,106 @@ public class Plot implements Comparable<Plot> {
      */
     private transient Job<?, ?> project;
 
-    /** All plots share the same JFreeChart drawing supplier object. */
-    private static final DrawingSupplier supplier = new DefaultDrawingSupplier(
+    /**
+     * All plots share the same JFreeChart drawing supplier object.
+     */
+    private static final DrawingSupplier SUPPLIER = new DefaultDrawingSupplier(
             DefaultDrawingSupplier.DEFAULT_PAINT_SEQUENCE,
             DefaultDrawingSupplier.DEFAULT_OUTLINE_PAINT_SEQUENCE,
             DefaultDrawingSupplier.DEFAULT_STROKE_SEQUENCE,
             DefaultDrawingSupplier.DEFAULT_OUTLINE_STROKE_SEQUENCE,
             // the plot data points are a small diamond shape
-            new Shape[] {
-                    new Polygon(new int[] { 3, 0, -3, 0 }, new int[] { 0, 4, 0, -4 }, 4)
+            new Shape[]{
+                    new Polygon(new int[]{3, 0, -3, 0}, new int[]{0, 4, 0, -4}, 4)
             });
 
-    /** The default plot width. */
+    /**
+     * The default plot width.
+     */
     private static final int DEFAULT_WIDTH = 750;
 
-    /** The default plot height. */
+    /**
+     * The default plot height.
+     */
     private static final int DEFAULT_HEIGHT = 450;
 
     // Transient values
 
-    /** The width of the plot. */
+    /**
+     * The width of the plot.
+     */
     private transient int width;
 
-    /** The height of the plot. */
+    /**
+     * The height of the plot.
+     */
     private transient int height;
 
-    /** The right-most build number on the plot. */
+    /**
+     * The right-most build number on the plot.
+     */
     private transient int rightBuildNum;
 
-    /** Whether or not the plot has a legend. */
+    /**
+     * Whether or not the plot has a legend.
+     */
     private transient boolean hasLegend = true;
 
-    /** Number of builds back to show on this plot from url. */
+    /**
+     * Number of builds back to show on this plot from url.
+     */
+    @SuppressWarnings("visibilitymodifier")
     public transient String urlNumBuilds;
 
-    /** Title of plot from url. */
+    /**
+     * Title of plot from url.
+     */
+    @SuppressWarnings("visibilitymodifier")
     public transient String urlTitle;
 
-    /** Style of plot from url. */
+    /**
+     * Style of plot from url.
+     */
+    @SuppressWarnings("visibilitymodifier")
     public transient String urlStyle;
 
-    /** Use description flag from url. */
+    /**
+     * Use description flag from url.
+     */
+    @SuppressWarnings("visibilitymodifier")
     public transient Boolean urlUseDescr;
 
     // Configuration values
 
-    /** Title of plot. Mandatory. */
+    /**
+     * Title of plot. Mandatory.
+     */
+    @SuppressWarnings("visibilitymodifier")
     public String title;
 
-    /** Y-axis label. Optional. */
+    /**
+     * Y-axis label. Optional.
+     */
+    @SuppressWarnings("visibilitymodifier")
     public String yaxis;
 
-    /** List of data series. */
+    /**
+     * List of data series.
+     */
+    @SuppressWarnings("visibilitymodifier")
     public List<Series> series;
 
-    /** Group name that this plot belongs to. */
+    /**
+     * Group name that this plot belongs to.
+     */
+    @SuppressWarnings("visibilitymodifier")
     public String group;
 
     /**
      * Number of builds back to show on this plot. Empty string means all
      * builds. Must not be "0".
      */
+    @SuppressWarnings("visibilitymodifier")
     public String numBuilds;
 
     /**
@@ -156,39 +206,118 @@ public class Plot implements Comparable<Plot> {
      * stored in the projects root directory. This is different from the source
      * csv file that can be used as a source for the plot.
      */
+    @SuppressWarnings("visibilitymodifier")
     public String csvFileName;
 
-    /** The date of the last change to the CSV file. */
+    /**
+     * The date of the last change to the CSV file.
+     */
     private long csvLastModification;
 
-    /** Optional style of plot: line, line3d, stackedArea, stackedBar, etc. */
+    /**
+     * Optional style of plot: line, line3d, stackedArea, stackedBar, etc.
+     */
+    @SuppressWarnings("visibilitymodifier")
     public String style;
 
-    /** Whether or not to use build descriptions as X-axis labels. Optional. */
+    /**
+     * Whether or not to use build descriptions as X-axis labels. Optional.
+     */
+    @SuppressWarnings("visibilitymodifier")
     public boolean useDescr;
 
-    /** Keep records for builds that were deleted. */
+    /**
+     * Keep records for builds that were deleted.
+     */
     private boolean keepRecords;
 
-    /** Whether or not to exclude zero as default Y-axis value. Optional. */
+    /**
+     * Whether or not to exclude zero as default Y-axis value. Optional.
+     */
+    @SuppressWarnings("visibilitymodifier")
     public boolean exclZero;
 
-    /** Use a logarithmic Y-axis. */
+    /**
+     * Use a logarithmic Y-axis.
+     */
+    @SuppressWarnings("visibilitymodifier")
     public boolean logarithmic;
 
-    /** Min/max yaxis values, string used so if no value defaults used */
+    /**
+     * Min/max yaxis values, string used so if no value defaults used
+     */
+    @SuppressWarnings("visibilitymodifier")
     public String yaxisMinimum;
+    @SuppressWarnings("visibilitymodifier")
     public String yaxisMaximum;
+
+    static class Label implements Comparable<Label> {
+        private final Integer buildNum;
+        private final String buildDate;
+        private final String text;
+
+        public Label(String buildNum, String buildTime, String text) {
+            this.buildNum = Integer.parseInt(buildNum);
+            synchronized (DATE_FORMAT) {
+                this.buildDate = DATE_FORMAT.format(new Date(Long.parseLong(buildTime)));
+            }
+            this.text = text;
+        }
+
+        public Label(String buildNum, String buildTime) {
+            this(buildNum, buildTime, null);
+        }
+
+        public int compareTo(Label that) {
+            return this.buildNum - that.buildNum;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof Label && ((Label) o).buildNum.equals(buildNum);
+        }
+
+        @Override
+        public int hashCode() {
+            return buildNum.hashCode();
+        }
+
+        public String numDateString() {
+            return "#" + buildNum + " (" + buildDate + ")";
+        }
+
+        @Override
+        public String toString() {
+            return text != null ? text : numDateString();
+        }
+    }
+
+    private enum ChartStyle {
+        AREA("name"), BAR("bar"), BAR_3D("bar3d"), LINE_3D("line3d"),
+        LINE_SIMPLE("lineSimple"), STACKED_AREA("stackedarea"), STACKED_BAR("stackedbar"),
+        STACKED_BAR_3D("stackedbar3d"), WATERFALL("waterfall");
+
+        private final String name;
+
+        ChartStyle(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
 
     /**
      * Creates a new plot with the given parameters. If numBuilds is the empty
      * string, then all builds will be included. Must not be zero.
      */
+    @SuppressWarnings("parameternumber")
     @DataBoundConstructor
     public Plot(String title, String yaxis, String group, String numBuilds,
-            String csvFileName, String style, boolean useDescr,
-            boolean keepRecords, boolean exclZero, boolean logarithmic,
-            String yaxisMinimum, String yaxisMaximum) {
+                String csvFileName, String style, boolean useDescr,
+                boolean keepRecords, boolean exclZero, boolean logarithmic,
+                String yaxisMinimum, String yaxisMaximum) {
         this.title = title;
         this.yaxis = yaxis;
         this.group = group;
@@ -208,7 +337,7 @@ public class Plot implements Comparable<Plot> {
      */
     @Deprecated
     public Plot(String title, String yaxis, String group, String numBuilds,
-            String csvFileName, String style, boolean useDescr) {
+                String csvFileName, String style, boolean useDescr) {
         this(title, yaxis, group, numBuilds, csvFileName, style, useDescr,
                 false, false, false, null, null);
     }
@@ -251,7 +380,8 @@ public class Plot implements Comparable<Plot> {
             try {
                 result = Double.parseDouble(input);
             } catch (NumberFormatException nfe) {
-                // Not a problem, result already set
+                LOGGER.log(Level.INFO, "Failed to parse Double value from String."
+                        + " Not a problem, result already set", nfe);
             }
         }
         return result;
@@ -333,8 +463,7 @@ public class Plot implements Comparable<Plot> {
         if (u == null) {
             urlUseDescr = null;
         } else {
-            urlUseDescr = "on".equalsIgnoreCase(u)
-                    || "true".equalsIgnoreCase(u);
+            urlUseDescr = "on".equalsIgnoreCase(u) || "true".equalsIgnoreCase(u);
         }
     }
 
@@ -509,8 +638,7 @@ public class Plot implements Comparable<Plot> {
      * @param rsp the response stream
      * @throws IOException
      */
-    public void plotGraphMap(StaplerRequest req, StaplerResponse rsp)
-            throws IOException {
+    public void plotGraphMap(StaplerRequest req, StaplerResponse rsp) throws IOException {
         if (ChartUtil.awtProblemCause != null) {
             // not available. send out error message
             rsp.sendRedirect2(req.getContextPath() + "/images/headless.png");
@@ -528,8 +656,7 @@ public class Plot implements Comparable<Plot> {
         ChartRenderingInfo info = new ChartRenderingInfo();
         plot.createBufferedImage(getWidth(), getHeight(), info);
         rsp.setContentType("text/plain;charset=UTF-8");
-        rsp.getWriter().println(
-                ChartUtilities.getImageMap(getCsvFileName(), info));
+        rsp.getWriter().println(ChartUtilities.getImageMap(getCsvFileName(), info));
     }
 
     /**
@@ -552,19 +679,18 @@ public class Plot implements Comparable<Plot> {
         // load the existing plot data from disk
         loadPlotData();
         // extract the data for each data series
-        for (Series series : getSeries()) {
-            if (series == null) {
+        for (Series s : getSeries()) {
+            if (s == null) {
                 continue;
             }
-            List<PlotPoint> seriesData = series.loadSeries(
-                    workspace, run.getNumber(), logger);
+            List<PlotPoint> seriesData = s.loadSeries(workspace, run.getNumber(), logger);
             if (seriesData != null) {
                 for (PlotPoint point : seriesData) {
                     if (point == null) {
                         continue;
                     }
 
-                    rawPlotData.add(new String[] {
+                    rawPlotData.add(new String[]{
                             point.getYvalue(),
                             point.getLabel(),
                             run.getNumber() + "", // convert to a string
@@ -583,56 +709,13 @@ public class Plot implements Comparable<Plot> {
      * Generates the plot and stores it in the plot instance variable.
      *
      * @param forceGenerate if true, force the plot to be re-generated even if the on-disk
-     * data hasn't changed
+     *                      data hasn't changed
      */
     private void generatePlot(boolean forceGenerate) {
-        class Label implements Comparable<Label> {
-            final private Integer buildNum;
-            final private String buildDate;
-            final private String text;
-
-            public Label(String buildNum, String buildTime, String text) {
-                this.buildNum = Integer.parseInt(buildNum);
-                synchronized (DATE_FORMAT) {
-                    this.buildDate = DATE_FORMAT.format(new Date(Long
-                            .parseLong(buildTime)));
-                }
-                this.text = text;
-            }
-
-            public Label(String buildNum, String buildTime) {
-                this(buildNum, buildTime, null);
-            }
-
-            public int compareTo(Label that) {
-                return this.buildNum - that.buildNum;
-            }
-
-            @Override
-            public boolean equals(Object o) {
-                return o instanceof Label
-                        && ((Label) o).buildNum.equals(buildNum);
-            }
-
-            @Override
-            public int hashCode() {
-                return buildNum.hashCode();
-            }
-
-            public String numDateString() {
-                return "#" + buildNum + " (" + buildDate + ")";
-            }
-
-            @Override
-            public String toString() {
-                return text != null ? text : numDateString();
-            }
-        }
         // LOGGER.info("Determining if we should generate plot " +
         // getCsvFileName());
         File csvFile = new File(project.getRootDir(), getCsvFileName());
-        if (csvFile.lastModified() == csvLastModification && plot != null
-                && !forceGenerate) {
+        if (csvFile.lastModified() == csvLastModification && plot != null && !forceGenerate) {
             // data hasn't changed so don't regenerate the plot
             return;
         }
@@ -663,41 +746,40 @@ public class Plot implements Comparable<Plot> {
                 try {
                     value = Double.valueOf(record[0]);
                 } catch (NumberFormatException nfe2) {
-                    LOGGER.log(Level.SEVERE, "Exception converting to number",
-                            nfe2);
+                    LOGGER.log(Level.SEVERE, "Exception converting to number", nfe2);
                     continue; // skip this record all together
                 }
             }
-            String series = record[1];
-            Label xlabel = getUrlUseDescr() ? new Label(record[2], record[3],
-                    descriptionForBuild(buildNum)) : new Label(record[2],
-                    record[3]);
+            Label columnXLabel = getUrlUseDescr()
+                    ? new Label(record[2], record[3], descriptionForBuild(buildNum))
+                    : new Label(record[2], record[3]);
             String url = null;
             if (record.length >= 5) {
                 url = record[4];
             }
-            dataset.setValue(value, url, series, xlabel);
+            String rowSeries = record[1];
+            dataset.setValue(value, url, rowSeries, columnXLabel);
         }
 
-        String urlNumBuilds = getURLNumBuilds();
-        int numBuilds;
-        if (StringUtils.isBlank(urlNumBuilds)) {
-            numBuilds = Integer.MAX_VALUE;
+        String builds = getURLNumBuilds();
+        int buildsNumber;
+        if (StringUtils.isBlank(builds)) {
+            buildsNumber = Integer.MAX_VALUE;
         } else {
             try {
-                numBuilds = Integer.parseInt(urlNumBuilds);
+                buildsNumber = Integer.parseInt(builds);
             } catch (NumberFormatException nfe) {
                 LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
-                numBuilds = Integer.MAX_VALUE;
+                buildsNumber = Integer.MAX_VALUE;
             }
         }
 
-        dataset.clipDataset(numBuilds);
+        dataset.clipDataset(buildsNumber);
         plot = createChart(dataset);
         CategoryPlot categoryPlot = (CategoryPlot) plot.getPlot();
         categoryPlot.setDomainGridlinePaint(Color.black);
         categoryPlot.setRangeGridlinePaint(Color.black);
-        categoryPlot.setDrawingSupplier(Plot.supplier);
+        categoryPlot.setDrawingSupplier(Plot.SUPPLIER);
         CategoryAxis domainAxis = new ShiftedCategoryAxis(Messages.Plot_Build());
         categoryPlot.setDomainAxis(domainAxis);
         domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
@@ -707,11 +789,9 @@ public class Plot implements Comparable<Plot> {
         for (Object category : dataset.getColumnKeys()) {
             Label label = (Label) category;
             if (label.text != null) {
-                domainAxis
-                        .addCategoryLabelToolTip(label, label.numDateString());
+                domainAxis.addCategoryLabelToolTip(label, label.numDateString());
             } else {
-                domainAxis.addCategoryLabelToolTip(label,
-                        descriptionForBuild(label.buildNum));
+                domainAxis.addCategoryLabelToolTip(label, descriptionForBuild(label.buildNum));
             }
         }
         // Replace the range axis by a logarithmic axis if the option is
@@ -738,8 +818,7 @@ public class Plot implements Comparable<Plot> {
                 .getRenderer();
         int numColors = dataset.getRowCount();
         for (int i = 0; i < numColors; i++) {
-            renderer.setSeriesPaint(i,
-                    new Color(Color.HSBtoRGB((1f / numColors) * i, 1f, 1f)));
+            renderer.setSeriesPaint(i, new Color(Color.HSBtoRGB((1f / numColors) * i, 1f, 1f)));
         }
         renderer.setBaseStroke(new BasicStroke(2.0f));
         renderer.setBaseToolTipGenerator(new StandardCategoryToolTipGenerator(
@@ -761,102 +840,38 @@ public class Plot implements Comparable<Plot> {
      * dataset. Defaults to using createLineChart.
      */
     private JFreeChart createChart(PlotCategoryDataset dataset) {
-        String s = getUrlStyle();
-        if ("area".equalsIgnoreCase(s)) {
-            return ChartFactory.createAreaChart(getURLTitle(), /*
-                                                                * categoryAxisLabel=
-                                                                */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
+        switch (ChartStyle.valueOf(getUrlStyle())) {
+            case AREA:
+                return ChartFactory.createAreaChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case BAR:
+                return ChartFactory.createBarChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case BAR_3D:
+                return ChartFactory.createBarChart3D(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case LINE_3D:
+                return ChartFactory.createLineChart3D(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case LINE_SIMPLE:
+                return ChartFactory.createLineChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case STACKED_AREA:
+                return ChartFactory.createStackedAreaChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case STACKED_BAR:
+                return ChartFactory.createStackedBarChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case STACKED_BAR_3D:
+                return ChartFactory.createStackedBarChart3D(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case WATERFALL:
+                return ChartFactory.createWaterfallChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            default:
+                return ChartFactory.createLineChart(getURLTitle(), null,
+                        getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
         }
-        if ("bar".equalsIgnoreCase(s)) {
-            return ChartFactory.createBarChart(getURLTitle(), /*
-                                                               * categoryAxisLabel=
-                                                               */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
-        }
-        if ("bar3d".equalsIgnoreCase(s)) {
-            return ChartFactory.createBarChart3D(getURLTitle(), /*
-                                                                 * categoryAxisLabel
-                                                                 * =
-                                                                 */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
-        }
-        if ("line3d".equalsIgnoreCase(s)) {
-            return ChartFactory.createLineChart3D(getURLTitle(), /*
-                                                                  * categoryAxisLabel
-                                                                  * =
-                                                                  */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
-        }
-        if ("lineSimple".equalsIgnoreCase(s)) {
-            return ChartFactory.createLineChart(
-                    getURLTitle(), /*categoryAxisLabel=*/null, getYaxis(), dataset,
-                    PlotOrientation.VERTICAL, hasLegend(), /*tooltips=*/true, /*url=*/false);
-        }
-
-        if ("stackedarea".equalsIgnoreCase(s)) {
-            return ChartFactory.createStackedAreaChart(getURLTitle(), /*
-                                                                       * categoryAxisLabel
-                                                                       * =
-                                                                       */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
-        }
-        if ("stackedbar".equalsIgnoreCase(s)) {
-            return ChartFactory.createStackedBarChart(getURLTitle(), /*
-                                                                      * categoryAxisLabel
-                                                                      * =
-                                                                      */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
-        }
-        if ("stackedbar3d".equalsIgnoreCase(s)) {
-            return ChartFactory.createStackedBarChart3D(getURLTitle(), /*
-                                                                        * categoryAxisLabel
-                                                                        * =
-                                                                        */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
-        }
-        if ("waterfall".equalsIgnoreCase(s)) {
-            return ChartFactory.createWaterfallChart(getURLTitle(), /*
-                                                                     * categoryAxisLabel
-                                                                     * =
-                                                                     */null,
-                    getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), /*
-                                                                                 * tooltips
-                                                                                 * =
-                                                                                 */
-                    true, /* url= */false);
-        }
-        return ChartFactory.createLineChart(getURLTitle(), /* categoryAxisLabel= */
-                null, getYaxis(), dataset, PlotOrientation.VERTICAL,
-                hasLegend(), /* tooltips= */true, /* url= */false);
     }
 
     /**
@@ -880,14 +895,14 @@ public class Plot implements Comparable<Plot> {
      * instance variable.
      */
     private void loadPlotData() {
-        rawPlotData = new ArrayList<String[]>();
+        rawPlotData = new ArrayList<>();
         // load existing plot file
         File plotFile = new File(project.getRootDir(), getCsvFileName());
         if (!plotFile.exists()) {
             return;
         }
         CSVReader reader = null;
-        rawPlotData = new ArrayList<String[]>();
+        rawPlotData = new ArrayList<>();
         try {
             reader = new CSVReader(new InputStreamReader(new FileInputStream(plotFile),
                     Charset.defaultCharset().name()));
@@ -905,8 +920,8 @@ public class Plot implements Comparable<Plot> {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException ignore) {
-                    // ignore
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Failed to close plot reader", e);
                 }
             }
         }
@@ -924,11 +939,11 @@ public class Plot implements Comparable<Plot> {
             writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream(plotFile),
                     Charset.defaultCharset().name()));
             // write 2 header lines
-            String[] header1 = new String[] {
+            String[] header1 = new String[]{
                     Messages.Plot_Title(),
                     this.getTitle()
             };
-            String[] header2 = new String[] {
+            String[] header2 = new String[]{
                     Messages.Plot_Value(),
                     Messages.Plot_SeriesLabel(), Messages.Plot_BuildNumber(),
                     Messages.Plot_BuildDate(), Messages.Plot_URL()
@@ -947,8 +962,8 @@ public class Plot implements Comparable<Plot> {
             if (writer != null) {
                 try {
                     writer.close();
-                } catch (IOException ignore) {
-                    // ignore
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, "Failed to close plot reader", e);
                 }
             }
         }
@@ -958,18 +973,15 @@ public class Plot implements Comparable<Plot> {
      * @return true if the build should be part of the graph.
      */
     /* package */boolean reportBuild(int buildNumber) {
-        int numBuilds;
+        int buildsNumber;
         try {
-            numBuilds = Integer.parseInt(this.numBuilds);
+            buildsNumber = Integer.parseInt(this.numBuilds);
         } catch (NumberFormatException ex) {
             // Report all builds
-            numBuilds = Integer.MAX_VALUE;
+            buildsNumber = Integer.MAX_VALUE;
         }
 
-        if (buildNumber < project.getNextBuildNumber() - numBuilds) {
-            return false;
-        }
-
-        return keepRecords || project.getBuildByNumber(buildNumber) != null;
+        return buildNumber >= project.getNextBuildNumber() - buildsNumber
+                && (keepRecords || project.getBuildByNumber(buildNumber) != null);
     }
 }

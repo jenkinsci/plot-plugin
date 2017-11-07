@@ -5,32 +5,28 @@
 
 package hudson.plugins.plot;
 
+import au.com.bytecode.opencsv.CSVReader;
 import hudson.FilePath;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Logger;
-
 import org.apache.commons.io.IOUtils;
-
-import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * Test a CSV series.
  *
  * @author Allen Reese
- *
  */
 public class CSVReaderTest extends SeriesTestCase {
-    private static transient final Logger LOGGER = Logger.getLogger(CSVReaderTest.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CSVReaderTest.class.getName());
 
-    private static final String[] files = { "test.csv", };
+    private static final String[] FILES = {"test.csv"};
 
-    private static final int[] lines = { 2, };
+    private static final int[] LINES = {2};
 
-    private static final int[] columns = { 8, };
+    private static final int[] COLUMNS = {8};
 
     public void testCSVReader() {
         // first create a FilePath to load the test Properties file.
@@ -47,15 +43,14 @@ public class CSVReaderTest extends SeriesTestCase {
 
         FilePath[] seriesFiles;
         try {
-            seriesFiles = workspaceRootDir.list(files[0]);
+            seriesFiles = workspaceRootDir.list(FILES[0]);
 
             if (seriesFiles != null && seriesFiles.length < 1) {
-                LOGGER.info("No plot data file found: "
-                        + workspaceRootDir.getName() + " " + files[0]);
+                LOGGER.info("No plot data file found: " + workspaceRootDir.getName() + " " + FILES[0]);
                 assertFalse(true);
             }
 
-            LOGGER.info("Loading plot series data from: " + files[0]);
+            LOGGER.info("Loading plot series data from: " + FILES[0]);
 
             in = seriesFiles[0].read();
 
@@ -67,37 +62,34 @@ public class CSVReaderTest extends SeriesTestCase {
             // read each line of the CSV file and add to rawPlotData
             int lineNum = 0;
             while ((nextLine = csvreader.readNext()) != null) {
-                // for some reason csvreader returns an empty line sometimes.
-                if (nextLine.length == 1 && nextLine[0].length() == 0)
+                // for some reason csv reader returns an empty line sometimes.
+                if (nextLine.length == 1 && nextLine[0].length() == 0) {
                     break;
+                }
 
-                if (columns[0] != nextLine.length) {
+                if (COLUMNS[0] != nextLine.length) {
                     StringBuilder msg = new StringBuilder();
-                    msg.append("column count is not equal ").append(
-                            nextLine.length);
-                    msg.append(" expected ").append(columns[0])
-                            .append(" at line ");
+                    msg.append("column count is not equal ").append(nextLine.length);
+                    msg.append(" expected ").append(COLUMNS[0]).append(" at line ");
                     msg.append(lineNum).append(" line: ").append("'");
                     for (String s : nextLine) {
-                        msg.append("\"").append(s).append("\":")
-                                .append(s.length()).append(",");
+                        msg.append("\"").append(s).append("\":").append(s.length()).append(",");
                     }
                     msg.append("' length ").append(nextLine.length);
-                    assertTrue(msg.toString(), columns[0] == nextLine.length);
+                    assertTrue(msg.toString(), COLUMNS[0] == nextLine.length);
                 }
                 ++lineNum;
             }
-            assertTrue("Line count is not equal " + lineNum + " expected "
-                    + lines[0], lines[0] == lineNum);
-        } catch (IOException e) {
-            assertFalse("Exception " + e, true);
-        } catch (InterruptedException e) {
+            assertTrue("Line count is not equal " + lineNum + " expected " + LINES[0], LINES[0] == lineNum);
+        } catch (IOException | InterruptedException e) {
             assertFalse("Exception " + e, true);
         } finally {
             try {
-                if (csvreader != null)
+                if (csvreader != null) {
                     csvreader.close();
+                }
             } catch (IOException e) {
+                assertFalse("Exception " + e, true);
             }
             IOUtils.closeQuietly(inputReader);
             IOUtils.closeQuietly(in);

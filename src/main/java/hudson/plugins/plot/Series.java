@@ -1,13 +1,12 @@
 /*
  * Copyright (c) 2007-2009 Yahoo! Inc.  All rights reserved.
- * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+ * The copyrights to the contents of this file are licensed under the MIT License
+ * (http://www.opensource.org/licenses/mit-license.php)
  */
-
 package hudson.plugins.plot;
 
 import hudson.Extension;
 import hudson.FilePath;
-
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import java.io.PrintStream;
@@ -24,19 +23,20 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Allen Reese
  */
 public abstract class Series extends AbstractDescribableImpl<Series> {
-    private static transient final Pattern PAT_NAME = Pattern.compile("%name%");
-    private static transient final Pattern PAT_INDEX = Pattern
-            .compile("%index%");
+    private static final transient Pattern PAT_NAME = Pattern.compile("%name%");
+    private static final transient Pattern PAT_INDEX = Pattern.compile("%index%");
     private static final Pattern PAT_BUILD_NUMBER = Pattern.compile("%build%");
 
     /**
      * Relative path to the data series property file. Mandatory.
      */
+    @SuppressWarnings("visibilitymodifier")
     protected String file;
 
     /**
      * Data series legend label. Optional.
      */
+    @SuppressWarnings("visibilitymodifier")
     protected String label;
 
     /**
@@ -44,14 +44,16 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
      * This should be an enum, but I am not sure how to support that with
      * stapler at the moment
      */
+    @SuppressWarnings("visibilitymodifier")
     protected String fileType;
 
     protected Series(String file, String label, String fileType) {
         this.file = file;
 
         // TODO: look into this, what do we do if there is no label?
-        if (label == null)
+        if (label == null) {
             label = Messages.Plot_Missing();
+        }
 
         this.label = label;
         this.fileType = fileType;
@@ -72,16 +74,13 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
     /**
      * Retrieves the plot data for one series after a build from the workspace.
      *
-     * @param workspaceRootDir
-     *            the root directory of the workspace
-     * @param buildNumber
-     *            the build Number
-     * @param logger
-     *            the logger to use
+     * @param workspaceRootDir the root directory of the workspace
+     * @param buildNumber      the build Number
+     * @param logger           the logger to use
      * @return a PlotPoint array of points to plot
      */
     public abstract List<PlotPoint> loadSeries(FilePath workspaceRootDir,
-            int buildNumber, PrintStream logger);
+                                               int buildNumber, PrintStream logger);
 
     // Convert data from before version 1.3
     private Object readResolve() {
@@ -90,13 +89,10 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
 
     /**
      * Return the url that should be used for this point.
-     * 
-     * @param label
-     *            Name of the column
-     * @param index
-     *            Index of the column
-     * @param buildNumber
-     *            The build number
+     *
+     * @param label       Name of the column
+     * @param index       Index of the column
+     * @param buildNumber The build number
      * @return url for the label.
      */
     protected String getUrl(String baseUrl, String label, int index, int buildNumber) {

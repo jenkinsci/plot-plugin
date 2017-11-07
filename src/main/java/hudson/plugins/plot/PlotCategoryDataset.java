@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2007 Yahoo! Inc.  All rights reserved.
- * Copyrights licensed under the MIT License.
+ * The copyrights to the contents of this file are licensed under the MIT License
+ * (http://www.opensource.org/licenses/mit-license.php)
  */
 package hudson.plugins.plot;
 
@@ -8,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.AbstractDataset;
 
@@ -22,26 +22,34 @@ import org.jfree.data.general.AbstractDataset;
 public class PlotCategoryDataset extends AbstractDataset implements CategoryDataset {
     private static final long serialVersionUID = 9215482265757674967L;
 
-    static class DataElement {
-        public final Number number;
-        public final String url;
+    private static class DataElement {
+        private final Number number;
+        private final String url;
 
-        public DataElement(Number n, String u) {
+        DataElement(Number n, String u) {
             this.number = n;
             this.url = u;
         }
     }
 
-    /** The row keys */
+    /**
+     * The row keys
+     */
     private transient List<Comparable> rowKeys;
 
-    /** The column keys */
+    /**
+     * The column keys
+     */
     private transient List<Comparable> columnKeys;
 
-    /** The row data */
+    /**
+     * The row data
+     */
     private transient List<Map<Comparable, DataElement>> data;
 
-    /** The max number of builds to plot */
+    /**
+     * The max number of builds to plot
+     */
     private transient int maxColumns;
 
     /**
@@ -56,9 +64,7 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
     /**
      * Truncates the dataset to the <i>last</i> <code>maxColumns</code> columns.
      *
-     * @param maxColumns
-     *            the maximum number columns that will appear to be in the
-     *            dataset.
+     * @param maxColumns the maximum number columns that will appear to be in the dataset.
      */
     public void clipDataset(int maxColumns) {
         this.maxColumns = maxColumns;
@@ -85,21 +91,22 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
         }
     }
 
-    // Values2D interface method
+    @Override
     public int getRowCount() {
         return rowKeys.size();
     }
 
-    // Values2D interface method
+    @Override
     public int getColumnCount() {
         return Math.min(columnKeys.size(), maxColumns);
     }
 
-    // Values2D interface method
+    @Override
     public Number getValue(int row, int column) {
         // LOGGER.info("("+row+","+column+")");
-        if (data.get(row) == null)
+        if (data.get(row) == null) {
             return null;
+        }
         // make column relative to maxColumns
         int newColumn = column;
         if (columnKeys.size() > maxColumns) {
@@ -107,27 +114,28 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
         }
         Comparable columnKey = columnKeys.get(newColumn);
         DataElement element = data.get(row).get(columnKey);
-        if (element == null)
+        if (element == null) {
             return null;
+        }
         return element.number;
     }
 
-    // KeyedValues2D interface method
+    @Override
     public Comparable getRowKey(int row) {
         return rowKeys.get(row);
     }
 
-    // KeyedValues2D interface method
+    @Override
     public int getRowIndex(Comparable key) {
         return rowKeys.indexOf(key);
     }
 
-    // KeyedValues2D interface method
+    @Override
     public List getRowKeys() {
         return rowKeys;
     }
 
-    // KeyedValues2D interface method
+    @Override
     public Comparable getColumnKey(int column) {
         // make column relative to maxColumns
         int newColumn = column;
@@ -137,52 +145,51 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
         return columnKeys.get(newColumn);
     }
 
-    // KeyedValues2D interface method
+    @Override
     public int getColumnIndex(Comparable key) {
         return columnKeys.indexOf(key);
     }
 
-    // KeyedValues2D interface method
+    @Override
     public List getColumnKeys() {
         int firstIndex = Math.max(0, columnKeys.size() - maxColumns);
         int lastIndex = Math.max(0, columnKeys.size());
         return columnKeys.subList(firstIndex, lastIndex);
     }
 
-    // KeyedValues2D interface method
     /**
      * Gets the value with the given row and column keys.
      *
-     * @param rowKey
-     *            the row key
-     * @param columnKey
-     *            the column key
+     * @param rowKey    the row key
+     * @param columnKey the column key
      * @return the value with the given row and column keys
      */
+    @Override
     public Number getValue(Comparable rowKey, Comparable columnKey) {
         // LOGGER.info("("+rowKey+","+columnKey+")");
         int rowIndex = rowKeys.indexOf(rowKey);
-        if (rowIndex == -1 || data.get(rowIndex) == null)
+        if (rowIndex == -1 || data.get(rowIndex) == null) {
             return null;
+        }
         DataElement element = (DataElement) data.get(rowIndex).get(columnKey);
-        if (element == null)
+        if (element == null) {
             return null;
+        }
         return element.number;
     }
 
     /**
      * Returns the URL at the given row and column.
      *
-     * @param row
-     *            the row index
-     * @param column
-     *            the column index
+     * @param row    the row index
+     * @param column the column index
      * @return the URL
      */
     public String getUrl(int row, int column) {
         // LOGGER.info("("+row+","+column+")");
-        if (data.get(row) == null)
+        if (data.get(row) == null) {
             return null;
+        }
         // make column relative to maxColumns
         int newColumn = column;
         if (columnKeys.size() > maxColumns) {
@@ -190,25 +197,21 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
         }
         Comparable columnKey = columnKeys.get(newColumn);
         DataElement element = data.get(row).get(columnKey);
-        if (element == null)
+        if (element == null) {
             return null;
+        }
         return element.url;
     }
 
     /**
      * Adds or updates a value.
      *
-     * @param value
-     *            the value to add
-     * @param url
-     *            the URL to add and associate with the value
-     * @param rowKey
-     *            the row key
-     * @param columnKey
-     *            the column key
+     * @param value     the value to add
+     * @param url       the URL to add and associate with the value
+     * @param rowKey    the row key
+     * @param columnKey the column key
      */
-    public void setValue(Number value, String url, Comparable rowKey,
-            Comparable columnKey) {
+    public void setValue(Number value, String url, Comparable rowKey, Comparable columnKey) {
         // LOGGER.info("Data point:"+value+","+url+","+rowKey+","+columnKey);
         int rowIndex = rowKeys.indexOf(rowKey);
         if (rowIndex == -1) {
@@ -226,8 +229,9 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
                     break;
                 }
             }
-            if (!added)
+            if (!added) {
                 columnKeys.add(columnKey);
+            }
         }
         // LOGGER.info("columnKeys.size():"+columnKeys.size());
         DataElement element = new DataElement(value, url);

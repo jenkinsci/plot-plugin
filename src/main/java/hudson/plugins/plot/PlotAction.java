@@ -7,7 +7,6 @@ package hudson.plugins.plot;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Job;
-import hudson.plugins.plot.Messages;
 import java.io.IOException;
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
@@ -30,7 +29,7 @@ public class PlotAction implements Action, StaplerProxy {
         this.publisher = publisher;
     }
 
-    public PlotAction(Job<?, ?> job, List<Plot> plots){
+    public PlotAction(Job<?, ?> job, List<Plot> plots) {
         this.project = job;
         publisher = new PlotPublisher();
         if (plots != null) {

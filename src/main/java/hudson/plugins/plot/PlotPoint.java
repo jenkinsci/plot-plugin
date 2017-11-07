@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2008-2009 Yahoo! Inc.  All rights reserved.
- * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+ * The copyrights to the contents of this file are licensed under the MIT License
+ * (http://www.opensource.org/licenses/mit-license.php)
  */
-
 package hudson.plugins.plot;
 
 public class PlotPoint {
@@ -22,12 +22,13 @@ public class PlotPoint {
     private String label;
 
     /**
-	 */
+     */
     public PlotPoint(String yvalue, String url, String label) {
         this.yvalue = yvalue;
 
-        if (url == null)
+        if (url == null) {
             url = "";
+        }
 
         this.url = url;
         this.label = label;
@@ -41,8 +42,7 @@ public class PlotPoint {
     }
 
     /**
-     * @param yvalue
-     *            set the yvalue for this point.
+     * @param yvalue set the yvalue for this point.
      */
     public void setYvalue(String yvalue) {
         this.yvalue = yvalue;
@@ -56,8 +56,7 @@ public class PlotPoint {
     }
 
     /**
-     * @param url
-     *            set the url for this point.
+     * @param url set the url for this point.
      */
     public void setUrl(String url) {
         this.url = url;
@@ -71,8 +70,7 @@ public class PlotPoint {
     }
 
     /**
-     * @param label
-     *            set the label for this point.
+     * @param label set the label for this point.
      */
     public void setLabel(String label) {
         this.label = label;

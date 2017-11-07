@@ -1,13 +1,13 @@
 /*
  * Copyright (c) 2008-2009 Yahoo! Inc.  All rights reserved.
- * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
+ * The copyrights to the contents of this file are licensed under the MIT License
+ * (http://www.opensource.org/licenses/mit-license.php)
  */
 
 package hudson.plugins.plot;
 
 import hudson.Extension;
 import hudson.FilePath;
-
 import hudson.model.Descriptor;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -25,10 +24,9 @@ import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author Allen Reese
- *
  */
 public class PropertiesSeries extends Series {
-    private static transient final Logger LOGGER =
+    private static final transient Logger LOGGER =
             Logger.getLogger(PropertiesSeries.class.getName());
 
     @DataBoundConstructor
@@ -40,10 +38,10 @@ public class PropertiesSeries extends Series {
      * Load the series from a properties file.
      */
     @Override
-    public List<PlotPoint> loadSeries(FilePath workspaceRootDir,
-            int buildNumber, PrintStream logger) {
+    public List<PlotPoint> loadSeries(FilePath workspaceRootDir, int buildNumber,
+                                      PrintStream logger) {
         InputStream in = null;
-        FilePath[] seriesFiles = null;
+        FilePath[] seriesFiles;
 
         try {
             seriesFiles = workspaceRootDir.list(getFile());

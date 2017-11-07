@@ -23,26 +23,25 @@
  */
 package hudson.plugins.plot;
 
-import static org.junit.Assert.assertEquals;
 import hudson.Launcher;
 import hudson.matrix.AxisList;
 import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixProject;
 import hudson.matrix.TextAxis;
-import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
 import hudson.model.FreeStyleProject;
 import hudson.tasks.Builder;
 import hudson.tasks.LogRotator;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+
+import static org.junit.Assert.assertEquals;
 
 public class PlotTest {
 
@@ -185,33 +184,28 @@ public class PlotTest {
         return p;
     }
 
-    private void plotBuilds(AbstractProject<?, ?> p, String count,
-            boolean keepRecords) {
+    private void plotBuilds(AbstractProject<?, ?> p, String count, boolean keepRecords) {
         final PlotPublisher publisher = new PlotPublisher();
         final Plot plot = new Plot("Title", "Number", "default", count, null,
                 "line", false, keepRecords, false, false, null, null);
         p.getPublishersList().add(publisher);
         publisher.addPlot(plot);
-        plot.series = Arrays.<Series> asList(new PropertiesSeries(
-                "src.properties", null));
+        plot.series = Arrays.<Series>asList(new PropertiesSeries("src.properties", null));
     }
 
-    private void plotMatrixBuilds(AbstractProject<?, ?> p, String count,
-            boolean keepRecords) {
+    private void plotMatrixBuilds(AbstractProject<?, ?> p, String count, boolean keepRecords) {
         final MatrixPlotPublisher publisher = new MatrixPlotPublisher();
         final Plot plot = new Plot("Title", "Number", "default", count, null,
                 "line", false, keepRecords, false, false, null, null);
         p.getPublishersList().add(publisher);
         publisher.setPlots(Arrays.asList(plot));
-        plot.series = Arrays.<Series> asList(new PropertiesSeries(
-                "src.properties", null));
+        plot.series = Arrays.<Series>asList(new PropertiesSeries("src.properties", null));
     }
 
-    private void assertSampleCount(AbstractProject<?, ?> p, int count)
-            throws Exception {
-        PlotReport pr = p instanceof MatrixConfiguration ? p.getAction(
-                MatrixPlotAction.class).getDynamic("default", null, null) : p
-                .getAction(PlotAction.class).getDynamic("default", null, null);
+    private void assertSampleCount(AbstractProject<?, ?> p, int count) throws Exception {
+        PlotReport pr = p instanceof MatrixConfiguration
+                ? p.getAction(MatrixPlotAction.class).getDynamic("default")
+                : p.getAction(PlotAction.class).getDynamic("default", null, null);
         List<List<String>> table = pr.getTable(0);
         assertEquals("Plot sample count", count, table.size() - 1);
     }
@@ -220,12 +214,11 @@ public class PlotTest {
 
         @Override
         public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-                BuildListener listener) throws InterruptedException,
+                               BuildListener listener) throws InterruptedException,
                 IOException {
             build.getWorkspace()
                     .child("src.properties")
-                    .write(String.format("YVALUE=%d", build.getNumber()),
-                            "UTF-8");
+                    .write(String.format("YVALUE=%d", build.getNumber()), "UTF-8");
             return true;
         }
     }

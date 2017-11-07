@@ -5,18 +5,13 @@
 
 package hudson.plugins.plot;
 
-import hudson.plugins.plot.PlotPoint;
-import hudson.plugins.plot.Series;
-
 import java.util.List;
-
 import org.jvnet.hudson.test.HudsonTestCase;
 
 /**
  * Stub to hold common series test functionality.
  *
  * @author Allen Reese
- *
  */
 public class SeriesTestCase extends HudsonTestCase {
     public void testDummy() {
@@ -40,25 +35,20 @@ public class SeriesTestCase extends HudsonTestCase {
             StringBuilder debug = new StringBuilder();
             int i = 0;
             for (PlotPoint p : points) {
-                debug.append("[").append(i++).append("]").append(p)
-                        .append("\n");
+                debug.append("[").append(i++).append("]").append(p).append("\n");
             }
 
             assertEquals("loadSeries loaded wrong number of points: expected "
-                    + expected + ", got " + points.size() + "\n" + debug,
-                    expected, points.size());
+                    + expected + ", got " + points.size() + "\n" + debug, expected, points.size());
         }
 
         // validate each point.
         for (int i = 0; i < points.size(); i++) {
-            assertNotNull("loadSeries returned null point at index " + i,
-                    points.get(i));
+            assertNotNull("loadSeries returned null point at index " + i, points.get(i));
             assertNotNull("loadSeries returned null yvalue at index " + i,
                     points.get(i).getYvalue());
-            assertNotNull("loadSeries returned null url at index " + i, points
-                    .get(i).getUrl());
-            assertNotNull("loadSeries returned null label at index " + i,
-                    points.get(i).getLabel());
+            assertNotNull("loadSeries returned null url at index " + i, points.get(i).getUrl());
+            assertNotNull("loadSeries returned null label at index " + i, points.get(i).getLabel());
 
             // make sure the yvalue's can be parsed
             try {
