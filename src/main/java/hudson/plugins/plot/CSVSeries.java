@@ -79,14 +79,13 @@ public class CSVSeries extends Series {
 
         if (exclusionValues == null) {
             this.inclusionFlag = InclusionFlag.OFF;
-            return;
+        } else {
+            this.inclusionFlag = InclusionFlag.valueOf(inclusionFlag);
         }
-
-        this.inclusionFlag = InclusionFlag.valueOf(inclusionFlag);
         this.exclusionValues = exclusionValues;
-        this.displayTableFlag = displayTableFlag;
-
         loadExclusionSet();
+
+        this.displayTableFlag = displayTableFlag;
     }
 
     public String getInclusionFlag() {
