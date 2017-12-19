@@ -293,9 +293,16 @@ public class Plot implements Comparable<Plot> {
     }
 
     private enum ChartStyle {
-        AREA("name"), BAR("bar"), BAR_3D("bar3d"), LINE_3D("line3d"),
-        LINE_SIMPLE("lineSimple"), STACKED_AREA("stackedarea"), STACKED_BAR("stackedbar"),
-        STACKED_BAR_3D("stackedbar3d"), WATERFALL("waterfall");
+        AREA("area"),
+        BAR("bar"),
+        BAR_3D("bar3d"),
+        LINE("line"),
+        LINE_3D("line3d"),
+        LINE_SIMPLE("lineSimple"),
+        STACKED_AREA("stackedarea"),
+        STACKED_BAR("stackedbar"),
+        STACKED_BAR_3D("stackedbar3d"),
+        WATERFALL("waterfall");
 
         private final String name;
 
@@ -303,8 +310,13 @@ public class Plot implements Comparable<Plot> {
             this.name = name;
         }
 
-        public String getName() {
-            return name;
+        static ChartStyle forName(String name) {
+            for (ChartStyle chartStyle : ChartStyle.values()) {
+                if (name.equals(chartStyle.name)) {
+                    return chartStyle;
+                }
+            }
+            return ChartStyle.LINE_SIMPLE;
         }
     }
 
@@ -840,7 +852,7 @@ public class Plot implements Comparable<Plot> {
      * dataset. Defaults to using createLineChart.
      */
     private JFreeChart createChart(PlotCategoryDataset dataset) {
-        switch (ChartStyle.valueOf(getUrlStyle())) {
+        switch (ChartStyle.forName(getUrlStyle())) {
             case AREA:
                 return ChartFactory.createAreaChart(getURLTitle(), null,
                         getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
@@ -868,6 +880,7 @@ public class Plot implements Comparable<Plot> {
             case WATERFALL:
                 return ChartFactory.createWaterfallChart(getURLTitle(), null,
                         getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case LINE:
             default:
                 return ChartFactory.createLineChart(getURLTitle(), null,
                         getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
