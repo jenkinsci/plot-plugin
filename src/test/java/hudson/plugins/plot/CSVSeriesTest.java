@@ -24,6 +24,11 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     private static final String[] FILES = {"test.csv"};
 
+    public void testCSVSeriesWithNullExclusionValuesSetsDisplayTableFlag() {
+        CSVSeries series = new CSVSeries(FILES[0], null, null, null, true);
+        assertTrue(series.getDisplayTableFlag());
+    }
+
     public void testCSVSeriesWithNoExclusions() {
         // first create a FilePath to load the test Properties file.
         File workspaceDirFile = new File("target/test-classes/");
