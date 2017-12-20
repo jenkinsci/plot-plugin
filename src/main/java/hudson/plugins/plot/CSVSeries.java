@@ -76,16 +76,15 @@ public class CSVSeries extends Series {
         super(file, "", "csv");
 
         this.url = url;
+        this.displayTableFlag = displayTableFlag;
 
         if (exclusionValues == null) {
             this.inclusionFlag = InclusionFlag.OFF;
         } else {
             this.inclusionFlag = InclusionFlag.valueOf(inclusionFlag);
+            this.exclusionValues = exclusionValues;
+            loadExclusionSet();
         }
-        this.exclusionValues = exclusionValues;
-        loadExclusionSet();
-
-        this.displayTableFlag = displayTableFlag;
     }
 
     public String getInclusionFlag() {
