@@ -6,32 +6,5 @@
  -->
 <?jelly escape-by-default='true'?>
 <div>
-  <p>This plugin provides generic plotting (or graphing) capability. Documentation on how to use this plugin with the Jenkins Job Builder is available <a href="http://docs.openstack.org/infra/jenkins-job-builder/publishers.html#publishers.plot">here</a>. There are various supported parameters at this time. For a full list of parameters the best place to view them is <a href="https://github.com/jenkinsci/plot-plugin/blob/master/src/main/java/hudson/plugins/plot/Plot.java">here</a>.</p>
-  <p>The currently supported parameters are:</p>
-  <p>
-    <ul>
-      <li>width (int, default: 750): The width of the plot in pixels.</li>
-      <li>height (int, default: 450): The height of the plot in pixels.</li>
-      <li>rightBuildNum (int, default: 2^38 - 1): The right-most build number on the plot.</li>
-      <li>hasLegend (boolean, default: true): Whether or not the plot has a legend.</li>
-      <li>urlNumBuilds (string, default: 2^38 - 1): Number of builds back to show on this plot from url.</li>
-      <li>urlTitle (string, default: ""): Title of plot from url.</li>
-      <li>urlStyle (string, default: ""): Style of plot from url.</li>
-      <li>urlUseDescr (boolean, default: false): Use description flag from url.</li>
-      <li>title (string, default: ""): Title of plot.</li>
-      <li>yaxis (string, default: ""): Y-axis label.</li>
-      <li>series (list): List of data series.</li>
-      <li>group (string): Group name that this plot belongs to.</li>
-      <li>numBuilds (string, default: ""): Number of builds back to show on this plot. Empty string means all builds. Must not be "0".</li>
-      <li>csvFileName (string, default: "$ROOT_DIR/plot-XXXX.csv"): The name of the CSV file that persists the plots data. The CSV file is stored in the projects root directory. This is different from the source csv file that can be used as a source for the plot.</li>
-      <li>csvLastModification (long, default: "last modified date"): The date of the last change to the CSV file.</li>
-      <li>style (string, default: "line"): Style of plot: line, line3d, stackedArea, stackedBar, etc.</li>
-      <li>useDescr (boolean, default: false): Whether or not to use build descriptions as X-axis labels.</li>
-      <li>keepRecords (boolean, default: false): Keep records for builds that were deleted.</li>
-      <li>exclZero (boolean, default: false): Whether or not to exclude zero as default Y-axis value.</li>
-      <li>logarithmic (boolean, default: false): Use a logarithmic Y-axis.</li>
-      <li>yaxisMinimum (string, default: ""): Minimum y-axis value.</li>
-      <li>yaxisMaximum (string, default: ""): Maximum y-axis value.</li>
-    </ul>
-  </p>
+  <p>This plugin provides generic plotting (or graphing) capability.</p>
 </div>
