@@ -3,10 +3,10 @@ package hudson.plugins.plot;
 import hudson.model.Action;
 import hudson.model.InvisibleAction;
 import hudson.model.Run;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import jenkins.tasks.SimpleBuildStep;
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.export.ExportedBean;
@@ -20,11 +20,11 @@ public class PlotBuildAction extends InvisibleAction
 
     PlotBuildAction(Run<?, ?> run, List<Plot> plots) {
         this.run = run;
-        this.plots = plots;
+        this.plots = new CopyOnWriteArrayList<>(plots);
     }
 
     @Override
-    public synchronized Collection<? extends Action> getProjectActions() {
+    public Collection<? extends Action> getProjectActions() {
         return Collections.<Action>singleton(new PlotAction(run.getParent(), plots));
     }
 
@@ -33,9 +33,9 @@ public class PlotBuildAction extends InvisibleAction
         return null;
     }
 
-    synchronized void addPlots(List<Plot> plots) {
+    void addPlots(List<Plot> plots) {
         if (this.plots == null) {
-            this.plots = new ArrayList<>();
+            this.plots = new CopyOnWriteArrayList<>();
         }
         this.plots.addAll(plots);
     }
