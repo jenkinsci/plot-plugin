@@ -5,6 +5,8 @@
 <suppressions>
     <suppress checks=".*" files="Messages.java"/>
     <suppress checks=".*" files="test.properties"/>
+    <!-- no check for automatically generated InjectedTest -->
+    <suppress checks=".*" files="InjectedTest.java"/>
     <suppress checks="LineLength" files=".*Test\.java"/>
     <!-- test methods names can contain "_" character -->
     <suppress checks="MethodNameCheck" files=".*Test\.java"/>
