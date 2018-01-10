@@ -159,7 +159,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
                         TaskListener listener) {
         List<Plot> plots = new ArrayList<>();
         Plot plot = new Plot(title, yaxis, group, numBuilds, csvFileName, style,
-                false, false, false, false, yaxisMinimum, yaxisMaximum);
+                useDescr, keepRecords, exclZero, logarithmic, yaxisMinimum, yaxisMaximum);
         plot.series = series;
         plot.addBuild(build, listener.getLogger(), workspace);
         plots.add(plot);
