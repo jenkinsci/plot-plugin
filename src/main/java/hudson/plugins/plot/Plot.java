@@ -756,7 +756,7 @@ public class Plot implements Comparable<Plot> {
                 value = Integer.parseInt(record[0]);
             } catch (NumberFormatException nfe) {
                 try {
-                    value = Double.valueOf(record[0]);
+                    value = Double.parseDouble(record[0]);
                 } catch (NumberFormatException nfe2) {
                     LOGGER.log(Level.SEVERE, "Exception converting to number", nfe2);
                     continue; // skip this record all together
