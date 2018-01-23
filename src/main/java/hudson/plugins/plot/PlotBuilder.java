@@ -39,10 +39,10 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     private final String numBuilds;
     private final String yaxis;
     private final String style;
-    private final Boolean useDescr;
-    private final Boolean exclZero;
-    private final Boolean logarithmic;
-    private final Boolean keepRecords;
+    private final boolean useDescr;
+    private final boolean exclZero;
+    private final boolean logarithmic;
+    private final boolean keepRecords;
     private final String yaxisMinimum;
     private final String yaxisMaximum;
     @SuppressWarnings("visibilitymodifier")
@@ -63,7 +63,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     @SuppressWarnings("parameternumber")
     @DataBoundConstructor
     public PlotBuilder(String group, String title, String numBuilds, String yaxis, String style,
-                       Boolean useDescr, Boolean exclZero, Boolean logarithmic, Boolean keepRecords,
+                       boolean useDescr, boolean exclZero, boolean logarithmic, boolean keepRecords,
                        String yaxisMinimum, String yaxisMaximum, String csvFileName,
                        List<CSVSeries> csvSeries, List<PropertiesSeries> propertiesSeries,
                        List<XMLSeries> xmlSeries) {
@@ -114,19 +114,19 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         return style;
     }
 
-    public Boolean getUseDescr() {
+    public boolean getUseDescr() {
         return useDescr;
     }
 
-    public Boolean getExclZero() {
+    public boolean getExclZero() {
         return exclZero;
     }
 
-    public Boolean getLogarithmic() {
+    public boolean getLogarithmic() {
         return logarithmic;
     }
 
-    public Boolean getKeepRecords() {
+    public boolean getKeepRecords() {
         return keepRecords;
     }
 
@@ -159,10 +159,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
                         TaskListener listener) {
         List<Plot> plots = new ArrayList<>();
         Plot plot = new Plot(title, yaxis, group, numBuilds, csvFileName, style,
-                useDescr != null && useDescr,
-                keepRecords != null && keepRecords,
-                exclZero != null && exclZero,
-                logarithmic != null && logarithmic,
+                useDescr, keepRecords, exclZero, logarithmic,
                 yaxisMinimum, yaxisMaximum);
         plot.series = series;
         plot.addBuild(build, listener.getLogger(), workspace);
