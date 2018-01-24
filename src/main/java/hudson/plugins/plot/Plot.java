@@ -810,7 +810,6 @@ public class Plot implements Comparable<Plot> {
         // selected
         if (isLogarithmic()) {
             LogarithmicAxis logAxis = new LogarithmicAxis(getYaxis());
-            logAxis.setExpTickLabelsFlag(true);
             categoryPlot.setRangeAxis(logAxis);
         }
 
