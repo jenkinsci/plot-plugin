@@ -170,7 +170,7 @@ public class CSVSeries extends Series {
                         continue;
                     }
 
-                    yvalue = nextLine[index];
+                    yvalue = nextLine[index].trim();
 
                     // empty value, caused by e.g. trailing comma in CSV
                     if (yvalue.trim().length() == 0) {
@@ -178,7 +178,7 @@ public class CSVSeries extends Series {
                     }
 
                     if (index < headerLine.length) {
-                        label = headerLine[index];
+                        label = headerLine[index].trim();
                     }
 
                     if (label == null || label.length() <= 0) {
