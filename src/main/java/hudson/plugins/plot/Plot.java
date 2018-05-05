@@ -299,9 +299,9 @@ public class Plot implements Comparable<Plot> {
         LINE("line"),
         LINE_3D("line3d"),
         LINE_SIMPLE("lineSimple"),
-        STACKED_AREA("stackedarea"),
-        STACKED_BAR("stackedbar"),
-        STACKED_BAR_3D("stackedbar3d"),
+        STACKED_AREA("stackedArea"),
+        STACKED_BAR("stackedBar"),
+        STACKED_BAR_3D("stackedBar3d"),
         WATERFALL("waterfall");
 
         private final String name;
@@ -312,7 +312,7 @@ public class Plot implements Comparable<Plot> {
 
         static ChartStyle forName(String name) {
             for (ChartStyle chartStyle : ChartStyle.values()) {
-                if (name.equals(chartStyle.name)) {
+                if (name.equalsIgnoreCase(chartStyle.name)) {
                     return chartStyle;
                 }
             }

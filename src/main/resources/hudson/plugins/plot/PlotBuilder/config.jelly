@@ -39,8 +39,8 @@
                     <f:option value="lineSimple" selected="${plot.style=='lineSimple'}">${%Line simple}</f:option>
                     <f:option value="line3d" selected="${plot.style=='line3d'}">${%Line 3D}</f:option>
                     <f:option value="stackedArea" selected="${plot.style=='stackedArea'}">${%Stacked Area}</f:option>
-                    <f:option value="stackedbar" selected="${plot.style=='stackedbar'}">${%Stacked Bar}</f:option>
-                    <f:option value="stackedbar3d" selected="${plot.style=='stackedbar3d'}">${%Stacked Bar 3D}
+                    <f:option value="stackedBar" selected="${plot.style=='stackedBar'}">${%Stacked Bar}</f:option>
+                    <f:option value="stackedBar3d" selected="${plot.style=='stackedBar3d'}">${%Stacked Bar 3D}
                     </f:option>
                     <f:option value="waterfall" selected="${plot.style=='waterfall'}">${%Waterfall}</f:option>
                 </select>
