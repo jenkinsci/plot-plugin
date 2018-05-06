@@ -24,7 +24,7 @@
                 <th> ${col} </th>
               </j:if>
               <j:if test="${loopStat3.index>0}">
-                <td> ${col} </td>
+                <td> <j:out value="${col}"/> </td>
               </j:if>
             </j:forEach>
             </tr>
