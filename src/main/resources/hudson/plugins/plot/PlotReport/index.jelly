@@ -9,6 +9,23 @@
   
   <d:taglib uri="chart">
     <d:tag name="chart">
+      <style>
+      table.valuesTable {
+        text-align: right; border: 2px solid gray; border-collapse: collapse;
+      }
+      table.valuesTable tr {
+        border: 1px solid lightgray;
+      }
+      table.valuesTable th {
+        border: 1px solid gray;
+        background-color: #eee;
+        padding:.2em;
+      }
+      table.valuesTable td {
+        border: 1px solid lightgray;
+        padding:.2em;
+      }
+      </style>
       <div id="${id}" style="margin-top: 2em">
         <div align="right" style="width:750px">
           <a href="#top"><img src="${rootURL}/images/24x24/up.gif"/>${%top}</a>
@@ -16,7 +33,7 @@
         <j:if test="${it.getDisplayTableFlag(index)}">
           <div>
           <p>
-          <table border="1">
+          <table class="valuesTable">
           <j:forEach var="tuple" items="${it.getTable(index)}" varStatus="loopStat3">
             <tr>
             <j:forEach var="col" items="${tuple}">
@@ -24,7 +41,7 @@
                 <th> ${col} </th>
               </j:if>
               <j:if test="${loopStat3.index>0}">
-                <td> ${col} </td>
+                <td> ${it.formatNumber(col)} </td>
               </j:if>
             </j:forEach>
             </tr>
