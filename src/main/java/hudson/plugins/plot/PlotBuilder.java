@@ -3,6 +3,7 @@ package hudson.plugins.plot;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -13,11 +14,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.CheckForNull;
 import javax.servlet.ServletException;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -34,24 +37,32 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class PlotBuilder extends Builder implements SimpleBuildStep {
 
+    // Required fields
     private final String group;
-    private final String title;
-    private final String numBuilds;
-    private final String yaxis;
     private final String style;
-    private final boolean useDescr;
-    private final boolean exclZero;
-    private final boolean logarithmic;
-    private final boolean keepRecords;
-    private final String yaxisMinimum;
-    private final String yaxisMaximum;
+
+    // Optional fields
+    @CheckForNull
+    private String title;
+    @CheckForNull
+    private String numBuilds;
+    @CheckForNull
+    private String yaxis;
+    @CheckForNull
+    private String yaxisMinimum;
+    @CheckForNull
+    private String yaxisMaximum;
+    private boolean useDescr;
+    private boolean exclZero;
+    private boolean logarithmic;
+    private boolean keepRecords;
+
+    // Generated?
     @SuppressWarnings("visibilitymodifier")
     public String csvFileName;
     /**
      * List of data series.
      */
-    @SuppressWarnings("visibilitymodifier")
-    public List<Series> series;
     @SuppressWarnings("visibilitymodifier")
     public List<CSVSeries> csvSeries;
     @SuppressWarnings("visibilitymodifier")
@@ -60,98 +71,133 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     public List<XMLSeries> xmlSeries;
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
-    @SuppressWarnings("parameternumber")
+    // Similarly, any optional @DataBoundSetter properties must match
     @DataBoundConstructor
-    public PlotBuilder(String group, String title, String numBuilds, String yaxis, String style,
-                       boolean useDescr, boolean exclZero, boolean logarithmic, boolean keepRecords,
-                       String yaxisMinimum, String yaxisMaximum, String csvFileName,
-                       List<CSVSeries> csvSeries, List<PropertiesSeries> propertiesSeries,
-                       List<XMLSeries> xmlSeries) {
+    public PlotBuilder(String group, String style, String csvFileName) {
         this.group = group;
-        this.title = title;
-        this.numBuilds = numBuilds;
-        this.yaxis = yaxis;
         this.style = style;
-        this.useDescr = useDescr;
-        this.exclZero = exclZero;
-        this.logarithmic = logarithmic;
-        this.keepRecords = keepRecords;
-        this.yaxisMinimum = yaxisMinimum;
-        this.yaxisMaximum = yaxisMaximum;
         this.csvFileName = csvFileName;
-        this.csvSeries = csvSeries;
-        this.propertiesSeries = propertiesSeries;
-        this.xmlSeries = xmlSeries;
-        this.series = new ArrayList<>();
-        if (csvSeries != null) {
-            this.series.addAll(csvSeries);
-        }
-        if (xmlSeries != null) {
-            this.series.addAll(xmlSeries);
-        }
-        if (propertiesSeries != null) {
-            this.series.addAll(propertiesSeries);
-        }
     }
 
     public String getGroup() {
         return group;
     }
 
+    public String getStyle() {
+        return style;
+    }
+
+    @CheckForNull
     public String getTitle() {
         return title;
     }
 
+    @DataBoundSetter
+    public final void setTitle(@CheckForNull String title) {
+        this.title = Util.fixEmptyAndTrim(title);
+    }
+
+    @CheckForNull
     public String getNumBuilds() {
         return numBuilds;
     }
 
+    @DataBoundSetter
+    public final void setNumBuilds(@CheckForNull String numBuilds) {
+        this.numBuilds = Util.fixEmptyAndTrim(numBuilds);
+    }
+
+    @CheckForNull
     public String getYaxis() {
         return yaxis;
     }
 
-    public String getStyle() {
-        return style;
+    @DataBoundSetter
+    public final void setYaxis(@CheckForNull String yaxis) {
+        this.yaxis = Util.fixEmptyAndTrim(yaxis);
     }
 
     public boolean getUseDescr() {
         return useDescr;
     }
 
+    @DataBoundSetter
+    public void setUseDescr(boolean useDescr) {
+        this.useDescr = useDescr;
+    }
+
     public boolean getExclZero() {
         return exclZero;
+    }
+
+    @DataBoundSetter
+    public void setExclZero(boolean exclZero) {
+        this.exclZero = exclZero;
     }
 
     public boolean getLogarithmic() {
         return logarithmic;
     }
 
+    @DataBoundSetter
+    public void setLogarithmic(boolean logarithmic) {
+        this.logarithmic = logarithmic;
+    }
+
     public boolean getKeepRecords() {
         return keepRecords;
     }
 
+    @DataBoundSetter
+    public void setKeepRecords(boolean keepRecords) {
+        this.keepRecords = keepRecords;
+    }
+
+    @CheckForNull
     public String getYaxisMinimum() {
         return yaxisMinimum;
     }
 
+    @DataBoundSetter
+    public final void setYaxisMinimum(@CheckForNull String yaxisMinimum) {
+        this.yaxisMinimum = Util.fixEmptyAndTrim(yaxisMinimum);
+    }
+
+    @CheckForNull
     public String getYaxisMaximum() {
         return yaxisMaximum;
     }
 
-    public List<Series> getSeries() {
-        return series;
+    @DataBoundSetter
+    public final void setYaxisMaximum(@CheckForNull String yaxisMaximum) {
+        this.yaxisMaximum = Util.fixEmptyAndTrim(yaxisMaximum);
     }
 
     public List<CSVSeries> getCsvSeries() {
         return csvSeries;
     }
 
+    @DataBoundSetter
+    public void setCsvSeries(List<CSVSeries> csvSeries) {
+        this.csvSeries = csvSeries;
+    }
+
     public List<PropertiesSeries> getPropertiesSeries() {
         return propertiesSeries;
     }
 
+    @DataBoundSetter
+    public void setPropertiesSeries(List<PropertiesSeries> propertiesSeries) {
+        this.propertiesSeries = propertiesSeries;
+    }
+
     public List<XMLSeries> getXmlSeries() {
         return xmlSeries;
+    }
+
+    @DataBoundSetter
+    public void setXmlSeries(List<XMLSeries> xmlSeries) {
+        this.xmlSeries = xmlSeries;
     }
 
     @Override
@@ -161,6 +207,18 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         Plot plot = new Plot(title, yaxis, group, numBuilds, csvFileName, style,
                 useDescr, keepRecords, exclZero, logarithmic,
                 yaxisMinimum, yaxisMaximum);
+
+        List<Series> series = new ArrayList<>();
+        if (csvSeries != null) {
+            series.addAll(csvSeries);
+        }
+        if (xmlSeries != null) {
+            series.addAll(xmlSeries);
+        }
+        if (propertiesSeries != null) {
+            series.addAll(propertiesSeries);
+        }
+
         plot.series = series;
         plot.addBuild(build, listener.getLogger(), workspace);
         plots.add(plot);
