@@ -1,9 +1,11 @@
-buildPlugin(platforms: ['linux'])
+def platform = 'linux'
 
-node {
-    stage("Upload coverage") {
-        // no need to execute tests as they were executed already
-        infra.runWithMaven("mvn -P enable-jacoco jacoco:prepare-agent jacoco:report")
+buildPlugin(platforms: [platform])
+
+node(platform) {
+    stage("Calculate & upload coverage") {
+        infra.checkout(params.containsKey('repo') ? params.repo : null)
+        infra.runWithMaven("mvn -P enable-jacoco test jacoco:prepare-agent jacoco:report")
         sh "curl -s https://codecov.io/bash | bash -s - -K"
     }
 }
