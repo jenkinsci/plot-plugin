@@ -1,6 +1,8 @@
-buildPlugin(platforms: ['linux'])
+def platform = 'linux'
 
-node {
+buildPlugin(platforms: [platform])
+
+node(platform) {
     stage("Upload coverage") {
         infra.checkout(params.containsKey('repo') ? params.repo : null)
         infra.runWithMaven("mvn -P enable-jacoco test jacoco:prepare-agent jacoco:report")
