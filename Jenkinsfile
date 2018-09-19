@@ -1,6 +1,6 @@
 def platform = 'linux'
 
-buildPlugin(platforms: [platform])
+buildPlugin(platforms: [platform], tests: [skip: true])
 
 node(platform) {
     stage("Calculate & upload coverage") {
