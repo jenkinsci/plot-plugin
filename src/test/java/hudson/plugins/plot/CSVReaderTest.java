@@ -49,9 +49,8 @@ public class CSVReaderTest extends SeriesTestCase {
                 seriesFiles = workspaceRootDir.list(FILES[index]);
 
                 if (seriesFiles != null && seriesFiles.length < 1) {
-                    LOGGER.info("No plot data file found: "
+                    fail("No plot data file found: "
                             + workspaceRootDir.getName() + " " + FILES[index]);
-                    assertFalse(true);
                 }
 
                 LOGGER.info("Loading plot series data from: " + FILES[index]);
@@ -80,20 +79,21 @@ public class CSVReaderTest extends SeriesTestCase {
                             msg.append("\"").append(s).append("\":").append(s.length()).append(",");
                         }
                         msg.append("' length ").append(nextLine.length);
-                        assertTrue(msg.toString(), COLUMNS[index] == nextLine.length);
+                        assertEquals(msg.toString(), COLUMNS[index], nextLine.length);
                     }
                     ++lineNum;
                 }
-                assertTrue("Line count is not equal " + lineNum + " expected " + LINES[index], LINES[index] == lineNum);
+                assertEquals("Line count is not equal " + lineNum + " expected " + LINES[index],
+                        LINES[index], lineNum);
             } catch (IOException | InterruptedException e) {
-                assertFalse("Exception " + e, true);
+                fail("Exception " + e);
             } finally {
                 try {
                     if (csvReader != null) {
                         csvReader.close();
                     }
                 } catch (IOException e) {
-                    assertFalse("Exception " + e, true);
+                    fail("Exception " + e);
                 }
                 IOUtils.closeQuietly(inputReader);
                 IOUtils.closeQuietly(inputStream);

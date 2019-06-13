@@ -5,8 +5,9 @@
 
 package hudson.plugins.plot;
 
-import java.util.List;
 import org.jvnet.hudson.test.HudsonTestCase;
+
+import java.util.List;
 
 /**
  * Stub to hold common series test functionality.
@@ -54,9 +55,9 @@ public class SeriesTestCase extends HudsonTestCase {
             try {
                 Double.parseDouble(points.get(i).getYvalue());
             } catch (NumberFormatException nfe) {
-                assertTrue("loadSeries returned invalid yvalue "
+                fail("loadSeries returned invalid yvalue "
                         + points.get(i).getYvalue() + " at index " + i
-                        + " Exception " + nfe.toString(), false);
+                        + " Exception " + nfe.toString());
             }
         }
     }

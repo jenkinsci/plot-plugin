@@ -52,10 +52,8 @@ public class CSVSeriesTest extends SeriesTestCase {
 
             try {
                 columns = getNumColumns(workspaceRootDir, FILES[index]);
-            } catch (IOException e) {
-                assertFalse(true);
-            } catch (InterruptedException e) {
-                assertFalse(true);
+            } catch (IOException | InterruptedException e) {
+                fail("Exception " + e.toString());
             }
 
             assertEquals(COLUMNS[index], columns);
@@ -163,7 +161,7 @@ public class CSVSeriesTest extends SeriesTestCase {
                     csvReader.close();
                 }
             } catch (IOException e) {
-                assertFalse("Exception " + e, true);
+                fail("Exception " + e);
             }
             IOUtils.closeQuietly(inputReader);
             IOUtils.closeQuietly(inputStream);
