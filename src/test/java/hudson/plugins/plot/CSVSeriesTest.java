@@ -29,7 +29,6 @@ public class CSVSeriesTest extends SeriesTestCase {
     private static final int[] CORRECTED_COLUMNS = {8, 3, 8};  // corrected for the trailing comma case
     private static final int[] TOTAL_POINTS = {8, 6, 8};  // total data points in the file
     private static final String[] LAST_COLUMN_NAME = {"error %", "thing", "error %"};  // the label on the last column
-    private static final String[] LAST_POINT = {"0.37", "42", "0.37"};  // the value of the last data point
 
     public void testCSVSeriesWithNullExclusionValuesSetsDisplayTableFlag() {
         CSVSeries series;
