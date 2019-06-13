@@ -22,12 +22,16 @@ import org.apache.commons.io.IOUtils;
 public class CSVReaderTest extends SeriesTestCase {
     private static final Logger LOGGER = Logger.getLogger(CSVReaderTest.class.getName());
 
-    private static final String[] FILES = {"test.csv", "spacestest.csv", "test_trailing_semicolon.csv"};
+    private static final String[] FILES = {
+            "test.csv",
+            "test_trailing_spaces.csv",
+            "test_trailing_semicolon.csv"
+    };
     private static final int[] LINES = {2, 3, 2};
     private static final int[] COLUMNS = {8, 3, 9};
 
     public void testCSVReader() {
-        for (int testfilenum = 0; testfilenum < FILES.length; testfilenum++) {
+        for (int index = 0; index < FILES.length; index++) {
             // first create a FilePath to load the test Properties file.
             File workspaceDirFile = new File("target/test-classes/");
             FilePath workspaceRootDir = new FilePath(workspaceDirFile);
@@ -36,62 +40,63 @@ public class CSVReaderTest extends SeriesTestCase {
                     + workspaceDirFile.getAbsolutePath());
             LOGGER.info("workspace Dir path: " + workspaceRootDir.getName());
 
-            CSVReader csvreader = null;
-            InputStream in = null;
+            CSVReader csvReader = null;
+            InputStream inputStream = null;
             InputStreamReader inputReader = null;
 
             FilePath[] seriesFiles;
             try {
-                seriesFiles = workspaceRootDir.list(FILES[testfilenum]);
+                seriesFiles = workspaceRootDir.list(FILES[index]);
 
                 if (seriesFiles != null && seriesFiles.length < 1) {
-                    LOGGER.info("No plot data file found: " + workspaceRootDir.getName() + " " + FILES[testfilenum]);
+                    LOGGER.info("No plot data file found: "
+                            + workspaceRootDir.getName() + " " + FILES[index]);
                     assertFalse(true);
                 }
 
-                LOGGER.info("Loading plot series data from: " + FILES[testfilenum]);
+                LOGGER.info("Loading plot series data from: " + FILES[index]);
 
-                in = seriesFiles[0].read();
+                inputStream = seriesFiles[0].read();
 
-                inputReader = new InputStreamReader(in);
-                csvreader = new CSVReader(inputReader);
+                inputReader = new InputStreamReader(inputStream);
+                csvReader = new CSVReader(inputReader);
 
                 // save the header line to use it for the plot labels.
                 String[] nextLine;
                 // read each line of the CSV file and add to rawPlotData
                 int lineNum = 0;
-                while ((nextLine = csvreader.readNext()) != null) {
+                while ((nextLine = csvReader.readNext()) != null) {
                     // for some reason csv reader returns an empty line sometimes.
                     if (nextLine.length == 1 && nextLine[0].length() == 0) {
                         break;
                     }
 
-                    if (COLUMNS[testfilenum] != nextLine.length) {
+                    if (COLUMNS[index] != nextLine.length) {
                         StringBuilder msg = new StringBuilder();
                         msg.append("column count is not equal ").append(nextLine.length);
-                        msg.append(" expected ").append(COLUMNS[testfilenum]).append(" at line ");
+                        msg.append(" expected ").append(COLUMNS[index]).append(" at line ");
                         msg.append(lineNum).append(" line: ").append("'");
                         for (String s : nextLine) {
                             msg.append("\"").append(s).append("\":").append(s.length()).append(",");
                         }
                         msg.append("' length ").append(nextLine.length);
-                        assertTrue(msg.toString(), COLUMNS[testfilenum] == nextLine.length);
+                        assertTrue(msg.toString(), COLUMNS[index] == nextLine.length);
                     }
                     ++lineNum;
                 }
-                assertTrue("Line count is not equal " + lineNum + " expected " + LINES[testfilenum], LINES[testfilenum] == lineNum);
+                assertTrue("Line count is not equal " + lineNum + " expected " + LINES[index], LINES[index] == lineNum);
             } catch (IOException | InterruptedException e) {
                 assertFalse("Exception " + e, true);
             } finally {
                 try {
-                    if (csvreader != null) {
-                        csvreader.close();
+                    if (csvReader != null) {
+                        csvReader.close();
                     }
                 } catch (IOException e) {
                     assertFalse("Exception " + e, true);
                 }
                 IOUtils.closeQuietly(inputReader);
-                IOUtils.closeQuietly(in);
+                IOUtils.closeQuietly(inputStream);
             }
         }
     }
