@@ -7,12 +7,16 @@ package hudson.plugins.plot;
 
 import au.com.bytecode.opencsv.CSVReader;
 import hudson.FilePath;
-import java.io.File;
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Logger;
-import org.apache.commons.io.IOUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Test a CSV series.
@@ -22,77 +26,75 @@ import org.apache.commons.io.IOUtils;
 public class CSVReaderTest extends SeriesTestCase {
     private static final Logger LOGGER = Logger.getLogger(CSVReaderTest.class.getName());
 
-    private static final String[] FILES = {"test.csv"};
+    private static final String[] FILES = {
+            "test.csv",
+            "test_trailing_spaces.csv",
+            "test_trailing_semicolon.csv"
+    };
+    private static final int[] LINES = {2, 3, 2};
+    private static final int[] COLUMNS = {8, 3, 9};
 
-    private static final int[] LINES = {2};
-
-    private static final int[] COLUMNS = {8};
-
+    @Test
     public void testCSVReader() {
-        // first create a FilePath to load the test Properties file.
-        File workspaceDirFile = new File("target/test-classes/");
-        FilePath workspaceRootDir = new FilePath(workspaceDirFile);
+        for (int index = 0; index < FILES.length; index++) {
+            CSVReader csvReader = null;
+            InputStream inputStream = null;
+            InputStreamReader inputReader = null;
 
-        LOGGER.info("workspace File path: "
-                + workspaceDirFile.getAbsolutePath());
-        LOGGER.info("workspace Dir path: " + workspaceRootDir.getName());
-
-        CSVReader csvreader = null;
-        InputStream in = null;
-        InputStreamReader inputReader = null;
-
-        FilePath[] seriesFiles;
-        try {
-            seriesFiles = workspaceRootDir.list(FILES[0]);
-
-            if (seriesFiles != null && seriesFiles.length < 1) {
-                LOGGER.info("No plot data file found: " + workspaceRootDir.getName() + " " + FILES[0]);
-                assertFalse(true);
-            }
-
-            LOGGER.info("Loading plot series data from: " + FILES[0]);
-
-            in = seriesFiles[0].read();
-
-            inputReader = new InputStreamReader(in);
-            csvreader = new CSVReader(inputReader);
-
-            // save the header line to use it for the plot labels.
-            String[] nextLine;
-            // read each line of the CSV file and add to rawPlotData
-            int lineNum = 0;
-            while ((nextLine = csvreader.readNext()) != null) {
-                // for some reason csv reader returns an empty line sometimes.
-                if (nextLine.length == 1 && nextLine[0].length() == 0) {
-                    break;
-                }
-
-                if (COLUMNS[0] != nextLine.length) {
-                    StringBuilder msg = new StringBuilder();
-                    msg.append("column count is not equal ").append(nextLine.length);
-                    msg.append(" expected ").append(COLUMNS[0]).append(" at line ");
-                    msg.append(lineNum).append(" line: ").append("'");
-                    for (String s : nextLine) {
-                        msg.append("\"").append(s).append("\":").append(s.length()).append(",");
-                    }
-                    msg.append("' length ").append(nextLine.length);
-                    assertTrue(msg.toString(), COLUMNS[0] == nextLine.length);
-                }
-                ++lineNum;
-            }
-            assertTrue("Line count is not equal " + lineNum + " expected " + LINES[0], LINES[0] == lineNum);
-        } catch (IOException | InterruptedException e) {
-            assertFalse("Exception " + e, true);
-        } finally {
+            FilePath[] seriesFiles;
             try {
-                if (csvreader != null) {
-                    csvreader.close();
+                seriesFiles = workspaceRootDir.list(FILES[index]);
+
+                if (seriesFiles != null && seriesFiles.length < 1) {
+                    fail("No plot data file found: "
+                            + workspaceRootDir.getName() + " " + FILES[index]);
                 }
-            } catch (IOException e) {
-                assertFalse("Exception " + e, true);
+
+                LOGGER.info("Loading plot series data from: " + FILES[index]);
+
+                inputStream = seriesFiles[0].read();
+
+                inputReader = new InputStreamReader(inputStream);
+                csvReader = new CSVReader(inputReader);
+
+                // save the header line to use it for the plot labels.
+                String[] nextLine;
+                // read each line of the CSV file and add to rawPlotData
+                int lineNum = 0;
+                while ((nextLine = csvReader.readNext()) != null) {
+                    // for some reason csv reader returns an empty line sometimes.
+                    if (nextLine.length == 1 && nextLine[0].length() == 0) {
+                        break;
+                    }
+
+                    if (COLUMNS[index] != nextLine.length) {
+                        StringBuilder msg = new StringBuilder();
+                        msg.append("column count is not equal ").append(nextLine.length);
+                        msg.append(" expected ").append(COLUMNS[index]).append(" at line ");
+                        msg.append(lineNum).append(" line: ").append("'");
+                        for (String s : nextLine) {
+                            msg.append("\"").append(s).append("\":").append(s.length()).append(",");
+                        }
+                        msg.append("' length ").append(nextLine.length);
+                        assertEquals(msg.toString(), COLUMNS[index], nextLine.length);
+                    }
+                    ++lineNum;
+                }
+                assertEquals("Line count is not equal " + lineNum + " expected " + LINES[index],
+                        LINES[index], lineNum);
+            } catch (IOException | InterruptedException e) {
+                fail("Exception " + e);
+            } finally {
+                try {
+                    if (csvReader != null) {
+                        csvReader.close();
+                    }
+                } catch (IOException e) {
+                    fail("Exception " + e);
+                }
+                IOUtils.closeQuietly(inputReader);
+                IOUtils.closeQuietly(inputStream);
             }
-            IOUtils.closeQuietly(inputReader);
-            IOUtils.closeQuietly(in);
         }
     }
 }

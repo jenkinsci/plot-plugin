@@ -5,18 +5,27 @@
 
 package hudson.plugins.plot;
 
+import hudson.FilePath;
+
+import java.io.File;
 import java.util.List;
-import org.jvnet.hudson.test.HudsonTestCase;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Stub to hold common series test functionality.
  *
  * @author Allen Reese
  */
-public class SeriesTestCase extends HudsonTestCase {
-    public void testDummy() {
-        // Allow us to subclass, and not have the tests puke.
-    }
+public class SeriesTestCase {
+    private static final Logger LOGGER = Logger.getLogger(SeriesTestCase.class.getName());
+
+    @SuppressWarnings("visibilitymodifier")
+    protected final FilePath workspaceRootDir = createTestDirectory();
 
     public void testSeries(Series series, String file, String label, String type) {
         // verify the properties was created correctly
@@ -54,10 +63,18 @@ public class SeriesTestCase extends HudsonTestCase {
             try {
                 Double.parseDouble(points.get(i).getYvalue());
             } catch (NumberFormatException nfe) {
-                assertTrue("loadSeries returned invalid yvalue "
+                fail("loadSeries returned invalid yvalue "
                         + points.get(i).getYvalue() + " at index " + i
-                        + " Exception " + nfe.toString(), false);
+                        + " Exception " + nfe.toString());
             }
         }
+    }
+
+    private FilePath createTestDirectory() {
+        File file = new File("target/test-classes/");
+        FilePath dir = new FilePath(file);
+        LOGGER.info("Workspace File path: " + file.getAbsolutePath());
+        LOGGER.info("Workspace Dir path: " + dir.getName());
+        return dir;
     }
 }

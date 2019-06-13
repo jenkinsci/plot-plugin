@@ -30,12 +30,11 @@ public class PlotBuilderTest {
         WorkflowJob p = r.createProject(WorkflowJob.class, "projectUnderTest");
         p.setDefinition(new CpsFlowDefinition(
                 "node {  \n"
-                        + "    sh '''\n"
-                        + "      echo '<my_data>' > data.xml\n"
-                        + "      echo '    <test value1=\"123.456\"/>' >> data.xml\n"
-                        + "      echo '    <test value2=\"321.654\"/>' >> data.xml\n"
-                        + "      echo '</my_data>' >> data.xml\n"
-                        + "    '''\n"
+                        + "    def content = '<my_data>'\n"
+                        + "    content += '<test value1=\"123.456\"/>'\n"
+                        + "    content += '<test value2=\"321.654\"/>'\n"
+                        + "    content += '</my_data>'\n"
+                        + "    writeFile file: 'data.xml', text: content\n"
                         + "    plot csvFileName: 'plot-xml.csv',\n"
                         + "       group: 'My Data',\n"
                         + "       title: 'Useful Title',\n"
@@ -56,10 +55,9 @@ public class PlotBuilderTest {
         WorkflowJob p = r.createProject(WorkflowJob.class, "projectUnderTest");
         p.setDefinition(new CpsFlowDefinition(
                 "node {  \n"
-                        + "    sh '''\n"
-                        + "      echo 'Avg,Median,90,min,max,samples,errors,error %' > data.csv\n"
-                        + "      echo '515.33,196,1117,2,16550,97560,360,0.37' >> data.csv\n"
-                        + "    '''\n"
+                        + "    def content = 'Avg,Median,90,min,max,samples,errors,error %'\n"
+                        + "    content += '515.33,196,1117,2,16550,97560,360,0.37'\n"
+                        + "    writeFile file: 'data.csv', text: content\n"
                         + "    plot csvFileName: 'plot-csv.csv',\n"
                         + "       group: 'My Data',\n"
                         + "       title: 'Useful Title',\n"
@@ -76,9 +74,8 @@ public class PlotBuilderTest {
         WorkflowJob p = r.createProject(WorkflowJob.class, "projectUnderTest");
         p.setDefinition(new CpsFlowDefinition(
                 "node {  \n"
-                        + "    sh '''\n"
-                        + "      echo 'YVALUE=1' > data.properties\n"
-                        + "    '''\n"
+                        + "    def content = 'YVALUE=1'\n"
+                        + "    writeFile file: 'data.properties', text: content\n"
                         + "    plot csvFileName: 'plot-properties.csv',\n"
                         + "       group: 'My Data',\n"
                         + "       title: 'Useful Title',\n"
