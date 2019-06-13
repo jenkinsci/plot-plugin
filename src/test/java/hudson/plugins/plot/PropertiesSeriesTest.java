@@ -5,8 +5,6 @@
 
 package hudson.plugins.plot;
 
-import hudson.FilePath;
-import java.io.File;
 import java.util.List;
 
 /**
@@ -19,12 +17,6 @@ public class PropertiesSeriesTest extends SeriesTestCase {
     private static final String[] LABELS = {"testLabel"};
 
     public void testPropertiesSeries() {
-        // first create a FilePath to load the test Properties file.
-        File workspaceDirFile = new File("target/test-classes/");
-        FilePath workspaceRootDir = new FilePath(workspaceDirFile);
-
-        System.out.println("workspace path path: " + workspaceDirFile.getAbsolutePath());
-
         // Create a new properties series.
         PropertiesSeries propSeries = new PropertiesSeries(FILES[0], LABELS[0]);
 

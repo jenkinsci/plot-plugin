@@ -5,9 +5,12 @@
 
 package hudson.plugins.plot;
 
+import hudson.FilePath;
 import org.jvnet.hudson.test.HudsonTestCase;
 
+import java.io.File;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Stub to hold common series test functionality.
@@ -15,6 +18,11 @@ import java.util.List;
  * @author Allen Reese
  */
 public class SeriesTestCase extends HudsonTestCase {
+    private static final Logger LOGGER = Logger.getLogger(SeriesTestCase.class.getName());
+
+    @SuppressWarnings("visibilitymodifier")
+    protected final FilePath workspaceRootDir = createTestDirectory();
+
     public void testDummy() {
         // Allow us to subclass, and not have the tests puke.
     }
@@ -60,5 +68,13 @@ public class SeriesTestCase extends HudsonTestCase {
                         + " Exception " + nfe.toString());
             }
         }
+    }
+
+    private FilePath createTestDirectory() {
+        File file = new File("target/test-classes/");
+        FilePath dir = new FilePath(file);
+        LOGGER.info("Workspace File path: " + file.getAbsolutePath());
+        LOGGER.info("Workspace Dir path: " + dir.getName());
+        return dir;
     }
 }

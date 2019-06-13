@@ -8,7 +8,6 @@ import au.com.bytecode.opencsv.CSVReader;
 import hudson.FilePath;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -40,13 +39,6 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     public void testCSVSeriesWithNoExclusions() {
         for (int index = 0; index < FILES.length; index++) {
-            // first create a FilePath to load the test Properties file.
-            File workspaceDirFile = new File("target/test-classes/");
-            FilePath workspaceRootDir = new FilePath(workspaceDirFile);
-
-            LOGGER.info("workspace File path: " + workspaceDirFile.getAbsolutePath());
-            LOGGER.info("workspace Dir path: " + workspaceRootDir.getName());
-
             // Check the number of columns
             int columns = -1;
 
@@ -83,13 +75,6 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     public void testCSVSeriesIncludeOnlyLastColumn() {
         for (int index = 0; index < FILES.length; index++) {
-            // first create a FilePath to load the test Properties file.
-            File workspaceDirFile = new File("target/test-classes/");
-            FilePath workspaceRootDir = new FilePath(workspaceDirFile);
-
-            LOGGER.info("workspace File path: " + workspaceDirFile.getAbsolutePath());
-            LOGGER.info("workspace Dir path: " + workspaceRootDir.getName());
-
             // Create a new CSV series.
             CSVSeries series = new CSVSeries(FILES[index], "http://localhost:8080/%name%/%index%/", "INCLUDE_BY_STRING", LAST_COLUMN_NAME[index], false);
 
@@ -107,14 +92,7 @@ public class CSVSeriesTest extends SeriesTestCase {
     }
 
     public void testCSVSeriesWithTrailingSemicolonDoesntCreateExtraneousPoint() {
-        // first create a FilePath to load the test Properties file.
-        File workspaceDirFile = new File("target/test-classes/");
-        FilePath workspaceRootDir = new FilePath(workspaceDirFile);
         String file = "test_trailing_semicolon.csv";
-
-        LOGGER.info("workspace File path: " + workspaceDirFile.getAbsolutePath());
-        LOGGER.info("workspace Dir path: " + workspaceRootDir.getName());
-
         // Create a new CSV series.
         CSVSeries series = new CSVSeries(file,
                 "http://localhost:8080/%name%/%index%/", "OFF", "", false);

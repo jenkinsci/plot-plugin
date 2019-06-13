@@ -1,13 +1,10 @@
 package hudson.plugins.plot;
 
-import hudson.FilePath;
-import java.io.File;
+import org.junit.Ignore;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
 
 /**
  * Test an XML series.
@@ -18,22 +15,6 @@ public class XMLSeriesTest extends SeriesTestCase {
     private static final String TEST_XML_FILE = "test.xml";
     private static final String TEST2_XML_FILE = "test2.xml";
     private static final String TEST3_XML_FILE = "test3.xml";
-
-    private File workspaceDirFile;
-    private FilePath workspaceRootDir;
-
-    @Before
-    public void setUp() {
-        // first create a FilePath to load the test Properties file.
-        workspaceDirFile = new File("target/test-classes/");
-        workspaceRootDir = new FilePath(workspaceDirFile);
-    }
-
-    @After
-    public void tearDown() {
-        workspaceRootDir = null;
-        workspaceDirFile = null;
-    }
 
     public void testXMLSeries_WhenNodesSharingAParentHaveOneStringAndOneNumericContent_ThenCoalesceNodesToPointLabelledWithStringContent() {
         // Create a new XML series.
