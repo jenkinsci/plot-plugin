@@ -154,6 +154,21 @@ public class XMLSeriesTest extends SeriesTestCase {
     }
 
     @Test
+    public void testXMLSeriesBoolean() {
+        // Create a new XML series.
+        String xpath = "//testcase[@name='testOne']";
+        XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "BOOLEAN", null);
+
+        // test the basic subclass properties.
+        testSeries(series, TEST_XML_FILE, "", "xml");
+
+        // load the series.
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        assertNotNull(points);
+        testPlotPoints(points, 1);
+    }
+
+    @Test
     public void testXMLSeriesNumber() {
         // Create a new XML series.
         String xpath =
