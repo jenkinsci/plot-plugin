@@ -7,13 +7,16 @@ package hudson.plugins.plot;
 
 import au.com.bytecode.opencsv.CSVReader;
 import hudson.FilePath;
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Logger;
 
-import org.apache.commons.io.IOUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Test a CSV series.
@@ -31,6 +34,7 @@ public class CSVReaderTest extends SeriesTestCase {
     private static final int[] LINES = {2, 3, 2};
     private static final int[] COLUMNS = {8, 3, 9};
 
+    @Test
     public void testCSVReader() {
         for (int index = 0; index < FILES.length; index++) {
             CSVReader csvReader = null;

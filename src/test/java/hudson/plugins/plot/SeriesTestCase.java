@@ -6,26 +6,26 @@
 package hudson.plugins.plot;
 
 import hudson.FilePath;
-import org.jvnet.hudson.test.HudsonTestCase;
 
 import java.io.File;
 import java.util.List;
 import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Stub to hold common series test functionality.
  *
  * @author Allen Reese
  */
-public class SeriesTestCase extends HudsonTestCase {
+public class SeriesTestCase {
     private static final Logger LOGGER = Logger.getLogger(SeriesTestCase.class.getName());
 
     @SuppressWarnings("visibilitymodifier")
     protected final FilePath workspaceRootDir = createTestDirectory();
-
-    public void testDummy() {
-        // Allow us to subclass, and not have the tests puke.
-    }
 
     public void testSeries(Series series, String file, String label, String type) {
         // verify the properties was created correctly

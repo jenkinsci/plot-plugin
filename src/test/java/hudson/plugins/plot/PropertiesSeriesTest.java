@@ -5,6 +5,8 @@
 
 package hudson.plugins.plot;
 
+import org.junit.Test;
+
 import java.util.List;
 
 /**
@@ -16,6 +18,7 @@ public class PropertiesSeriesTest extends SeriesTestCase {
     private static final String[] FILES = {"test.properties"};
     private static final String[] LABELS = {"testLabel"};
 
+    @Test
     public void testPropertiesSeries() {
         // Create a new properties series.
         PropertiesSeries propSeries = new PropertiesSeries(FILES[0], LABELS[0]);

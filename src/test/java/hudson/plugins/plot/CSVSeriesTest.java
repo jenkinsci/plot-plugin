@@ -7,12 +7,17 @@ package hudson.plugins.plot;
 import au.com.bytecode.opencsv.CSVReader;
 import hudson.FilePath;
 import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test a CSV series.
@@ -29,6 +34,7 @@ public class CSVSeriesTest extends SeriesTestCase {
     private static final int[] TOTAL_POINTS = {8, 6, 8};  // total data points in the file
     private static final String[] LAST_COLUMN_NAME = {"error %", "thing", "error %"};  // the label on the last column
 
+    @Test
     public void testCSVSeriesWithNullExclusionValuesSetsDisplayTableFlag() {
         CSVSeries series;
         for (int index = 0; index < FILES.length; index++) {
@@ -37,6 +43,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         }
     }
 
+    @Test
     public void testCSVSeriesWithNoExclusions() {
         for (int index = 0; index < FILES.length; index++) {
             // Check the number of columns
@@ -73,6 +80,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         }
     }
 
+    @Test
     public void testCSVSeriesIncludeOnlyLastColumn() {
         for (int index = 0; index < FILES.length; index++) {
             // Create a new CSV series.
@@ -91,6 +99,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         }
     }
 
+    @Test
     public void testCSVSeriesWithTrailingSemicolonDoesntCreateExtraneousPoint() {
         String file = "test_trailing_semicolon.csv";
         // Create a new CSV series.

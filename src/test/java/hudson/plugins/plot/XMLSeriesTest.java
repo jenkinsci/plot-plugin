@@ -1,10 +1,14 @@
 package hudson.plugins.plot;
 
 import org.junit.Ignore;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test an XML series.
@@ -16,6 +20,7 @@ public class XMLSeriesTest extends SeriesTestCase {
     private static final String TEST2_XML_FILE = "test2.xml";
     private static final String TEST3_XML_FILE = "test3.xml";
 
+    @Test
     public void testXMLSeries_WhenNodesSharingAParentHaveOneStringAndOneNumericContent_ThenCoalesceNodesToPointLabelledWithStringContent() {
         // Create a new XML series.
         String xpath = "//UIAction/name|//UIAction/numCalls";
@@ -38,6 +43,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 4);
     }
 
+    @Test
     public void testXMLSeries_WhenNodesHaveNoContent_ThenCoalesceForAttributes() {
         // Create a new XML series.
         String xpath =
@@ -58,6 +64,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 3);
     }
 
+    @Test
     public void testXMLSeriesNodeset() {
         // Create a new XML series.
         String xpath = "//testcase";
@@ -79,6 +86,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 4);
     }
 
+    @Test
     public void testXMLSeries_WhenAllNodesAreNumeric_ThenPointsAreLabelledWithNodeName() {
         // Create a new XML series.
         String xpath = "/results/testcase/*";
@@ -97,6 +105,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 2);
     }
 
+    @Test
     public void testXMLSeriesEmptyNodeset() {
         // Create a new XML series.
         String xpath = "/there/is/no/such/element";
@@ -113,6 +122,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 0);
     }
 
+    @Test
     public void testXMLSeriesNode() {
         // Create a new XML series.
         String xpath = "//testcase[@name='testThree']";
@@ -125,10 +135,11 @@ public class XMLSeriesTest extends SeriesTestCase {
         List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
         assertNotNull(points);
         assertEquals(points.size(), 1);
-        assertEquals(Double.parseDouble(points.get(0).getYvalue()), 27d);
+        assertEquals(Double.parseDouble(points.get(0).getYvalue()), 27d, 0);
         testPlotPoints(points, 1);
     }
 
+    @Test
     public void testXMLSeriesString() {
         // Create a new XML series.
         String xpath = "//testcase[@name='testOne']/@time";
@@ -143,6 +154,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 1);
     }
 
+    @Test
     public void testXMLSeriesNumber() {
         // Create a new XML series.
         String xpath =
@@ -160,6 +172,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 1);
     }
 
+    @Test
     public void testXMLSeriesUrl() {
         // Create a new XML series.
         String xpath = "/results/testcase/*";
