@@ -1,6 +1,5 @@
 package hudson.plugins.plot;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -189,20 +188,5 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 2);
         assertEquals("http://localhost/42/one/0", points.get(0).getUrl());
         assertEquals("http://localhost/42/two/0", points.get(1).getUrl());
-    }
-
-    @Ignore
-    public void testXMLSeriesBoolean() {
-        // Create a new XML series.
-        String xpath = "//testcase[@name='testOne']/@time";
-        XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "BOOLEAN", null);
-
-        // test the basic subclass properties.
-        testSeries(series, TEST_XML_FILE, "", "xml");
-
-        // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
-        assertNotNull(points);
-        testPlotPoints(points, 1);
     }
 }
