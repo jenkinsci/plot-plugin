@@ -9,24 +9,26 @@ import au.com.bytecode.opencsv.CSVReader;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.Descriptor;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * Represents a plot data series configuration from an CSV file.
@@ -61,7 +63,7 @@ public class CSVSeries extends Series {
     /**
      * Comma separated list of columns to exclude.
      */
-    private String exclusionValues;
+    private List<String> exclusionValues;
 
     /**
      * Url to use as a base for mapping points.
@@ -72,7 +74,7 @@ public class CSVSeries extends Series {
 
     @DataBoundConstructor
     public CSVSeries(String file, String url, String inclusionFlag,
-                     String exclusionValues, boolean displayTableFlag) {
+                     Object exclusionValues, boolean displayTableFlag) {
         super(file, "", "csv");
 
         this.url = url;
@@ -82,7 +84,19 @@ public class CSVSeries extends Series {
             this.inclusionFlag = InclusionFlag.OFF;
         } else {
             this.inclusionFlag = InclusionFlag.valueOf(inclusionFlag);
-            this.exclusionValues = exclusionValues;
+
+            if (exclusionValues instanceof String) {
+                this.exclusionValues = Arrays.asList(PAT_COMMA.split((String) exclusionValues));
+            } else if (exclusionValues instanceof List) {
+                this.exclusionValues = (List<String>) exclusionValues;
+            } else {
+                LOGGER.log(Level.SEVERE,
+                        "Not supported Class for exclusionValues ("
+                                + exclusionValues.getClass()
+                                + ")! Try String or List"
+                );
+            }
+
             loadExclusionSet();
         }
     }
@@ -91,7 +105,7 @@ public class CSVSeries extends Series {
         return ObjectUtils.toString(inclusionFlag);
     }
 
-    public String getExclusionValues() {
+    public List<String> getExclusionValues() {
         return exclusionValues;
     }
 
@@ -232,7 +246,7 @@ public class CSVSeries extends Series {
      *
      * @return true if the point should be excluded based on label or column
      */
-    private boolean excludePoint(String label, int index) {
+    private boolean excludePoint(final String label, int index) {
         if (inclusionFlag == null || inclusionFlag == InclusionFlag.OFF) {
             return false;
         }
@@ -241,11 +255,18 @@ public class CSVSeries extends Series {
         switch (inclusionFlag) {
             case INCLUDE_BY_STRING:
                 // if the set contains it, don't exclude it.
-                retVal = !(strExclusionSet.contains(label));
+                retVal = !(strExclusionSet.contains(label) || strExclusionSet
+                        .stream()
+                        .parallel()
+                        .anyMatch(label::matches));
                 break;
             case EXCLUDE_BY_STRING:
                 // if the set doesn't contain it, exclude it.
-                retVal = strExclusionSet.contains(label);
+                retVal = strExclusionSet.contains(label)
+                        || strExclusionSet
+                        .stream()
+                        .parallel()
+                        .anyMatch(label::matches);
                 break;
             case INCLUDE_BY_COLUMN:
                 // if the set contains it, don't exclude it.
@@ -294,7 +315,7 @@ public class CSVSeries extends Series {
                 LOGGER.log(Level.SEVERE, "Failed to initialize columns exclusions set.");
         }
 
-        for (String str : PAT_COMMA.split(exclusionValues)) {
+        for (String str : exclusionValues) {
             if (str == null || str.length() <= 0) {
                 continue;
             }
