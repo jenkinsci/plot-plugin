@@ -12,6 +12,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -154,4 +156,65 @@ public class CSVSeriesTest extends SeriesTestCase {
             IOUtils.closeQuietly(inputStream);
         }
     }
+
+    @Test
+    public void testExcludeByRegexInAList() {
+        CSVSeries series = new CSVSeries("pct_sum1_web.csv",
+                null,
+                "EXCLUDE_BY_STRING",
+                Arrays.asList("HTTP_[4,5]\\d{2}", "Hits", "Throughput", "RunId", "Trend Measurement Type"),
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 3);
+    }
+
+    @Test
+    public void testIncludeByRegexInAList() {
+        CSVSeries series = new CSVSeries("pct_sum1_web.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                Arrays.asList("HTTP_[2,3]\\d{2}"),
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 3);
+    }
+    @Test
+    public void testIncludeTestuserByRegexInAList() {
+        CSVSeries series = new CSVSeries("big-pct_average_trt.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                Arrays.asList(".*testUser_2", ".*testUser_6"),
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 48);
+    }
+
+    @Test
+    public void testIncludeByRegexInAString() {
+        CSVSeries series = new CSVSeries("big-pct_average_trt.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                Collections.singletonList(".*_(OpenStartPage|Login)_.*"),
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 14);
+    }
+
+    @Test
+    public void testIncludeByString() {
+        CSVSeries series = new CSVSeries("test.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                Arrays.asList("Avg", "Median"),
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 2);
+    }
+
+
 }
