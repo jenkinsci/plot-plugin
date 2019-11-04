@@ -12,7 +12,7 @@
     <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
     <jenkins.version>2.0</jenkins.version>
     <!-- Java Level to use. Java 7 required when using core >= 1.612 -->
-    <java.level>8</java.level>
+    <java.level>7</java.level>
   </properties>
 
   <artifactId>plot</artifactId>
