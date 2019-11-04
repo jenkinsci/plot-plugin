@@ -255,18 +255,11 @@ public class CSVSeries extends Series {
         switch (inclusionFlag) {
             case INCLUDE_BY_STRING:
                 // if the set contains it, don't exclude it.
-                retVal = !(strExclusionSet.contains(label) || strExclusionSet
-                        .stream()
-                        .parallel()
-                        .anyMatch(label::matches));
+                retVal = !checkExclusionSet(label);
                 break;
             case EXCLUDE_BY_STRING:
                 // if the set doesn't contain it, exclude it.
-                retVal = strExclusionSet.contains(label)
-                        || strExclusionSet
-                        .stream()
-                        .parallel()
-                        .anyMatch(label::matches);
+                retVal = checkExclusionSet(label);
                 break;
             case INCLUDE_BY_COLUMN:
                 // if the set contains it, don't exclude it.
@@ -286,6 +279,20 @@ public class CSVSeries extends Series {
         }
 
         return retVal;
+    }
+
+
+    private boolean checkExclusionSet(String label) {
+        if (strExclusionSet.contains(label))
+            return true;
+        else {
+            for (String s : strExclusionSet) {
+                if (label.matches(s)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
