@@ -70,6 +70,9 @@ public class CSVSeries extends Series {
      */
     private String url;
 
+    /**
+     * Show table of the single values in charts.
+     */
     private boolean displayTableFlag;
 
     @DataBoundConstructor
@@ -287,6 +290,11 @@ public class CSVSeries extends Series {
         return retVal;
     }
 
+    /**
+     * Checks if the current label / header is known in the strExclusionSet (plain text or regex).
+     * @param label
+     * @return if the label is in the set
+     */
     private boolean checkExclusionSet(String label) {
         if (strExclusionSet.contains(label)) {
             return true;
