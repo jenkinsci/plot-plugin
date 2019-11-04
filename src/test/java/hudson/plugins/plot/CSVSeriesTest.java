@@ -40,7 +40,11 @@ public class CSVSeriesTest extends SeriesTestCase {
     public void testCSVSeriesWithNullExclusionValuesSetsDisplayTableFlag() {
         CSVSeries series;
         for (int index = 0; index < FILES.length; index++) {
-            series = new CSVSeries(FILES[index], null, null, null, true);
+            series = new CSVSeries(FILES[index],
+                    null,
+                    null,
+                    null,
+                    true);
             assertTrue(series.getDisplayTableFlag());
         }
     }
@@ -60,7 +64,11 @@ public class CSVSeriesTest extends SeriesTestCase {
             assertEquals(COLUMNS[index], columns);
 
             // Create a new CSV series.
-            CSVSeries series = new CSVSeries(FILES[index], "http://localhost:8080/%name%/%index%/", "OFF", "", false);
+            CSVSeries series = new CSVSeries(FILES[index],
+                    "http://localhost:8080/%name%/%index%/",
+                    "OFF",
+                    "",
+                    false);
 
             LOGGER.info("Created series " + series.toString());
             // test the basic subclass properties.
@@ -86,12 +94,18 @@ public class CSVSeriesTest extends SeriesTestCase {
     public void testCSVSeriesIncludeOnlyLastColumn() {
         for (int index = 0; index < FILES.length; index++) {
             // Create a new CSV series.
-            CSVSeries series = new CSVSeries(FILES[index], "http://localhost:8080/%name%/%index%/", "INCLUDE_BY_STRING", LAST_COLUMN_NAME[index], false);
+            CSVSeries series = new CSVSeries(FILES[index],
+                    "http://localhost:8080/%name%/%index%/",
+                    "INCLUDE_BY_STRING",
+                    LAST_COLUMN_NAME[index],
+                    false);
 
             LOGGER.info("Created series " + series.toString());
 
             // load the series.
-            List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+            List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                    0,
+                    System.out);
             LOGGER.info("Got " + points.size() + " plot points");
             testPlotPoints(points, LINES[index] - 1);  // expect one point per line, minus one header line
 
@@ -106,14 +120,19 @@ public class CSVSeriesTest extends SeriesTestCase {
         String file = "test_trailing_semicolon.csv";
         // Create a new CSV series.
         CSVSeries series = new CSVSeries(file,
-                "http://localhost:8080/%name%/%index%/", "OFF", "", false);
+                "http://localhost:8080/%name%/%index%/",
+                "OFF",
+                "",
+                false);
 
         LOGGER.info("Created series " + series.toString());
         // test the basic subclass properties.
         testSeries(series, file, "", "csv");
 
         // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
         LOGGER.info("Got " + points.size() + " plot points");
         testPlotPoints(points, 8);
     }
@@ -181,7 +200,9 @@ public class CSVSeriesTest extends SeriesTestCase {
                 "INCLUDE_BY_STRING",
                 Arrays.asList(".*testUser_1", ".*testUser_2"),
                 false);
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
         LOGGER.info("Got " + points.size() + " plot points");
         testPlotPoints(points, 6);
     }
@@ -192,9 +213,11 @@ public class CSVSeriesTest extends SeriesTestCase {
         CSVSeries series = new CSVSeries("test_regex-by-suffix.csv",
                 null,
                 "EXCLUDE_BY_STRING",
-                Arrays.asList("(?i)(RunID)","Login_.*",".*testUser_[1-2]{1,2}"),
+                Arrays.asList("(?i)(RunID)", "Login_.*", ".*testUser_[1-2]{1,2}"),
                 false);
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
         LOGGER.info("Got " + points.size() + " plot points");
         testPlotPoints(points, 4);
     }
@@ -206,10 +229,13 @@ public class CSVSeriesTest extends SeriesTestCase {
                 "EXCLUDE_BY_STRING",
                 Arrays.asList(".*min", ".*max", "host", "threads"),
                 false);
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
         LOGGER.info("Got " + points.size() + " plot points");
         testPlotPoints(points, 8);
     }
+
     @Test
     public void testIncludeHeaderByRegex() {
         CSVSeries series = new CSVSeries("test_exclusions.csv",
@@ -217,10 +243,13 @@ public class CSVSeriesTest extends SeriesTestCase {
                 "INCLUDE_BY_STRING",
                 Arrays.asList(".*avg"),
                 false);
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
         LOGGER.info("Got " + points.size() + " plot points");
         testPlotPoints(points, 5);
     }
+
     @Test
     public void testIncludeHeaderByStringAndRegex() {
         CSVSeries series = new CSVSeries("test_exclusions.csv",
@@ -228,7 +257,9 @@ public class CSVSeriesTest extends SeriesTestCase {
                 "INCLUDE_BY_STRING",
                 Arrays.asList("errors", ".*avg", "autoplay count"),
                 false);
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
         LOGGER.info("Got " + points.size() + " plot points");
         testPlotPoints(points, 6);
     }
@@ -240,7 +271,9 @@ public class CSVSeriesTest extends SeriesTestCase {
                 "INCLUDE_BY_STRING",
                 Collections.singletonList(".*_(OpenStartPage|Login)_.*"),
                 false);
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
         LOGGER.info("Got " + points.size() + " plot points");
         testPlotPoints(points, 14);
     }
@@ -252,7 +285,9 @@ public class CSVSeriesTest extends SeriesTestCase {
                 "INCLUDE_BY_STRING",
                 Arrays.asList("Avg", "Median"),
                 false);
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
         LOGGER.info("Got " + points.size() + " plot points");
         testPlotPoints(points, 2);
     }
