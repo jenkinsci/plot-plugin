@@ -88,7 +88,13 @@ public class CSVSeries extends Series {
             if (exclusionValues instanceof String) {
                 this.exclusionValues = Arrays.asList(PAT_COMMA.split((String) exclusionValues));
             } else if (exclusionValues instanceof List) {
-                this.exclusionValues = (List<String>) exclusionValues;
+                if (this.exclusionValues == null) {
+                    this.exclusionValues = new ArrayList<>();
+                }
+                // Cast every Object to a String
+                for (Object o : (List<?>) exclusionValues) {
+                    this.exclusionValues.add(o.toString());
+                }
             } else {
                 LOGGER.log(Level.SEVERE,
                         "Not supported Class for exclusionValues ("

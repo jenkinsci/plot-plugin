@@ -119,27 +119,31 @@ public class CSVSeriesTest extends SeriesTestCase {
     }
 
     @Test
-    public void constructorShallFailOnExclusionValue_IntArray() {
-        CSVSeries series = new CSVSeries("pct_sum1_web.csv",
+    public void testCSVExclusionValue_IntArray() {
+        CSVSeries series = new CSVSeries("test.csv",
                 null,
                 "EXCLUDE_BY_STRING",
                 Arrays.asList(123, 345),
                 false);
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
         LOGGER.info("Got " + points.size() + " plot points");
-        testPlotPoints(points, 3);
+        testPlotPoints(points, 8);
     }
 
     @Test
-    public void constructorShallFailOnExclusionValue_EmptyArray() {
-        CSVSeries series = new CSVSeries("pct_sum1_web.csv",
+    public void testCSVInclusionValue_IntArray() {
+        CSVSeries series = new CSVSeries("test.csv",
                 null,
-                "EXCLUDE_BY_STRING",
-                Arrays.asList(),
+                "INCLUDE_BY_STRING",
+                Arrays.asList(123, 345),
                 false);
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
         LOGGER.info("Got " + points.size() + " plot points");
-        testPlotPoints(points, 3);
+        testPlotPoints(points, 0);
     }
 
     @Test
