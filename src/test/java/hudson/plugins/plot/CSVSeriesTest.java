@@ -158,6 +158,31 @@ public class CSVSeriesTest extends SeriesTestCase {
     }
 
     @Test
+    public void constructorShallFailOnExclusionValue_IntArray() {
+        CSVSeries series = new CSVSeries("pct_sum1_web.csv",
+                null,
+                "EXCLUDE_BY_STRING",
+                Arrays.asList(123,345),
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 3);
+    }
+
+    @Test
+    public void constructorShallFailOnExclusionValue_EmptyArray() {
+        CSVSeries series = new CSVSeries("pct_sum1_web.csv",
+                null,
+                "EXCLUDE_BY_STRING",
+                Arrays.asList(),
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 3);
+    }
+
+
+    @Test
     public void testExcludeByRegexInAList() {
         CSVSeries series = new CSVSeries("pct_sum1_web.csv",
                 null,
