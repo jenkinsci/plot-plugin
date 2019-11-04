@@ -281,11 +281,10 @@ public class CSVSeries extends Series {
         return retVal;
     }
 
-
     private boolean checkExclusionSet(String label) {
-        if (strExclusionSet.contains(label))
+        if (strExclusionSet.contains(label)) {
             return true;
-        else {
+        } else {
             for (String s : strExclusionSet) {
                 if (label.matches(s)) {
                     return true;

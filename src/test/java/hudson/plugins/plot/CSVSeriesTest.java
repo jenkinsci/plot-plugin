@@ -123,7 +123,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         CSVSeries series = new CSVSeries("pct_sum1_web.csv",
                 null,
                 "EXCLUDE_BY_STRING",
-                Arrays.asList(123,345),
+                Arrays.asList(123, 345),
                 false);
         List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
         LOGGER.info("Got " + points.size() + " plot points");
@@ -149,7 +149,9 @@ public class CSVSeriesTest extends SeriesTestCase {
                 "EXCLUDE_BY_STRING",
                 Arrays.asList("HTTP_[4,5]\\d{2}", "Hits", "Throughput", "RunId", "Trend Measurement Type"),
                 false);
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
         LOGGER.info("Got " + points.size() + " plot points");
         testPlotPoints(points, 3);
     }
@@ -161,7 +163,9 @@ public class CSVSeriesTest extends SeriesTestCase {
                 "INCLUDE_BY_STRING",
                 Arrays.asList("HTTP_[2,3]\\d{2}"),
                 false);
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
         LOGGER.info("Got " + points.size() + " plot points");
         testPlotPoints(points, 3);
     }
