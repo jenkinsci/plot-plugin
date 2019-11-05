@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -39,6 +40,7 @@ public class CSVSeries extends Series {
     private static final transient Logger LOGGER = Logger.getLogger(CSVSeries.class.getName());
     // Debugging hack, so I don't have to change FINE/INFO...
     private static final transient Level DEFAULT_LOG_LEVEL = Level.FINEST;
+    private static final transient Pattern PAT_SEMICOLON_ENCLOSURE = Pattern.compile("\"(.*?)\"");
     private static final transient Pattern PAT_COMMA = Pattern.compile(",");
 
     public enum InclusionFlag {
@@ -63,7 +65,12 @@ public class CSVSeries extends Series {
     /**
      * Comma separated list of columns to exclude.
      */
-    private List<String> exclusionValues;
+    private String exclusionValues;
+
+    /**
+     * Comma separated list of columns to exclude.
+     */
+    private List<String> exclusionValuesList;
 
     /**
      * Url to use as a base for mapping points.
@@ -77,45 +84,49 @@ public class CSVSeries extends Series {
 
     @DataBoundConstructor
     public CSVSeries(String file, String url, String inclusionFlag,
-                     Object exclusionValues, boolean displayTableFlag) {
+                     String exclusionValues, boolean displayTableFlag) {
         super(file, "", "csv");
 
         this.url = url;
         this.displayTableFlag = displayTableFlag;
+        this.exclusionValues = exclusionValues;
 
-        if (exclusionValues == null) {
+        if (this.exclusionValues == null) {
             this.inclusionFlag = InclusionFlag.OFF;
         } else {
             this.inclusionFlag = InclusionFlag.valueOf(inclusionFlag);
+            this.exclusionValuesList = new ArrayList<>();
 
-            if (exclusionValues instanceof String) {
-                this.exclusionValues = Arrays.asList(PAT_COMMA.split((String) exclusionValues));
-            } else if (exclusionValues instanceof List) {
-                if (this.exclusionValues == null) {
-                    this.exclusionValues = new ArrayList<>();
-                }
-                // Cast every Object to a String
-                for (Object o : (List<?>) exclusionValues) {
-                    this.exclusionValues.add(o.toString());
-                }
-            } else {
-                LOGGER.log(Level.SEVERE,
-                        "Not supported Class for exclusionValues ("
-                                + exclusionValues.getClass()
-                                + ")! Try String or List"
-                );
+            /**
+             * first: try to handle the regex. The values are enclosed by ""
+             * If there are no values found, use plain splitting by comma
+             */
+            Matcher m = PAT_SEMICOLON_ENCLOSURE.matcher(this.exclusionValues);
+            int results = 0;
+            while (m.find()) {
+                this.exclusionValuesList.add(m.group().replaceAll("\"", ""));
+                results++;
             }
 
-            loadExclusionSet();
+            if (results == 0) {
+                this.exclusionValuesList = Arrays.asList(
+                        PAT_COMMA.split((String) this.exclusionValues)
+                );
+            }
         }
+        loadExclusionSet();
     }
 
     public String getInclusionFlag() {
         return ObjectUtils.toString(inclusionFlag);
     }
 
-    public List<String> getExclusionValues() {
+    public String getExclusionValues() {
         return exclusionValues;
+    }
+
+    public List<String> getExclusionValuesList() {
+        return exclusionValuesList;
     }
 
     public String getUrl() {
@@ -292,6 +303,7 @@ public class CSVSeries extends Series {
 
     /**
      * Checks if the current label / header is known in the strExclusionSet (plain text or regex).
+     *
      * @param label
      * @return if the label is in the set
      */
@@ -300,8 +312,15 @@ public class CSVSeries extends Series {
             return true;
         } else {
             for (String s : strExclusionSet) {
-                if (label.matches(s)) {
-                    return true;
+                try {
+                    if (label.matches(s)) {
+                        return true;
+                    }
+                } catch (java.util.regex.PatternSyntaxException e) {
+                    // Log error for error tracing and also throw exception
+                    LOGGER.log(Level.SEVERE, "Exception searching the match with the Exclusion '"
+                            + s + "'", e);
+                    throw e;
                 }
             }
         }
@@ -335,7 +354,7 @@ public class CSVSeries extends Series {
                 LOGGER.log(Level.SEVERE, "Failed to initialize columns exclusions set.");
         }
 
-        for (String str : exclusionValues) {
+        for (String str : exclusionValuesList) {
             if (str == null || str.length() <= 0) {
                 continue;
             }

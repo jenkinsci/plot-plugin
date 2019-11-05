@@ -12,8 +12,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -142,7 +140,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         CSVSeries series = new CSVSeries("test.csv",
                 null,
                 "EXCLUDE_BY_STRING",
-                Arrays.asList(123, 345),
+                "123,345",
                 false);
         List<PlotPoint> points = series.loadSeries(workspaceRootDir,
                 0,
@@ -156,7 +154,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         CSVSeries series = new CSVSeries("test.csv",
                 null,
                 "INCLUDE_BY_STRING",
-                Arrays.asList(123, 345),
+                "123,345",
                 false);
         List<PlotPoint> points = series.loadSeries(workspaceRootDir,
                 0,
@@ -170,7 +168,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         CSVSeries series = new CSVSeries("test_regex-webstatistics.csv",
                 null,
                 "EXCLUDE_BY_STRING",
-                Arrays.asList("HTTP_[4,5]\\d{2}", "Hits", "Throughput", "RunId", "Trend Measurement Type"),
+                "\"HTTP_[4,5]\\d{2}\",\"Hits\",\"Throughput\",\"RunId\",\"Trend Measurement Type\"",
                 false);
         List<PlotPoint> points = series.loadSeries(workspaceRootDir,
                 0,
@@ -180,17 +178,31 @@ public class CSVSeriesTest extends SeriesTestCase {
     }
 
     @Test
-    public void testIncludeByRegexInAList() {
+    public void testIncludeBySingleRegexWithComma() {
         CSVSeries series = new CSVSeries("test_regex-webstatistics.csv",
                 null,
                 "INCLUDE_BY_STRING",
-                Arrays.asList("HTTP_[2,3]\\d{2}"),
+                "\"HTTP_[2,3]\\d{2}\"",
                 false);
         List<PlotPoint> points = series.loadSeries(workspaceRootDir,
                 0,
                 System.out);
         LOGGER.info("Got " + points.size() + " plot points");
         testPlotPoints(points, 3);
+    }
+
+    @Test(expected = java.util.regex.PatternSyntaxException.class)
+    public void testIncludeBySingleRegexWithComma_unescaped_shouldFail() {
+        CSVSeries series = new CSVSeries("test_regex-webstatistics.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                "HTTP_[2,3]\\d{2}",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 0);
     }
 
     @Test
@@ -198,7 +210,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         CSVSeries series = new CSVSeries("test_regex-by-suffix.csv",
                 null,
                 "INCLUDE_BY_STRING",
-                Arrays.asList(".*testUser_1", ".*testUser_2"),
+                "\".*testUser_1\",\".*testUser_2\"",
                 false);
         List<PlotPoint> points = series.loadSeries(workspaceRootDir,
                 0,
@@ -213,7 +225,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         CSVSeries series = new CSVSeries("test_regex-by-suffix.csv",
                 null,
                 "EXCLUDE_BY_STRING",
-                Arrays.asList("(?i)(RunID)", "Login_.*", ".*testUser_[1-2]{1,2}"),
+                "\"(?i)(RunID)\",\"Login_.*\",\".*testUser_[1-2]{1,2}\"",
                 false);
         List<PlotPoint> points = series.loadSeries(workspaceRootDir,
                 0,
@@ -227,7 +239,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         CSVSeries series = new CSVSeries("test_exclusions.csv",
                 null,
                 "EXCLUDE_BY_STRING",
-                Arrays.asList(".*min", ".*max", "host", "threads"),
+                "\".*min\",\".*max\",\"host\",\"threads\"",
                 false);
         List<PlotPoint> points = series.loadSeries(workspaceRootDir,
                 0,
@@ -241,7 +253,42 @@ public class CSVSeriesTest extends SeriesTestCase {
         CSVSeries series = new CSVSeries("test_exclusions.csv",
                 null,
                 "INCLUDE_BY_STRING",
-                Arrays.asList(".*avg"),
+                "\".*avg\"",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 4);
+    }
+
+    /**
+     * Making sure, the 3 exclusionValues are put into the List by surrounding even the String with ""
+     */
+    @Test
+    public void testIncludeHeaderByRegexAndEscapedString() {
+        CSVSeries series = new CSVSeries("test_exclusions.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                "\"errors\",\".*avg\",\"autoplay count\"",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 6);
+    }
+
+
+    /**
+     * By not surrounding single Strings with "", only the Regex will be put into the List
+     */
+    @Test
+    public void testIncludeHeaderByRegexAndUnescapedString() {
+        CSVSeries series = new CSVSeries("test_exclusions.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                "errors,\".*avg\",autoplay count",
                 false);
         List<PlotPoint> points = series.loadSeries(workspaceRootDir,
                 0,
@@ -251,25 +298,11 @@ public class CSVSeriesTest extends SeriesTestCase {
     }
 
     @Test
-    public void testIncludeHeaderByStringAndRegex() {
-        CSVSeries series = new CSVSeries("test_exclusions.csv",
-                null,
-                "INCLUDE_BY_STRING",
-                Arrays.asList("errors", ".*avg", "autoplay count"),
-                false);
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
-                0,
-                System.out);
-        LOGGER.info("Got " + points.size() + " plot points");
-        testPlotPoints(points, 6);
-    }
-
-    @Test
     public void testIncludeByRegexInAString() {
         CSVSeries series = new CSVSeries("test_regex-by-suffix.csv",
                 null,
                 "INCLUDE_BY_STRING",
-                Collections.singletonList(".*_(OpenStartPage|Login)_.*"),
+                "\".*_(OpenStartPage|Login)_.*\"",
                 false);
         List<PlotPoint> points = series.loadSeries(workspaceRootDir,
                 0,
@@ -283,7 +316,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         CSVSeries series = new CSVSeries("test.csv",
                 null,
                 "INCLUDE_BY_STRING",
-                Arrays.asList("Avg", "Median"),
+                "Avg,Median",
                 false);
         List<PlotPoint> points = series.loadSeries(workspaceRootDir,
                 0,
