@@ -247,7 +247,7 @@ public class CSVSeriesTest extends SeriesTestCase {
                 0,
                 System.out);
         LOGGER.info("Got " + points.size() + " plot points");
-        testPlotPoints(points, 5);
+        testPlotPoints(points, 4);
     }
 
     @Test
@@ -275,7 +275,7 @@ public class CSVSeriesTest extends SeriesTestCase {
                 0,
                 System.out);
         LOGGER.info("Got " + points.size() + " plot points");
-        testPlotPoints(points, 14);
+        testPlotPoints(points, 8);
     }
 
     @Test
