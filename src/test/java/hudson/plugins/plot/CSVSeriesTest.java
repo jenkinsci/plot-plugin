@@ -249,6 +249,20 @@ public class CSVSeriesTest extends SeriesTestCase {
     }
 
     @Test
+    public void testIncludeHeaderByRegex_testcsv() {
+        CSVSeries series = new CSVSeries("test.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                "\"m.*\",\"error.*\"",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 4);
+    }
+
+    @Test
     public void testIncludeHeaderByRegex() {
         CSVSeries series = new CSVSeries("test_exclusions.csv",
                 null,
