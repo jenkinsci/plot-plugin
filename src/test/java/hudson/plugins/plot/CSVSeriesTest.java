@@ -137,6 +137,10 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test
     public void testCSVExclusionValue_IntArray() {
+        /*
+         * header before:       Avg,Median,90,min,max,samples,errors,error %
+         * header afterwards:   Avg,Median,90,min,max,samples,errors,error %
+         */
         CSVSeries series = new CSVSeries("test.csv",
                 null,
                 "EXCLUDE_BY_STRING",
@@ -151,6 +155,10 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test
     public void testCSVInclusionValue_IntArray() {
+        /*
+         * header before:       Avg,Median,90,min,max,samples,errors,error %
+         * header afterwards:
+         */
         CSVSeries series = new CSVSeries("test.csv",
                 null,
                 "INCLUDE_BY_STRING",
@@ -165,6 +173,10 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test
     public void testExcludeByRegexInAList() {
+        /*
+         * header before:       RunId,Trend Measurement Type,HTTP_200,HTTP_201,HTTP_302,HTTP_500,Hits,Throughput,
+         * header afterwards:   HTTP_200,HTTP_201,HTTP_302
+         */
         CSVSeries series = new CSVSeries("test_regex_webstatistics.csv",
                 null,
                 "EXCLUDE_BY_STRING",
@@ -178,7 +190,11 @@ public class CSVSeriesTest extends SeriesTestCase {
     }
 
     @Test
-    public void testIncludeBySingleRegexWithComma() {
+    public void testIncludeByRegex() {
+        /*
+         * header before: RunId,Trend Measurement Type,HTTP_200,HTTP_201,HTTP_302,HTTP_500,Hits,Throughput,
+         * header afterwards:   HTTP_200,HTTP_201,HTTP_302
+         */
         CSVSeries series = new CSVSeries("test_regex_webstatistics.csv",
                 null,
                 "INCLUDE_BY_STRING",
@@ -193,6 +209,9 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test(expected = java.util.regex.PatternSyntaxException.class)
     public void testIncludeBySingleRegexWithComma_unescaped_shouldFail() {
+        /*
+         * Testing with an unsupported pattern, causing the test to fail.
+         */
         CSVSeries series = new CSVSeries("test_regex_webstatistics.csv",
                 null,
                 "INCLUDE_BY_STRING",
@@ -206,7 +225,11 @@ public class CSVSeriesTest extends SeriesTestCase {
     }
 
     @Test
-    public void testIncludeTestuserByRegex() {
+    public void testIncludeBySuffixByRegex() {
+        /*
+         * header before:       RunId,StartPage_0010_OpenStartPage_testUser_1,StartPage_0010_OpenStartPage_testUser_2,StartPage_0010_OpenStartPage_testUser_3,StartPage_0010_OpenStartPage_testUser_4,Login_0010_Login_testUser_1,Login_0010_Login_testUser_2,Login_0010_Login_testUser_3,Login_0010_Login_testUser_4,UploadAsset_0010_OpenPerformancetestAssets_testUser_1,UploadAsset_0010_OpenPerformancetestAssets_testUser_2,UploadAsset_0010_OpenPerformancetestAssets_testUser_3,UploadAsset_0010_OpenPerformancetestAssets_testUser_4
+         * header afterwards:   StartPage_0010_OpenStartPage_testUser_1,StartPage_0010_OpenStartPage_testUser_2,Login_0010_Login_testUser_1,Login_0010_Login_testUser_2,UploadAsset_0010_OpenPerformancetestAssets_testUser_1,UploadAsset_0010_OpenPerformancetestAssets_testUser_2
+         */
         CSVSeries series = new CSVSeries("test_regex_by_suffix.csv",
                 null,
                 "INCLUDE_BY_STRING",
@@ -220,8 +243,13 @@ public class CSVSeriesTest extends SeriesTestCase {
     }
 
     @Test
-    public void testExcludeTestuserByRegex() {
-        // Testing a little more complex regex with case insensitive and boundaries
+    public void testExcludeBySuffixByRegex() {
+        /*
+         * Testing a little more complex regex with case insensitive and boundaries.
+         *
+         * header before:       RunId,StartPage_0010_OpenStartPage_testUser_1,StartPage_0010_OpenStartPage_testUser_2,StartPage_0010_OpenStartPage_testUser_3,StartPage_0010_OpenStartPage_testUser_4,Login_0010_Login_testUser_1,Login_0010_Login_testUser_2,Login_0010_Login_testUser_3,Login_0010_Login_testUser_4,UploadAsset_0010_OpenPerformancetestAssets_testUser_1,UploadAsset_0010_OpenPerformancetestAssets_testUser_2,UploadAsset_0010_OpenPerformancetestAssets_testUser_3,UploadAsset_0010_OpenPerformancetestAssets_testUser_4
+         * header afterwards:   StartPage_0010_OpenStartPage_testUser_3,StartPage_0010_OpenStartPage_testUser_4,UploadAsset_0010_OpenPerformancetestAssets_testUser_3,UploadAsset_0010_OpenPerformancetestAssets_testUser_4
+         */
         CSVSeries series = new CSVSeries("test_regex_by_suffix.csv",
                 null,
                 "EXCLUDE_BY_STRING",
@@ -236,6 +264,10 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test
     public void testExcludeHeaderByRegex() {
+        /*
+         * header before:       recs avg,recs min,recs max,station avg,station min,station max,personalized avg,personalized min,personalized max,autoplay avg,autoplay min,autoplay max,station count,personalized count,autoplay count,threads,host,errors
+         * header afterwards:   recs avg,station avg,personalized avg,autoplay avg,station count,personalized count,autoplay count,errors
+         */
         CSVSeries series = new CSVSeries("test_exclusions.csv",
                 null,
                 "EXCLUDE_BY_STRING",
@@ -250,6 +282,10 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test
     public void testIncludeHeaderByRegex_testcsv() {
+        /*
+         * header before:       Avg,Median,90,min,max,samples,errors,error %
+         * header afterwards:   min,max,errors,error %
+         */
         CSVSeries series = new CSVSeries("test.csv",
                 null,
                 "INCLUDE_BY_STRING",
@@ -264,6 +300,10 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test
     public void testIncludeHeaderByRegex() {
+        /*
+         * header before:       recs avg,recs min,recs max,station avg,station min,station max,personalized avg,personalized min,personalized max,autoplay avg,autoplay min,autoplay max,station count,personalized count,autoplay count,threads,host,errors
+         * header afterwards:   recs avg,station avg,personalized avg,autoplay avg
+         */
         CSVSeries series = new CSVSeries("test_exclusions.csv",
                 null,
                 "INCLUDE_BY_STRING",
@@ -281,6 +321,10 @@ public class CSVSeriesTest extends SeriesTestCase {
      */
     @Test
     public void testIncludeHeaderByRegexAndEscapedString() {
+        /*
+         * header before:       recs avg,recs min,recs max,station avg,station min,station max,personalized avg,personalized min,personalized max,autoplay avg,autoplay min,autoplay max,station count,personalized count,autoplay count,threads,host,errors
+         * header afterwards:   recs avg,station avg,personalized avg,autoplay avg,autoplay count,errors
+         */
         CSVSeries series = new CSVSeries("test_exclusions.csv",
                 null,
                 "INCLUDE_BY_STRING",
@@ -293,12 +337,15 @@ public class CSVSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 6);
     }
 
-
     /**
      * By not surrounding single Strings with "", only the Regex will be put into the List
      */
     @Test
     public void testIncludeHeaderByRegexAndUnescapedString() {
+        /*
+         * header before:       recs avg,recs min,recs max,station avg,station min,station max,personalized avg,personalized min,personalized max,autoplay avg,autoplay min,autoplay max,station count,personalized count,autoplay count,threads,host,errors
+         * header afterwards:   recs avg,station avg,personalized avg,autoplay avg
+         */
         CSVSeries series = new CSVSeries("test_exclusions.csv",
                 null,
                 "INCLUDE_BY_STRING",
@@ -313,6 +360,10 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test
     public void testIncludeByRegexInAString() {
+        /*
+         * header before:       RunId,StartPage_0010_OpenStartPage_testUser_1,StartPage_0010_OpenStartPage_testUser_2,StartPage_0010_OpenStartPage_testUser_3,StartPage_0010_OpenStartPage_testUser_4,Login_0010_Login_testUser_1,Login_0010_Login_testUser_2,Login_0010_Login_testUser_3,Login_0010_Login_testUser_4,UploadAsset_0010_OpenPerformancetestAssets_testUser_1,UploadAsset_0010_OpenPerformancetestAssets_testUser_2,UploadAsset_0010_OpenPerformancetestAssets_testUser_3,UploadAsset_0010_OpenPerformancetestAssets_testUser_4
+         * header afterwards:   StartPage_0010_OpenStartPage_testUser_1,StartPage_0010_OpenStartPage_testUser_2,StartPage_0010_OpenStartPage_testUser_3,StartPage_0010_OpenStartPage_testUser_4,Login_0010_Login_testUser_1,Login_0010_Login_testUser_2,Login_0010_Login_testUser_3,Login_0010_Login_testUser_4
+         */
         CSVSeries series = new CSVSeries("test_regex_by_suffix.csv",
                 null,
                 "INCLUDE_BY_STRING",
@@ -327,6 +378,10 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test
     public void testIncludeByString() {
+        /*
+         * header before:       Avg,Median,90,min,max,samples,errors,error %
+         * header afterwards:   Avg,Median
+         */
         CSVSeries series = new CSVSeries("test.csv",
                 null,
                 "INCLUDE_BY_STRING",
@@ -377,5 +432,4 @@ public class CSVSeriesTest extends SeriesTestCase {
             IOUtils.closeQuietly(inputStream);
         }
     }
-
 }
