@@ -165,7 +165,7 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test
     public void testExcludeByRegexInAList() {
-        CSVSeries series = new CSVSeries("test_regex-webstatistics.csv",
+        CSVSeries series = new CSVSeries("test_regex_webstatistics.csv",
                 null,
                 "EXCLUDE_BY_STRING",
                 "\"HTTP_[4,5]\\d{2}\",\"Hits\",\"Throughput\",\"RunId\",\"Trend Measurement Type\"",
@@ -179,7 +179,7 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test
     public void testIncludeBySingleRegexWithComma() {
-        CSVSeries series = new CSVSeries("test_regex-webstatistics.csv",
+        CSVSeries series = new CSVSeries("test_regex_webstatistics.csv",
                 null,
                 "INCLUDE_BY_STRING",
                 "\"HTTP_[2,3]\\d{2}\"",
@@ -193,7 +193,7 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test(expected = java.util.regex.PatternSyntaxException.class)
     public void testIncludeBySingleRegexWithComma_unescaped_shouldFail() {
-        CSVSeries series = new CSVSeries("test_regex-webstatistics.csv",
+        CSVSeries series = new CSVSeries("test_regex_webstatistics.csv",
                 null,
                 "INCLUDE_BY_STRING",
                 "HTTP_[2,3]\\d{2}",
@@ -207,7 +207,7 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test
     public void testIncludeTestuserByRegex() {
-        CSVSeries series = new CSVSeries("test_regex-by-suffix.csv",
+        CSVSeries series = new CSVSeries("test_regex_by_suffix.csv",
                 null,
                 "INCLUDE_BY_STRING",
                 "\".*testUser_1\",\".*testUser_2\"",
@@ -222,7 +222,7 @@ public class CSVSeriesTest extends SeriesTestCase {
     @Test
     public void testExcludeTestuserByRegex() {
         // Testing a little more complex regex with case insensitive and boundaries
-        CSVSeries series = new CSVSeries("test_regex-by-suffix.csv",
+        CSVSeries series = new CSVSeries("test_regex_by_suffix.csv",
                 null,
                 "EXCLUDE_BY_STRING",
                 "\"(?i)(RunID)\",\"Login_.*\",\".*testUser_[1-2]{1,2}\"",
@@ -313,7 +313,7 @@ public class CSVSeriesTest extends SeriesTestCase {
 
     @Test
     public void testIncludeByRegexInAString() {
-        CSVSeries series = new CSVSeries("test_regex-by-suffix.csv",
+        CSVSeries series = new CSVSeries("test_regex_by_suffix.csv",
                 null,
                 "INCLUDE_BY_STRING",
                 "\".*_(OpenStartPage|Login)_.*\"",
