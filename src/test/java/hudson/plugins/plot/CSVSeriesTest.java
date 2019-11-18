@@ -281,24 +281,6 @@ public class CSVSeriesTest extends SeriesTestCase {
     }
 
     @Test
-    public void testIncludeHeaderByRegex_testcsv() {
-        /*
-         * header before:       Avg,Median,90,min,max,samples,errors,error %
-         * header afterwards:   min,max,errors,error %
-         */
-        CSVSeries series = new CSVSeries("test.csv",
-                null,
-                "INCLUDE_BY_STRING",
-                "\"m.*\",\"error.*\"",
-                false);
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
-                0,
-                System.out);
-        LOGGER.info("Got " + points.size() + " plot points");
-        testPlotPoints(points, 4);
-    }
-
-    @Test
     public void testIncludeHeaderByRegex() {
         /*
          * header before:       recs avg,recs min,recs max,station avg,station min,station max,personalized avg,personalized min,personalized max,autoplay avg,autoplay min,autoplay max,station count,personalized count,autoplay count,threads,host,errors
