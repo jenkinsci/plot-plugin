@@ -37,10 +37,6 @@ public class SeriesTestCase {
     }
 
     public void testPlotPoints(List<PlotPoint> points, int expected) {
-        String labels = "";
-        for (PlotPoint p : points)
-            labels += p.getLabel() + ",";
-        LOGGER.info(labels);
         assertTrue("Must have more than 0 columns", expected > -1);
 
         assertNotNull("loadSeries failed to return any points", points);
