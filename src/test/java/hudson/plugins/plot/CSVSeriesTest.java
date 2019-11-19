@@ -38,7 +38,11 @@ public class CSVSeriesTest extends SeriesTestCase {
     public void testCSVSeriesWithNullExclusionValuesSetsDisplayTableFlag() {
         CSVSeries series;
         for (int index = 0; index < FILES.length; index++) {
-            series = new CSVSeries(FILES[index], null, null, null, true);
+            series = new CSVSeries(FILES[index],
+                    null,
+                    null,
+                    null,
+                    true);
             assertTrue(series.getDisplayTableFlag());
         }
     }
@@ -58,7 +62,11 @@ public class CSVSeriesTest extends SeriesTestCase {
             assertEquals(COLUMNS[index], columns);
 
             // Create a new CSV series.
-            CSVSeries series = new CSVSeries(FILES[index], "http://localhost:8080/%name%/%index%/", "OFF", "", false);
+            CSVSeries series = new CSVSeries(FILES[index],
+                    "http://localhost:8080/%name%/%index%/",
+                    "OFF",
+                    "",
+                    false);
 
             LOGGER.info("Created series " + series.toString());
             // test the basic subclass properties.
@@ -84,12 +92,18 @@ public class CSVSeriesTest extends SeriesTestCase {
     public void testCSVSeriesIncludeOnlyLastColumn() {
         for (int index = 0; index < FILES.length; index++) {
             // Create a new CSV series.
-            CSVSeries series = new CSVSeries(FILES[index], "http://localhost:8080/%name%/%index%/", "INCLUDE_BY_STRING", LAST_COLUMN_NAME[index], false);
+            CSVSeries series = new CSVSeries(FILES[index],
+                    "http://localhost:8080/%name%/%index%/",
+                    "INCLUDE_BY_STRING",
+                    LAST_COLUMN_NAME[index],
+                    false);
 
             LOGGER.info("Created series " + series.toString());
 
             // load the series.
-            List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+            List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                    0,
+                    System.out);
             LOGGER.info("Got " + points.size() + " plot points");
             testPlotPoints(points, LINES[index] - 1);  // expect one point per line, minus one header line
 
@@ -104,16 +118,262 @@ public class CSVSeriesTest extends SeriesTestCase {
         String file = "test_trailing_semicolon.csv";
         // Create a new CSV series.
         CSVSeries series = new CSVSeries(file,
-                "http://localhost:8080/%name%/%index%/", "OFF", "", false);
+                "http://localhost:8080/%name%/%index%/",
+                "OFF",
+                "",
+                false);
 
         LOGGER.info("Created series " + series.toString());
         // test the basic subclass properties.
         testSeries(series, file, "", "csv");
 
         // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
         LOGGER.info("Got " + points.size() + " plot points");
         testPlotPoints(points, 8);
+    }
+
+    @Test
+    public void testCSVExclusionValue_IntArray() {
+        /*
+         * header before:       Avg,Median,90,min,max,samples,errors,error %
+         * header afterwards:   Avg,Median,90,min,max,samples,errors,error %
+         */
+        CSVSeries series = new CSVSeries("test.csv",
+                null,
+                "EXCLUDE_BY_STRING",
+                "123,345",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 8);
+    }
+
+    @Test
+    public void testCSVInclusionValue_IntArray() {
+        /*
+         * header before:       Avg,Median,90,min,max,samples,errors,error %
+         * header afterwards:
+         */
+        CSVSeries series = new CSVSeries("test.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                "123,345",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 0);
+    }
+
+    @Test
+    public void testExcludeByRegexInAList() {
+        /*
+         * header before:       RunId,Trend Measurement Type,HTTP_200,HTTP_201,HTTP_302,HTTP_500,Hits,Throughput,
+         * header afterwards:   HTTP_200,HTTP_201,HTTP_302
+         */
+        CSVSeries series = new CSVSeries("test_regex_webstatistics.csv",
+                null,
+                "EXCLUDE_BY_STRING",
+                "\"HTTP_[4,5]\\d{2}\",\"Hits\",\"Throughput\",\"RunId\",\"Trend Measurement Type\"",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 3);
+    }
+
+    @Test
+    public void testIncludeByRegex() {
+        /*
+         * header before: RunId,Trend Measurement Type,HTTP_200,HTTP_201,HTTP_302,HTTP_500,Hits,Throughput,
+         * header afterwards:   HTTP_200,HTTP_201,HTTP_302
+         */
+        CSVSeries series = new CSVSeries("test_regex_webstatistics.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                "\"HTTP_[2,3]\\d{2}\"",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 3);
+    }
+
+    @Test(expected = java.util.regex.PatternSyntaxException.class)
+    public void testIncludeBySingleRegexWithComma_unescaped_shouldFail() {
+        /*
+         * Testing with an unsupported pattern, causing the test to fail.
+         */
+        CSVSeries series = new CSVSeries("test_regex_webstatistics.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                "HTTP_[2,3]\\d{2}",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 0);
+    }
+
+    @Test
+    public void testIncludeBySuffixByRegex() {
+        /*
+         * header before:       RunId,StartPage_0010_OpenStartPage_testUser_1,StartPage_0010_OpenStartPage_testUser_2,StartPage_0010_OpenStartPage_testUser_3,StartPage_0010_OpenStartPage_testUser_4,Login_0010_Login_testUser_1,Login_0010_Login_testUser_2,Login_0010_Login_testUser_3,Login_0010_Login_testUser_4,UploadAsset_0010_OpenPerformancetestAssets_testUser_1,UploadAsset_0010_OpenPerformancetestAssets_testUser_2,UploadAsset_0010_OpenPerformancetestAssets_testUser_3,UploadAsset_0010_OpenPerformancetestAssets_testUser_4
+         * header afterwards:   StartPage_0010_OpenStartPage_testUser_1,StartPage_0010_OpenStartPage_testUser_2,Login_0010_Login_testUser_1,Login_0010_Login_testUser_2,UploadAsset_0010_OpenPerformancetestAssets_testUser_1,UploadAsset_0010_OpenPerformancetestAssets_testUser_2
+         */
+        CSVSeries series = new CSVSeries("test_regex_by_suffix.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                "\".*testUser_1\",\".*testUser_2\"",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 6);
+    }
+
+    @Test
+    public void testExcludeBySuffixByRegex() {
+        /*
+         * Testing a little more complex regex with case insensitive and boundaries.
+         *
+         * header before:       RunId,StartPage_0010_OpenStartPage_testUser_1,StartPage_0010_OpenStartPage_testUser_2,StartPage_0010_OpenStartPage_testUser_3,StartPage_0010_OpenStartPage_testUser_4,Login_0010_Login_testUser_1,Login_0010_Login_testUser_2,Login_0010_Login_testUser_3,Login_0010_Login_testUser_4,UploadAsset_0010_OpenPerformancetestAssets_testUser_1,UploadAsset_0010_OpenPerformancetestAssets_testUser_2,UploadAsset_0010_OpenPerformancetestAssets_testUser_3,UploadAsset_0010_OpenPerformancetestAssets_testUser_4
+         * header afterwards:   StartPage_0010_OpenStartPage_testUser_3,StartPage_0010_OpenStartPage_testUser_4,UploadAsset_0010_OpenPerformancetestAssets_testUser_3,UploadAsset_0010_OpenPerformancetestAssets_testUser_4
+         */
+        CSVSeries series = new CSVSeries("test_regex_by_suffix.csv",
+                null,
+                "EXCLUDE_BY_STRING",
+                "\"(?i)(RunID)\",\"Login_.*\",\".*testUser_[1-2]{1,2}\"",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 4);
+    }
+
+    @Test
+    public void testExcludeHeaderByRegex() {
+        /*
+         * header before:       recs avg,recs min,recs max,station avg,station min,station max,personalized avg,personalized min,personalized max,autoplay avg,autoplay min,autoplay max,station count,personalized count,autoplay count,threads,host,errors
+         * header afterwards:   recs avg,station avg,personalized avg,autoplay avg,station count,personalized count,autoplay count,errors
+         */
+        CSVSeries series = new CSVSeries("test_exclusions.csv",
+                null,
+                "EXCLUDE_BY_STRING",
+                "\".*min\",\".*max\",\"host\",\"threads\"",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 8);
+    }
+
+    @Test
+    public void testIncludeHeaderByRegex() {
+        /*
+         * header before:       recs avg,recs min,recs max,station avg,station min,station max,personalized avg,personalized min,personalized max,autoplay avg,autoplay min,autoplay max,station count,personalized count,autoplay count,threads,host,errors
+         * header afterwards:   recs avg,station avg,personalized avg,autoplay avg
+         */
+        CSVSeries series = new CSVSeries("test_exclusions.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                "\".*avg\"",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 4);
+    }
+
+    /**
+     * Making sure, the 3 exclusionValues are put into the List by surrounding even the String with ""
+     */
+    @Test
+    public void testIncludeHeaderByRegexAndEscapedString() {
+        /*
+         * header before:       recs avg,recs min,recs max,station avg,station min,station max,personalized avg,personalized min,personalized max,autoplay avg,autoplay min,autoplay max,station count,personalized count,autoplay count,threads,host,errors
+         * header afterwards:   recs avg,station avg,personalized avg,autoplay avg,autoplay count,errors
+         */
+        CSVSeries series = new CSVSeries("test_exclusions.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                "\"errors\",\".*avg\",\"autoplay count\"",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 6);
+    }
+
+    /**
+     * By not surrounding single Strings with "", only the Regex will be put into the List
+     */
+    @Test
+    public void testIncludeHeaderByRegexAndUnescapedString() {
+        /*
+         * header before:       recs avg,recs min,recs max,station avg,station min,station max,personalized avg,personalized min,personalized max,autoplay avg,autoplay min,autoplay max,station count,personalized count,autoplay count,threads,host,errors
+         * header afterwards:   recs avg,station avg,personalized avg,autoplay avg
+         */
+        CSVSeries series = new CSVSeries("test_exclusions.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                "errors,\".*avg\",autoplay count",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 4);
+    }
+
+    @Test
+    public void testIncludeByRegexInAString() {
+        /*
+         * header before:       RunId,StartPage_0010_OpenStartPage_testUser_1,StartPage_0010_OpenStartPage_testUser_2,StartPage_0010_OpenStartPage_testUser_3,StartPage_0010_OpenStartPage_testUser_4,Login_0010_Login_testUser_1,Login_0010_Login_testUser_2,Login_0010_Login_testUser_3,Login_0010_Login_testUser_4,UploadAsset_0010_OpenPerformancetestAssets_testUser_1,UploadAsset_0010_OpenPerformancetestAssets_testUser_2,UploadAsset_0010_OpenPerformancetestAssets_testUser_3,UploadAsset_0010_OpenPerformancetestAssets_testUser_4
+         * header afterwards:   StartPage_0010_OpenStartPage_testUser_1,StartPage_0010_OpenStartPage_testUser_2,StartPage_0010_OpenStartPage_testUser_3,StartPage_0010_OpenStartPage_testUser_4,Login_0010_Login_testUser_1,Login_0010_Login_testUser_2,Login_0010_Login_testUser_3,Login_0010_Login_testUser_4
+         */
+        CSVSeries series = new CSVSeries("test_regex_by_suffix.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                "\".*_(OpenStartPage|Login)_.*\"",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 8);
+    }
+
+    @Test
+    public void testIncludeByString() {
+        /*
+         * header before:       Avg,Median,90,min,max,samples,errors,error %
+         * header afterwards:   Avg,Median
+         */
+        CSVSeries series = new CSVSeries("test.csv",
+                null,
+                "INCLUDE_BY_STRING",
+                "Avg,Median",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 2);
     }
 
     private int getNumColumns(FilePath workspaceRootDir, String file) throws IOException, InterruptedException {

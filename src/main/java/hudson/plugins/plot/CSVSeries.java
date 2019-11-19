@@ -9,24 +9,27 @@ import au.com.bytecode.opencsv.CSVReader;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.Descriptor;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents a plot data series configuration from an CSV file.
@@ -37,6 +40,7 @@ public class CSVSeries extends Series {
     private static final transient Logger LOGGER = Logger.getLogger(CSVSeries.class.getName());
     // Debugging hack, so I don't have to change FINE/INFO...
     private static final transient Level DEFAULT_LOG_LEVEL = Level.FINEST;
+    private static final transient Pattern PAT_SEMICOLON_ENCLOSURE = Pattern.compile("\"(.*?)\"");
     private static final transient Pattern PAT_COMMA = Pattern.compile(",");
 
     public enum InclusionFlag {
@@ -64,10 +68,18 @@ public class CSVSeries extends Series {
     private String exclusionValues;
 
     /**
+     * Comma separated list of columns to exclude.
+     */
+    private List<String> exclusionValuesList;
+
+    /**
      * Url to use as a base for mapping points.
      */
     private String url;
 
+    /**
+     * Show table of the single values in charts.
+     */
     private boolean displayTableFlag;
 
     @DataBoundConstructor
@@ -77,14 +89,32 @@ public class CSVSeries extends Series {
 
         this.url = url;
         this.displayTableFlag = displayTableFlag;
+        this.exclusionValues = exclusionValues;
 
-        if (exclusionValues == null) {
+        if (this.exclusionValues == null) {
             this.inclusionFlag = InclusionFlag.OFF;
         } else {
             this.inclusionFlag = InclusionFlag.valueOf(inclusionFlag);
-            this.exclusionValues = exclusionValues;
-            loadExclusionSet();
+            this.exclusionValuesList = new ArrayList<>();
+
+            /**
+             * first: try to handle the regex. The values are enclosed by ""
+             * If there are no values found, use plain splitting by comma
+             */
+            Matcher m = PAT_SEMICOLON_ENCLOSURE.matcher(this.exclusionValues);
+            int results = 0;
+            while (m.find()) {
+                this.exclusionValuesList.add(m.group().replaceAll("\"", ""));
+                results++;
+            }
+
+            if (results == 0) {
+                this.exclusionValuesList = Arrays.asList(
+                        PAT_COMMA.split((String) this.exclusionValues)
+                );
+            }
         }
+        loadExclusionSet();
     }
 
     public String getInclusionFlag() {
@@ -93,6 +123,10 @@ public class CSVSeries extends Series {
 
     public String getExclusionValues() {
         return exclusionValues;
+    }
+
+    public List<String> getExclusionValuesList() {
+        return exclusionValuesList;
     }
 
     public String getUrl() {
@@ -232,7 +266,7 @@ public class CSVSeries extends Series {
      *
      * @return true if the point should be excluded based on label or column
      */
-    private boolean excludePoint(String label, int index) {
+    private boolean excludePoint(final String label, int index) {
         if (inclusionFlag == null || inclusionFlag == InclusionFlag.OFF) {
             return false;
         }
@@ -241,11 +275,11 @@ public class CSVSeries extends Series {
         switch (inclusionFlag) {
             case INCLUDE_BY_STRING:
                 // if the set contains it, don't exclude it.
-                retVal = !(strExclusionSet.contains(label));
+                retVal = !checkExclusionSet(label);
                 break;
             case EXCLUDE_BY_STRING:
                 // if the set doesn't contain it, exclude it.
-                retVal = strExclusionSet.contains(label);
+                retVal = checkExclusionSet(label);
                 break;
             case INCLUDE_BY_COLUMN:
                 // if the set contains it, don't exclude it.
@@ -265,6 +299,32 @@ public class CSVSeries extends Series {
         }
 
         return retVal;
+    }
+
+    /**
+     * Checks if the current label / header is known in the strExclusionSet (plain text or regex).
+     *
+     * @param label
+     * @return if the label is in the set
+     */
+    private boolean checkExclusionSet(String label) {
+        if (strExclusionSet.contains(label)) {
+            return true;
+        } else {
+            for (String s : strExclusionSet) {
+                try {
+                    if (label.matches(s)) {
+                        return true;
+                    }
+                } catch (java.util.regex.PatternSyntaxException e) {
+                    // Log error for error tracing and also throw exception
+                    LOGGER.log(Level.SEVERE, "Exception searching the match with the Exclusion '"
+                            + s + "'", e);
+                    throw e;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -294,7 +354,7 @@ public class CSVSeries extends Series {
                 LOGGER.log(Level.SEVERE, "Failed to initialize columns exclusions set.");
         }
 
-        for (String str : PAT_COMMA.split(exclusionValues)) {
+        for (String str : exclusionValuesList) {
             if (str == null || str.length() <= 0) {
                 continue;
             }

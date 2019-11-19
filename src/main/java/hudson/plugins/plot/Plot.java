@@ -439,6 +439,7 @@ public class Plot implements Comparable<Plot> {
         if (StringUtils.isBlank(csvFileName) && project != null) {
             try {
                 csvFileName = File.createTempFile("plot-", ".csv", project.getRootDir()).getName();
+                LOGGER.log(Level.WARNING, "Loading " + csvFileName);
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Unable to create temporary CSV file.", e);
             }
