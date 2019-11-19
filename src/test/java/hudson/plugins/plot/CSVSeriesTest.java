@@ -154,4 +154,20 @@ public class CSVSeriesTest extends SeriesTestCase {
             IOUtils.closeQuietly(inputStream);
         }
     }
+
+    @Test
+    public void testCSVSeriesMultipleFiles() {
+        for (int index = 0; index < FILES.length; index++) {
+            // Create a new CSV series.
+            CSVSeries series = new CSVSeries("*.csv", "http://localhost:8080/%name%/%index%/", "INCLUDE_BY_STRING", "Avg", false);
+
+            LOGGER.info("Created series " + series.toString());
+
+            // load the series.
+            List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+            LOGGER.info("Got " + points.size() + " plot points");
+            testPlotPoints(points, 2);  // Avg is found in 2 files, each containing 1 line
+        }
+    }
+
 }
