@@ -126,7 +126,7 @@ public class CSVSeries extends Series {
         }
 
         for (FilePath seriesFile : seriesFiles) {
-            List<PlotPoint> seriesList = loadSeriesFile(seriesFile, buildNumber, logger);
+            List<PlotPoint> seriesList = loadSeriesFile(seriesFile, buildNumber);
             if (seriesList != null) {
                 if (ret != null) {
                     ret.addAll(seriesList);
@@ -139,8 +139,7 @@ public class CSVSeries extends Series {
         return ret;
     }
 
-    private List<PlotPoint> loadSeriesFile(FilePath seriesFile,
-                                           int buildNumber, PrintStream logger) {
+    private List<PlotPoint> loadSeriesFile(FilePath seriesFile, int buildNumber) {
         CSVReader reader = null;
         InputStream in = null;
         InputStreamReader inputReader = null;
