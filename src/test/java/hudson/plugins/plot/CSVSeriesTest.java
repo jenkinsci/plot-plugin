@@ -154,5 +154,4 @@ public class CSVSeriesTest extends SeriesTestCase {
             IOUtils.closeQuietly(inputStream);
         }
     }
-
 }
