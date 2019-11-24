@@ -143,6 +143,37 @@ public class CSVSeries extends Series {
     @Override
     public List<PlotPoint> loadSeries(FilePath workspaceRootDir,
                                       int buildNumber, PrintStream logger) {
+        List<PlotPoint> ret = null;
+
+        FilePath[] seriesFiles;
+        try {
+            seriesFiles = workspaceRootDir.list(getFile());
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Exception trying to retrieve series files", e);
+            return null;
+        }
+
+        if (ArrayUtils.isEmpty(seriesFiles)) {
+            LOGGER.info("No plot data file found: " + workspaceRootDir.getName()
+                    + " " + getFile());
+            return null;
+        }
+
+        for (FilePath seriesFile : seriesFiles) {
+            List<PlotPoint> seriesList = loadSeriesFile(seriesFile, buildNumber);
+            if (seriesList != null) {
+                if (ret != null) {
+                    ret.addAll(seriesList);
+                } else {
+                    ret = seriesList;
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    private List<PlotPoint> loadSeriesFile(FilePath seriesFile, int buildNumber) {
         CSVReader reader = null;
         InputStream in = null;
         InputStreamReader inputReader = null;
@@ -150,29 +181,15 @@ public class CSVSeries extends Series {
         try {
             List<PlotPoint> ret = new ArrayList<>();
 
-            FilePath[] seriesFiles;
-            try {
-                seriesFiles = workspaceRootDir.list(getFile());
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Exception trying to retrieve series files", e);
-                return null;
-            }
-
-            if (ArrayUtils.isEmpty(seriesFiles)) {
-                LOGGER.info("No plot data file found: " + workspaceRootDir.getName()
-                        + " " + getFile());
-                return null;
-            }
-
             try {
                 if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
                     LOGGER.log(DEFAULT_LOG_LEVEL, "Loading plot series data from: " + getFile());
                 }
 
-                in = seriesFiles[0].read();
+                in = seriesFile.read();
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Exception reading plot series data from "
-                        + seriesFiles[0], e);
+                        + seriesFile, e);
                 return null;
             }
 
