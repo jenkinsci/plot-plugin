@@ -27,12 +27,12 @@ import static org.junit.Assert.fail;
 public class CSVSeriesTest extends SeriesTestCase {
     private static final Logger LOGGER = Logger.getLogger(CSVSeriesTest.class.getName());
 
-    private static final String[] FILES = {"test.csv", "test_trailing_spaces.csv", "test_trailing_semicolon.csv"};
-    private static final int[] LINES = {2, 3, 2};  // lines in the file including header
-    private static final int[] COLUMNS = {8, 3, 9};  // columns in the file
-    private static final int[] CORRECTED_COLUMNS = {8, 3, 8};  // corrected for the trailing comma case
-    private static final int[] TOTAL_POINTS = {8, 6, 8};  // total data points in the file
-    private static final String[] LAST_COLUMN_NAME = {"error %", "thing", "error %"};  // the label on the last column
+    private static final String[] FILES = {"test.csv", "test_trailing_spaces.csv", "test_trailing_semicolon.csv", "test_multiple*.csv"};
+    private static final int[] LINES = {2, 3, 2, 4};  // lines in the file including header
+    private static final int[] COLUMNS = {8, 3, 9, 2};  // columns in the file
+    private static final int[] CORRECTED_COLUMNS = {8, 3, 8, 2};  // corrected for the trailing comma case
+    private static final int[] TOTAL_POINTS = {8, 6, 8, 6};  // total data points in the file
+    private static final String[] LAST_COLUMN_NAME = {"error %", "thing", "error %", "bravo"};  // the label on the last column
 
     @Test
     public void testCSVSeriesWithNullExclusionValuesSetsDisplayTableFlag() {
@@ -153,19 +153,6 @@ public class CSVSeriesTest extends SeriesTestCase {
             IOUtils.closeQuietly(inputReader);
             IOUtils.closeQuietly(inputStream);
         }
-    }
-
-    @Test
-    public void testCSVSeriesMultipleFiles() {
-        // Create a new CSV series.
-        CSVSeries series = new CSVSeries("*.csv", "http://localhost:8080/%name%/%index%/", "INCLUDE_BY_STRING", "Avg", false);
-
-        LOGGER.info("Created series " + series.toString());
-
-        // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
-        LOGGER.info("Got " + points.size() + " plot points");
-        testPlotPoints(points, 2);  // Avg is found in 2 files, each containing 1 line
     }
 
 }
