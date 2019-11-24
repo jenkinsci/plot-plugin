@@ -125,7 +125,8 @@ public class CSVSeries extends Series {
             return null;
         }
 
-        for (int index = 0; index < seriesFiles.length; index++) {
+        for (FilePath seriesFile : seriesFiles) {
+            List<PlotPoint> seriesList = loadSeriesFile(seriesFile, buildNumber, logger);
             List<PlotPoint> seriesList =
                 loadSeriesFile(seriesFiles[index], buildNumber, logger);
             if (seriesList != null) {
