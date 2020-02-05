@@ -329,19 +329,21 @@ public class CSVSeries extends Series {
             return true;
         } else {
             for (String s : strExclusionSet) {
-                try {
-                    if (label.matches(s)) {
-                        return true;
-                    }
-                } catch (java.util.regex.PatternSyntaxException e) {
-                    // Log error for error tracing and also throw exception
-                    LOGGER.log(Level.SEVERE, "Exception searching the match with the Exclusion '"
-                            + s + "'", e);
-                    throw e;
+                if (checkPatternIsValid(s) && label.matches(s)) {
+                    return true;
                 }
             }
         }
         return false;
+    }
+
+    private boolean checkPatternIsValid(String pattern) {
+        try {
+            Pattern.compile(pattern);
+        } catch (java.util.regex.PatternSyntaxException e) {
+            return false;
+        }
+        return true;
     }
 
     /**

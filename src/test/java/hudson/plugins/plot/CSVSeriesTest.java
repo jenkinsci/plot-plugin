@@ -190,6 +190,24 @@ public class CSVSeriesTest extends SeriesTestCase {
     }
 
     @Test
+    public void testExcludeColumnWithParentheses() {
+        /*
+         * header before:       Avg,Median,90,(min,max,samples,errors
+         * header afterwards:   Median,90,max,samples,errors
+         */
+        CSVSeries series = new CSVSeries("test_regex_parentheses.csv",
+                null,
+                "EXCLUDE_BY_STRING",
+                "Avg,(min",
+                false);
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir,
+                0,
+                System.out);
+        LOGGER.info("Got " + points.size() + " plot points");
+        testPlotPoints(points, 5);
+    }
+
+    @Test
     public void testIncludeByRegex() {
         /*
          * header before: RunId,Trend Measurement Type,HTTP_200,HTTP_201,HTTP_302,HTTP_500,Hits,Throughput,
@@ -207,15 +225,12 @@ public class CSVSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 3);
     }
 
-    @Test(expected = java.util.regex.PatternSyntaxException.class)
-    public void testIncludeBySingleRegexWithComma_unescaped_shouldFail() {
-        /*
-         * Testing with an unsupported pattern, causing the test to fail.
-         */
+    @Test
+    public void testIncludeBySingleRegexWrongPattern_shouldFindNoPoints() {
         CSVSeries series = new CSVSeries("test_regex_webstatistics.csv",
                 null,
                 "INCLUDE_BY_STRING",
-                "HTTP_[2,3]\\d{2}",
+                "\"(HTTP\"",
                 false);
         List<PlotPoint> points = series.loadSeries(workspaceRootDir,
                 0,
