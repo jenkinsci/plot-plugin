@@ -217,10 +217,6 @@ public class CSVSeries extends Series {
                     String yvalue;
                     String label = null;
 
-                    if (index > nextLine.length) {
-                        continue;
-                    }
-
                     yvalue = nextLine[index].trim();
 
                     // empty value, caused by e.g. trailing comma in CSV
