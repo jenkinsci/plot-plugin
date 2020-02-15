@@ -143,8 +143,7 @@ public class CSVSeries extends Series {
     @Override
     public List<PlotPoint> loadSeries(FilePath workspaceRootDir,
                                       int buildNumber, PrintStream logger) {
-        List<PlotPoint> ret = null;
-
+        List<PlotPoint> plotPoints = null;
         FilePath[] seriesFiles;
         try {
             seriesFiles = workspaceRootDir.list(getFile());
@@ -162,15 +161,14 @@ public class CSVSeries extends Series {
         for (FilePath seriesFile : seriesFiles) {
             List<PlotPoint> seriesList = loadSeriesFile(seriesFile, buildNumber);
             if (seriesList != null) {
-                if (ret != null) {
-                    ret.addAll(seriesList);
+                if (plotPoints != null) {
+                    plotPoints.addAll(seriesList);
                 } else {
-                    ret = seriesList;
+                    plotPoints = seriesList;
                 }
             }
         }
-
-        return ret;
+        return plotPoints;
     }
 
     private List<PlotPoint> loadSeriesFile(FilePath seriesFile, int buildNumber) {
