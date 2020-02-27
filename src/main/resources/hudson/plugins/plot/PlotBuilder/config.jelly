@@ -65,6 +65,9 @@
             <f:entry title="${%Y-axis maximum}" field="yaxisMaximum" help="/plugin/plot/help-yaxisMaximum.html">
                 <f:textbox name="yaxisMaximum" value="${plot.yaxisMaximum}"/>
             </f:entry>
+            <f:entry title="${%Description title}" help="/plugin/plot/help-description.html">
+              <f:textbox name="description" value="${plot.description}" />
+            </f:entry>
 
             <f:entry title="" description="${%A new data series definition}">
                 <f:repeatableProperty field="csvSeries" add="Add CSV series"/>

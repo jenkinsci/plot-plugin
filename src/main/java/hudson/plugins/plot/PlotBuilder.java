@@ -45,6 +45,8 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     @CheckForNull
     private String title;
     @CheckForNull
+    private String description;
+    @CheckForNull
     private String numBuilds;
     @CheckForNull
     private String yaxis;
@@ -95,6 +97,11 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     @DataBoundSetter
     public final void setTitle(@CheckForNull String title) {
         this.title = Util.fixEmptyAndTrim(title);
+    }
+
+    @DataBoundSetter
+    public final void setDescription(@CheckForNull String title) {
+        this.description = Util.fixEmptyAndTrim(title);
     }
 
     @CheckForNull
@@ -206,7 +213,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         List<Plot> plots = new ArrayList<>();
         Plot plot = new Plot(title, yaxis, group, numBuilds, csvFileName, style,
                 useDescr, keepRecords, exclZero, logarithmic,
-                yaxisMinimum, yaxisMaximum);
+                yaxisMinimum, yaxisMaximum, description);
 
         List<Series> series = new ArrayList<>();
         if (csvSeries != null) {
