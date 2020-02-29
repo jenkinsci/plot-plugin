@@ -177,7 +177,7 @@ public class Plot implements Comparable<Plot> {
     public String title;
 
     /**
-     * Description .
+     * Description of plot. Optional.
      */
     @SuppressWarnings("visibilitymodifier")
     public String description;
@@ -340,7 +340,6 @@ public class Plot implements Comparable<Plot> {
         this.yaxis = yaxis;
         this.group = group;
         this.numBuilds = numBuilds;
-        this.description = description;
         this.csvFileName = csvFileName;
         this.style = style;
         this.useDescr = useDescr;
@@ -349,6 +348,7 @@ public class Plot implements Comparable<Plot> {
         this.logarithmic = logarithmic;
         this.yaxisMinimum = yaxisMinimum;
         this.yaxisMaximum = yaxisMaximum;
+        this.description = description;
     }
 
     /**
@@ -427,7 +427,7 @@ public class Plot implements Comparable<Plot> {
                 + getRightBuildNum() + "),HASLEGEND(" + hasLegend()
                 + "),ISLOGARITHMIC(" + isLogarithmic() + "),YAXISMINIMUM("
                 + yaxisMinimum + "),YAXISMAXIMUM(" + yaxisMaximum
-                + "),FILENAME(" + getCsvFileName() + "),DESCRIPTION"
+                + "),FILENAME(" + getCsvFileName() + "),DESCRIPTION("
                 + getDescription() + ")";
     }
 
@@ -658,7 +658,6 @@ public class Plot implements Comparable<Plot> {
         setTitle(req);
         setStyle(req);
         setUseDescr(req);
-        setDescription(req);
         // need to force regenerate the plot in case build
         // descriptions (used for tool tips) have changed
         generatePlot(true);
@@ -687,7 +686,6 @@ public class Plot implements Comparable<Plot> {
         setTitle(req);
         setStyle(req);
         setUseDescr(req);
-        setDescription(req);
         generatePlot(false);
         ChartRenderingInfo info = new ChartRenderingInfo();
         plot.createBufferedImage(getWidth(), getHeight(), info);

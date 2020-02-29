@@ -99,11 +99,6 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         this.title = Util.fixEmptyAndTrim(title);
     }
 
-    @DataBoundSetter
-    public final void setDescription(@CheckForNull String title) {
-        this.description = Util.fixEmptyAndTrim(title);
-    }
-
     @CheckForNull
     public String getNumBuilds() {
         return numBuilds;
@@ -178,6 +173,11 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     @DataBoundSetter
     public final void setYaxisMaximum(@CheckForNull String yaxisMaximum) {
         this.yaxisMaximum = Util.fixEmptyAndTrim(yaxisMaximum);
+    }
+
+    @DataBoundSetter
+    public final void setDescription(@CheckForNull String description) {
+        this.description = Util.fixEmptyAndTrim(description);
     }
 
     public List<CSVSeries> getCsvSeries() {
@@ -301,4 +301,3 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         }
     }
 }
-

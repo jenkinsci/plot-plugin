@@ -93,6 +93,12 @@ public class PlotReport {
     }
 
     // called from PlotReport/index.jelly
+    public String getPlotDescription(int i) {
+        Plot plot = getPlot(i);
+        return plot.getDescription();
+    }
+
+    // called from PlotReport/index.jelly
     public void doGetPlot(StaplerRequest req, StaplerResponse rsp) {
         String i = req.getParameter("index");
         Plot plot = getPlot(i);
