@@ -53,7 +53,7 @@
         <img src="getPlot?index=${index}&amp;width=750&amp;height=450" width="750" height="450" lazymap="getPlotMap?index=${index}" />
         <div style="width:750px">
           <j:if test="${it.getPlotDescription(index) != null}">
-            <b>Description</b>: ${it.getPlotDescription(index)}
+            <b>Description</b>: <j:out value="${it.getPlotDescription(index)}"/>
           </j:if>
         </div>
       </div>
