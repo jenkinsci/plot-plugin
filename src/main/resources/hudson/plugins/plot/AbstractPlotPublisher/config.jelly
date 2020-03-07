@@ -19,6 +19,9 @@
         <f:entry title="${%Plot title}" help="/plugin/plot/help-title.html">
           <f:textbox name="title" value="${plot.title}" />
         </f:entry>
+        <f:entry title="${%Plot description}" help="/plugin/plot/help-description.html">
+          <f:textbox name="description" value="${plot.description}" />
+        </f:entry>
         <f:entry title="${%Number of builds to include}" help="/plugin/plot/help-numbuilds.html">
           <input class="positive-number" type="text" name="numBuilds"
                  style="width:20em" value="${plot.numBuilds}" />
@@ -55,10 +58,6 @@
         <f:entry title="${%Y-axis maximum}" help="/plugin/plot/help-yaxisMaximum.html">
           <f:textbox name="yaxisMaximum" value="${plot.yaxisMaximum}" />
         </f:entry>
-        <f:entry title="${%Description title}" help="/plugin/plot/help-description.html">
-          <f:textbox name="description" value="${plot.description}" />
-        </f:entry>
-
         <f:entry title="${%Keep records for deleted builds}" help="/plugin/plot/help-keepRecords.html">
           <f:checkbox name="keepRecords" checked="${plot.keepRecords}" />
         </f:entry>
