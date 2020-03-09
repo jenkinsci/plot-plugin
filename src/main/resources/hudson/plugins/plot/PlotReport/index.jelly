@@ -1,4 +1,4 @@
-<!-- 
+<!--
 /*
  * Copyright (c) 2008-2009 Yahoo! Inc.  All rights reserved.
  * The copyrights to the contents of this file are licensed under the MIT License (http://www.opensource.org/licenses/mit-license.php)
@@ -6,7 +6,7 @@
  -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:c="chart">
-  
+
   <d:taglib uri="chart">
     <d:tag name="chart">
       <style>
@@ -51,6 +51,13 @@
           </div>
         </j:if>
         <img src="getPlot?index=${index}&amp;width=750&amp;height=450" width="750" height="450" lazymap="getPlotMap?index=${index}" />
+        <div style="width:750px">
+          <j:if test="${it.getPlotDescription(index) != null}">
+            <j:if test="${!it.getPlotDescription(index).isEmpty()}">
+              <b>Description</b>: <j:out value="${it.getPlotDescription(index)}"/>
+            </j:if>
+          </j:if>
+        </div>
       </div>
     </d:tag>
     <d:tag name="individualChart">
@@ -74,7 +81,7 @@
           </j:forEach>
         </select>
       </div>
-      
+
       <j:forEach var="plot" items="${it.plots}" varStatus="loopStat2">
         <c:individualChart id="${plot.csvFileName}" index="${loopStat2.index}" />
       </j:forEach>
