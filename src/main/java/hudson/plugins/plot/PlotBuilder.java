@@ -175,6 +175,11 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         this.yaxisMaximum = Util.fixEmptyAndTrim(yaxisMaximum);
     }
 
+    @CheckForNull
+    public String getDescription() {
+        return description;
+    }
+
     @DataBoundSetter
     public final void setDescription(@CheckForNull String description) {
         this.description = Util.fixEmptyAndTrim(description);
