@@ -5,6 +5,8 @@
 [![GitHub Release](https://img.shields.io/badge/dynamic/json?color=blue&label=changelog&query=$.tag_name&url=https://api.github.com/repos/jenkinsci/plot-plugin/releases/latest)](https://github.com/jenkinsci/plot-plugin/releases/latest)
 [![Jenkins Plugin installs](https://img.shields.io/jenkins/plugin/i/plot?color=blue)](https://plugins.jenkins.io/plot/)
 
+## Description
+
 This plugin provides generic plotting (or graphing) capabilities in Jenkins.
 
 This plugin will **plot** one or more **single values variations across builds** in one or more plots. 
