@@ -395,11 +395,11 @@ public class Plot implements Comparable<Plot> {
 
     public Double getDoubleFromString(String input) {
         Double result = null;
-        if (input != null) {
+        if (!StringUtils.isEmpty(input)) {
             try {
                 result = Double.parseDouble(input);
             } catch (NumberFormatException nfe) {
-                LOGGER.log(Level.FINE, "Failed to parse Double value from String."
+                LOGGER.log(Level.INFO, "Failed to parse Double value from String."
                         + " Not a problem, result already set", nfe);
             }
         }
