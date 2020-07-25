@@ -395,7 +395,7 @@ public class Plot implements Comparable<Plot> {
 
     public Double getDoubleFromString(String input) {
         Double result = null;
-        if (input != null) {
+        if (!StringUtils.isEmpty(input)) {
             try {
                 result = Double.parseDouble(input);
             } catch (NumberFormatException nfe) {
