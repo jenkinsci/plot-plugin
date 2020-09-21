@@ -50,7 +50,6 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
     protected Series(String file, String label, String fileType) {
         this.file = file;
 
-        // TODO: look into this, what do we do if there is no label?
         if (label == null) {
             label = Messages.Plot_Missing();
         }
