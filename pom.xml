@@ -92,10 +92,6 @@
 
   <build>
     <plugins>
-      <!-- tell mvn eclipse:eclipse to leave out xml-apis. 
-           (xml-apis.jar has an old version of the DOM.  
-           Eclipse tends to get the classpath order wrong)
-      -->
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <version>2.16</version>
