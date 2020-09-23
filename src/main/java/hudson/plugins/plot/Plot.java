@@ -861,9 +861,9 @@ public class Plot implements Comparable<Plot> {
             String s = getUrlStyle();
             LineAndShapeRenderer lasRenderer = (LineAndShapeRenderer) renderer;
             if ("lineSimple".equalsIgnoreCase(s)) {
-                lasRenderer.setShapesVisible(false); // TODO: deprecated, may be unnecessary
+                lasRenderer.setShapesVisible(false);
             } else {
-                lasRenderer.setShapesVisible(true); // TODO: deprecated, may be unnecessary
+                lasRenderer.setShapesVisible(true);
             }
         }
     }
