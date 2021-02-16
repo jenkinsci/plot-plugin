@@ -6,11 +6,11 @@
  -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
-         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:p="/lib/plot">
     <f:entry>
         <input name="csvFileName" type="hidden" value="${descriptor.csvFileName}" />
 
-        <table width="100%">
+        <p:blockWrapper>
             <f:entry title="${%Plot group}" field="group" help="/plugin/plot/help-group.html">
                 <f:textbox name="group" value="${plot.group}" clazz="required"/>
             </f:entry>
@@ -79,7 +79,7 @@
                 <f:repeatableProperty field="xmlSeries" add="Add XML series"/>
             </f:entry>
 
-        </table>
+        </p:blockWrapper>
 
     </f:entry>
 </j:jelly>

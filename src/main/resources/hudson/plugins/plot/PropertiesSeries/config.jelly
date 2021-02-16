@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:p="/lib/plot">
     <f:entry>
-    <table width="100%" bgcolor="#EEEEEE">
+    <p:blockWrapperBackground>
     <f:entry title="${%Data series file}" help="/plugin/plot/help-series.html">
         <f:textbox name="file" value="${series.file}"
                    checkUrl="'descriptorByName/hudson.plugins.plot.PlotPublisher/checkSeriesFile?value='+toValue(this)" />
@@ -16,6 +16,6 @@
                 </div>
             </f:entry>
         </f:nested>
-    </table>
+    </p:blockWrapperBackground>
     </f:entry>
 </j:jelly>
