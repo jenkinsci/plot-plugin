@@ -3,7 +3,7 @@
     <!-- TODO remove this once https://github.com/jenkinsci/jenkins/pull/3895 is in the core baseline -->
     <j:choose>
         <j:when test="${divBasedFormLayout}">
-            <div style="background-color: #EEEEEE">
+            <div>
                 <d:invokeBody/>
             </div>
         </j:when>
