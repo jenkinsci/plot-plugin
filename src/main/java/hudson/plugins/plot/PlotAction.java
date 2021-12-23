@@ -39,7 +39,7 @@ public class PlotAction implements Action, StaplerProxy {
 
     @Override
     public String getIconFileName() {
-        return "graph.gif";
+        return "graph.png";
     }
 
     @Override

@@ -66,7 +66,7 @@ public class MatrixPlotAction implements Action, StaplerProxy {
     }
 
     public String getIconFileName() {
-        return "graph.gif";
+        return "graph.png";
     }
 
     public String getUrlName() {

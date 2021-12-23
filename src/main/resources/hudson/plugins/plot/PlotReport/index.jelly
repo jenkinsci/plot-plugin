@@ -28,7 +28,7 @@
       </style>
       <div id="${id}" style="margin-top: 2em">
         <div align="right" style="width:750px">
-          <a href="#top"><img src="${rootURL}/images/24x24/up.gif"/>${%top}</a>
+          <a href="#top"><l:icon class="icon-up icon-md"/>${%top}</a>
         </div>
         <j:if test="${it.getDisplayTableFlag(index)}">
           <div>
@@ -68,7 +68,7 @@
   <l:layout title="${it.group}">
     <st:include it="${it.job}" page="sidepanel.jelly" optional="true" />
     <l:main-panel>
-      <h1><img src="${rootURL}/images/32x32/graph.gif"/>${it.group}</h1>
+      <h1><l:icon class="icon-graph icon-xlg"/>${it.group}</h1>
       <div>
         <script>
           function jump(menu){
