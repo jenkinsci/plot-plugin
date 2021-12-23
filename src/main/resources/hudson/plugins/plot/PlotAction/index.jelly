@@ -5,7 +5,7 @@
  */
  -->
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:t="/lib/hudson">
   <l:layout title="${it.job.displayName} plots">
     <st:include it="${it.job}" page="sidepanel.jelly" />
     <l:main-panel>
@@ -18,7 +18,7 @@
           </p>
           <table>
             <j:forEach var="group" items="${it.originalGroups}">
-              <t:summary icon="graph.gif" href="${it.getUrlGroup(group)}/">
+              <t:summary icon="icon-graph icon-md" href="${it.getUrlGroup(group)}/">
                 ${group}
               </t:summary>
             </j:forEach>
