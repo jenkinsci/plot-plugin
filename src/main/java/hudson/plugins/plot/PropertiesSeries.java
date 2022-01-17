@@ -6,6 +6,7 @@
 
 package hudson.plugins.plot;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.Descriptor;
@@ -87,12 +88,14 @@ public class PropertiesSeries extends Series {
 
     @Extension
     public static class DescriptorImpl extends Descriptor<Series> {
+        @NonNull
         public String getDisplayName() {
             return Messages.Plot_PropertiesSeries();
         }
 
         @Override
-        public Series newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData)
+                throws FormException {
             return SeriesFactory.createSeries(formData, req);
         }
     }
