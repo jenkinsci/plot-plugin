@@ -27,7 +27,7 @@
       }
       </style>
       <div id="${id}" style="margin-top: 2em">
-        <div align="right" style="width:750px">
+        <div align="right">
           <a href="#top"><l:icon class="icon-up icon-md"/>${%top}</a>
         </div>
         <j:if test="${it.getDisplayTableFlag(index)}">
@@ -50,8 +50,8 @@
           </p>
           </div>
         </j:if>
-        <img src="getPlot?index=${index}&amp;width=750&amp;height=450" width="750" height="450" lazymap="getPlotMap?index=${index}" />
-        <div style="width:750px">
+        <img src="getPlot?index=${index}" lazymap="getPlotMap?index=${index}" />
+        <div>
           <j:if test="${it.getPlotDescription(index) != null}">
             <j:if test="${!it.getPlotDescription(index).isEmpty()}">
               <b>Description</b>: <j:out value="${it.getPlotDescription(index)}"/>

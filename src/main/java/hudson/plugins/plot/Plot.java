@@ -127,12 +127,12 @@ public class Plot implements Comparable<Plot> {
     /**
      * The width of the plot.
      */
-    private transient int width;
+    private transient int width = DEFAULT_WIDTH;
 
     /**
      * The height of the plot.
      */
-    private transient int height;
+    private transient int height = DEFAULT_HEIGHT;
 
     /**
      * The right-most build number on the plot.
@@ -569,21 +569,15 @@ public class Plot implements Comparable<Plot> {
     }
 
     /**
-     * Sets the plot width from the "width" parameter in the given
-     * StaplerRequest. If the parameter doesn't exist or isn't an integer then a
-     * default is used.
+     * Sets the plot width
+     * If the parameter isn't an integer then a default is used.
      */
-    private void setWidth(StaplerRequest req) {
-        String w = req.getParameter("width");
-        if (w == null) {
+    public void setWidth(String w) {
+        try {
+            width = Integer.parseInt(w);
+        } catch (NumberFormatException nfe) {
+            LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
             width = DEFAULT_WIDTH;
-        } else {
-            try {
-                width = Integer.parseInt(w);
-            } catch (NumberFormatException nfe) {
-                LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
-                width = DEFAULT_WIDTH;
-            }
         }
     }
 
@@ -592,21 +586,15 @@ public class Plot implements Comparable<Plot> {
     }
 
     /**
-     * Sets the plot height from the "height" parameter in the given
-     * StaplerRequest. If the parameter doesn't exist or isn't an integer then a
-     * default is used.
+     * Sets the plot height
+     * If the parameter isn't an integer then a default is used.
      */
-    private void setHeight(StaplerRequest req) {
-        String h = req.getParameter("height");
-        if (h == null) {
+    public void setHeight(String h) {
+        try {
+            height = Integer.parseInt(h);
+        } catch (NumberFormatException nfe) {
+            LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
             height = DEFAULT_HEIGHT;
-        } else {
-            try {
-                height = Integer.parseInt(h);
-            } catch (NumberFormatException nfe) {
-                LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
-                height = DEFAULT_HEIGHT;
-            }
         }
     }
 
@@ -650,8 +638,6 @@ public class Plot implements Comparable<Plot> {
             rsp.sendRedirect2(req.getContextPath() + "/images/headless.png");
             return;
         }
-        setWidth(req);
-        setHeight(req);
         setNumBuilds(req);
         setRightBuildNum(req);
         setHasLegend(req);
@@ -678,8 +664,6 @@ public class Plot implements Comparable<Plot> {
             rsp.sendRedirect2(req.getContextPath() + "/images/headless.png");
             return;
         }
-        setWidth(req);
-        setHeight(req);
         setNumBuilds(req);
         setRightBuildNum(req);
         setHasLegend(req);
