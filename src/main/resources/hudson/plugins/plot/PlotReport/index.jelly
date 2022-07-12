@@ -54,7 +54,7 @@
         <div style="width:750px">
           <j:if test="${it.getPlotDescription(index) != null}">
             <j:if test="${!it.getPlotDescription(index).isEmpty()}">
-              <b>Description</b>: <j:out value="${it.getPlotDescription(index)}"/>
+              <b>Description</b>: <span>${it.getPlotDescription(index)}</span>
             </j:if>
           </j:if>
         </div>
