@@ -1,5 +1,6 @@
 package hudson.plugins.plot;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.matrix.MatrixProject;
@@ -26,6 +27,7 @@ public class PlotDescriptor extends BuildStepDescriptor<Publisher> {
         super(PlotPublisher.class);
     }
 
+    @NonNull
     public String getDisplayName() {
         return Messages.Plot_Publisher_DisplayName();
     }
