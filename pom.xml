@@ -10,7 +10,7 @@
 
   <properties>
     <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
-    <jenkins.version>2.332.4</jenkins.version>
+    <jenkins.version>2.346.3</jenkins.version>
   </properties>
 
   <dependencyManagement>
@@ -18,7 +18,7 @@
       <!-- https://github.com/jenkinsci/bom -->
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.332.x</artifactId>
+        <artifactId>bom-2.346.x</artifactId>
         <version>1607.va_c1576527071</version>
         <scope>import</scope>
         <type>pom</type>
