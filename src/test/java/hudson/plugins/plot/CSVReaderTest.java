@@ -5,7 +5,8 @@
 
 package hudson.plugins.plot;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import hudson.FilePath;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -82,7 +83,7 @@ public class CSVReaderTest extends SeriesTestCase {
                 }
                 assertEquals("Line count is not equal " + lineNum + " expected " + LINES[index],
                         LINES[index], lineNum);
-            } catch (IOException | InterruptedException e) {
+            } catch (CsvValidationException | IOException | InterruptedException e) {
                 fail("Exception " + e);
             } finally {
                 try {

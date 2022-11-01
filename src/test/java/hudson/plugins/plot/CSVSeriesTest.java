@@ -4,7 +4,8 @@
  */
 package hudson.plugins.plot;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import hudson.FilePath;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -417,6 +418,8 @@ public class CSVSeriesTest extends SeriesTestCase {
 
             LOGGER.info("Got " + headerLine.length + " columns");
             return headerLine.length;
+        } catch (CsvValidationException invalid) {
+            throw new IOException(invalid);
         } finally {
             try {
                 if (csvReader != null) {
