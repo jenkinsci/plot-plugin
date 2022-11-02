@@ -5,8 +5,9 @@
  */
 package hudson.plugins.plot;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.opencsv.exceptions.CsvValidationException;
 import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -948,7 +949,7 @@ public class Plot implements Comparable<Plot> {
             while ((nextLine = reader.readNext()) != null) {
                 rawPlotData.add(nextLine);
             }
-        } catch (IOException ioe) {
+        } catch (CsvValidationException | IOException ioe) {
             LOGGER.log(Level.SEVERE, "Exception reading plot file", ioe);
         } finally {
             if (reader != null) {
