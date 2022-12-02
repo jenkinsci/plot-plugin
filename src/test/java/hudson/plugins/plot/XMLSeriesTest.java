@@ -2,12 +2,20 @@ package hudson.plugins.plot;
 
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+
 
 /**
  * Test an XML series.
@@ -18,6 +26,7 @@ public class XMLSeriesTest extends SeriesTestCase {
     private static final String TEST_XML_FILE = "test.xml";
     private static final String TEST2_XML_FILE = "test2.xml";
     private static final String TEST3_XML_FILE = "test3.xml";
+    private static final String TEST4_XML_FILE = "test4.xml";
 
     @Test
     public void testXMLSeries_WhenNodesSharingAParentHaveOneStringAndOneNumericContent_ThenCoalesceNodesToPointLabelledWithStringContent() {
@@ -203,5 +212,30 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 2);
         assertEquals("http://localhost/42/one/0", points.get(0).getUrl());
         assertEquals("http://localhost/42/two/0", points.get(1).getUrl());
+    }
+
+    @Test
+    public void testXMLSeries_failToReadExternalDTD() throws UnsupportedEncodingException {
+        // Create a new XML series with test file
+        String xpathString = "/results/testcase/*";
+        XMLSeries series = new XMLSeries(TEST4_XML_FILE, xpathString, "NODESET", null);
+        testSeries(series, TEST4_XML_FILE, "", "xml");
+
+        //we want to examin the logoutput
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final String utf8 = StandardCharsets.UTF_8.name();
+        PrintStream customOutput = new PrintStream(baos, true, utf8);
+
+        // load the series to see if we have the expected behavior.
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, customOutput);
+
+
+        assertNull(points);
+
+        String expectedOutput = "DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true";
+        String customOutputAsString = baos.toString();
+        assertNotNull(customOutputAsString);
+        //depending on the "JRE" (?) the custom output is terminated or not by a \n
+        assertThat(customOutputAsString, containsString(expectedOutput));
     }
 }

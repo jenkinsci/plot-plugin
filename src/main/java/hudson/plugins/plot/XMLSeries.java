@@ -9,6 +9,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.Descriptor;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayDeque;
@@ -21,11 +23,14 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
+import jenkins.util.xml.XMLUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -35,6 +40,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * Represents a plot data series configuration from an XML file.
@@ -203,10 +209,7 @@ public class XMLSeries extends Series {
                 if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
                     LOGGER.log(DEFAULT_LOG_LEVEL, "Loading plot series data from: " + getFile());
                 }
-
                 in = seriesFiles[0].read();
-                // load existing plot file
-                inputSource = new InputSource(in);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE,
                         "Exception reading plot series data from " + seriesFiles[0], e);
@@ -221,8 +224,10 @@ public class XMLSeries extends Series {
                 LOGGER.log(DEFAULT_LOG_LEVEL, "Loaded XML Plot file: " + getFile());
             }
 
+
             XPath xpath = XPathFactory.newInstance().newXPath();
-            Object xmlObject = xpath.evaluate(xpathString, inputSource, nodeType);
+            Object xmlObject = xpath.evaluate(xpathString, XMLUtils.parse(in), nodeType);
+
 
             /*
              * If we have a nodeset, we need multiples, otherwise we just need
@@ -266,6 +271,13 @@ public class XMLSeries extends Series {
             return ret;
         } catch (XPathExpressionException e) {
             LOGGER.log(Level.SEVERE, "XPathExpressionException for XPath '" + getXpath() + "'", e);
+        }  catch (SAXException e) {
+            if (logger != null) {
+                logger.println(e.getMessage());
+            }
+            LOGGER.log(Level.SEVERE, "Exception parsing XML", e);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Unexpected IO Error", e);
         } finally {
             IOUtils.closeQuietly(in);
         }
@@ -280,7 +292,7 @@ public class XMLSeries extends Series {
             addValueToList(ret, nodeMap.getNamedItem("name").getTextContent().trim(),
                     n, buildNumber);
         } else {
-            addValueToList(ret, n.getLocalName().trim(), n, buildNumber);
+            addValueToList(ret, n.getNodeName().trim(), n, buildNumber);
         }
     }
 

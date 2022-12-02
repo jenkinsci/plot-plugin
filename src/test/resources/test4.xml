@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE html SYSTEM "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <testcase name="first/one">
+    <one>0.521</one>
+    <two>0.5015</two>
+  </testcase>
+</html>

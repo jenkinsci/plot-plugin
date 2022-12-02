@@ -5,3 +5,4 @@ work
 .settings
 *.iml
 .idea
+.vscode
