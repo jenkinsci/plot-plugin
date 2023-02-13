@@ -5,7 +5,9 @@
  */
 package hudson.plugins.plot;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.Descriptor;
@@ -254,7 +256,7 @@ public class CSVSeries extends Series {
             }
 
             return ret;
-        } catch (IOException ioe) {
+        } catch (CsvValidationException | IOException ioe) {
             LOGGER.log(Level.SEVERE, "Exception loading series", ioe);
         } finally {
             if (reader != null) {
@@ -404,12 +406,14 @@ public class CSVSeries extends Series {
 
     @Extension
     public static class DescriptorImpl extends Descriptor<Series> {
+        @NonNull
         public String getDisplayName() {
             return Messages.Plot_CsvSeries();
         }
 
         @Override
-        public Series newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData)
+                throws FormException {
             return SeriesFactory.createSeries(formData, req);
         }
     }

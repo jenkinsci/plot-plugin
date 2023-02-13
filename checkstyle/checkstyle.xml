@@ -46,7 +46,13 @@
         <property name="lineSeparator" value="lf"/>
     </module>
 
-
+    <module name="LineLength">
+      <property name="max" value="100"/>
+      <property name="ignorePattern"
+                value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+      <property name="fileExtensions"
+                value="java,html,jelly"/>
+    </module>
 
     <!-- Checks that property files contain the same keys.         -->
     <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
@@ -68,8 +74,6 @@
     </module>
 
     <module name="TreeWalker">
-
-        <property name="cacheFile" value="${checkstyle.cache.file}"/>
 
         <!-- required for SuppressWarningsFilter (and other Suppress* rules not used here) -->
         <!-- see http://checkstyle.sourceforge.net/config_annotation.html#SuppressWarningsHolder -->
@@ -128,11 +132,6 @@
 
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
-        <module name="LineLength">
-            <property name="max" value="100"/>
-            <property name="ignorePattern"
-                      value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
-        </module>
         <module name="MethodLength"/>
         <module name="ParameterNumber"/>
 
@@ -153,7 +152,6 @@
         <!-- Modifier Checks                                    -->
         <!-- See http://checkstyle.sf.net/config_modifiers.html -->
         <module name="ModifierOrder"/>
-        <module name="RedundantModifier"/>
 
 
         <!-- Checks for blocks. You know, those {}'s         -->

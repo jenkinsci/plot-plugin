@@ -1,5 +1,6 @@
 package hudson.plugins.plot;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -203,6 +204,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
             super(MatrixPlotPublisher.class);
         }
 
+        @NonNull
         public String getDisplayName() {
             return Messages.Plot_Publisher_DisplayName();
         }

@@ -1,5 +1,7 @@
 package hudson.plugins.plot;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -14,7 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.CheckForNull;
 import javax.servlet.ServletException;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
@@ -233,8 +234,8 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     }
 
     @Override
-    public void perform(Run<?, ?> build, FilePath workspace, Launcher launcher,
-                        TaskListener listener) {
+    public void perform(@NonNull Run<?, ?> build, @NonNull FilePath workspace,
+                        @NonNull Launcher launcher, @NonNull TaskListener listener) {
         List<Plot> plots = new ArrayList<>();
         Plot plot = new Plot(title, yaxis, group, numBuilds, csvFileName, style,
                 useDescr, keepRecords, exclZero, logarithmic,
@@ -323,6 +324,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         /**
          * This human readable group is used in the configuration screen.
          */
+        @NonNull
         public String getDisplayName() {
             return Messages.Plot_Publisher_DisplayName();
         }
