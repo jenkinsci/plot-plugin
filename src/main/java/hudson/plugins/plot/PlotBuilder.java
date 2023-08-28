@@ -45,8 +45,6 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
 
     // Optional fields
     @CheckForNull
-    private String title;
-    @CheckForNull
     private String description;
     @CheckForNull
     private String numBuilds;
