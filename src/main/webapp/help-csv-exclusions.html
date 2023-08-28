@@ -35,4 +35,13 @@ should contain a comma separated list of values.
 	528.75,201,1172,2,17732,97560,360,0.37%
   </pre>
   With an exclusion set to <i>Exclude columns by name</i> and a value of <i>max,samples,errors,error %</i>
+  <br>
+  <br>
+  <b>Note:</b>When you want to use Regular Expressions (Regex) make sure, to enclose each Regex with quotation marks (like "HTTP_[2,3]\d{2}").
+  For example include only <i>min, max, errors and error % </i>, use <i>"m.*","error.*"</i>
+  <pre>
+    min,max,errors,error %
+    2,16550,360,0.37
+  </pre>
+
 </div>

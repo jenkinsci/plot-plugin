@@ -5,8 +5,9 @@
  */
 package hudson.plugins.plot;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.opencsv.exceptions.CsvValidationException;
 import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -177,6 +178,12 @@ public class Plot implements Comparable<Plot> {
     public String title;
 
     /**
+     * Description of plot. Optional.
+     */
+    @SuppressWarnings("visibilitymodifier")
+    public String description;
+
+    /**
      * Y-axis label. Optional.
      */
     @SuppressWarnings("visibilitymodifier")
@@ -329,7 +336,7 @@ public class Plot implements Comparable<Plot> {
     public Plot(String title, String yaxis, String group, String numBuilds,
                 String csvFileName, String style, boolean useDescr,
                 boolean keepRecords, boolean exclZero, boolean logarithmic,
-                String yaxisMinimum, String yaxisMaximum) {
+                String yaxisMinimum, String yaxisMaximum, String description) {
         this.title = title;
         this.yaxis = yaxis;
         this.group = group;
@@ -342,6 +349,7 @@ public class Plot implements Comparable<Plot> {
         this.logarithmic = logarithmic;
         this.yaxisMinimum = yaxisMinimum;
         this.yaxisMaximum = yaxisMaximum;
+        this.description = description;
     }
 
     /**
@@ -351,7 +359,7 @@ public class Plot implements Comparable<Plot> {
     public Plot(String title, String yaxis, String group, String numBuilds,
                 String csvFileName, String style, boolean useDescr) {
         this(title, yaxis, group, numBuilds, csvFileName, style, useDescr,
-                false, false, false, null, null);
+                false, false, false, null, null, null);
     }
 
     // needed for serialization
@@ -388,7 +396,7 @@ public class Plot implements Comparable<Plot> {
 
     public Double getDoubleFromString(String input) {
         Double result = null;
-        if (input != null) {
+        if (!StringUtils.isEmpty(input)) {
             try {
                 result = Double.parseDouble(input);
             } catch (NumberFormatException nfe) {
@@ -420,7 +428,8 @@ public class Plot implements Comparable<Plot> {
                 + getRightBuildNum() + "),HASLEGEND(" + hasLegend()
                 + "),ISLOGARITHMIC(" + isLogarithmic() + "),YAXISMINIMUM("
                 + yaxisMinimum + "),YAXISMAXIMUM(" + yaxisMaximum
-                + "),FILENAME(" + getCsvFileName() + ")";
+                + "),FILENAME(" + getCsvFileName() + "),DESCRIPTION("
+                + getDescription() + ")";
     }
 
     public String getYaxis() {
@@ -439,6 +448,7 @@ public class Plot implements Comparable<Plot> {
         if (StringUtils.isBlank(csvFileName) && project != null) {
             try {
                 csvFileName = File.createTempFile("plot-", ".csv", project.getRootDir()).getName();
+                LOGGER.log(Level.WARNING, "Loading " + csvFileName);
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Unable to create temporary CSV file.", e);
             }
@@ -521,6 +531,19 @@ public class Plot implements Comparable<Plot> {
 
     public String getNumBuilds() {
         return numBuilds;
+    }
+
+    /**
+     * Sets the description of the plot from the "description" parameter in the
+     * given StaplerRequest. If the parameter doesn't exist or isn't an string
+     * then a default is used.
+     */
+    private void setDescription(StaplerRequest req) {
+        description = req.getParameter("description");
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     /**
@@ -839,9 +862,9 @@ public class Plot implements Comparable<Plot> {
             String s = getUrlStyle();
             LineAndShapeRenderer lasRenderer = (LineAndShapeRenderer) renderer;
             if ("lineSimple".equalsIgnoreCase(s)) {
-                lasRenderer.setShapesVisible(false); // TODO: deprecated, may be unnecessary
+                lasRenderer.setShapesVisible(false);
             } else {
-                lasRenderer.setShapesVisible(true); // TODO: deprecated, may be unnecessary
+                lasRenderer.setShapesVisible(true);
             }
         }
     }
@@ -926,7 +949,7 @@ public class Plot implements Comparable<Plot> {
             while ((nextLine = reader.readNext()) != null) {
                 rawPlotData.add(nextLine);
             }
-        } catch (IOException ioe) {
+        } catch (CsvValidationException | IOException ioe) {
             LOGGER.log(Level.SEVERE, "Exception reading plot file", ioe);
         } finally {
             if (reader != null) {

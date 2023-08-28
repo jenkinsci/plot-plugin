@@ -1,5 +1,6 @@
 package hudson.plugins.plot;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -151,7 +152,8 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
             for (Plot p : plots) {
                 Plot plot = new Plot(p.title, p.yaxis, p.group, p.numBuilds,
                         p.csvFileName, p.style, p.useDescr, p.getKeepRecords(),
-                        p.getExclZero(), p.isLogarithmic(), p.yaxisMinimum, p.yaxisMaximum);
+                        p.getExclZero(), p.isLogarithmic(), p.yaxisMinimum, p.yaxisMaximum,
+                        p.description);
                 plot.series = p.series;
                 plot.setProject((MatrixConfiguration) build.getProject());
                 addPlot(plot);
@@ -202,6 +204,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
             super(MatrixPlotPublisher.class);
         }
 
+        @NonNull
         public String getDisplayName() {
             return Messages.Plot_Publisher_DisplayName();
         }

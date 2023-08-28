@@ -5,19 +5,23 @@
  */
  -->
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+  xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <f:entry>
     <f:repeatable var="plot" items="${instance.plots}" name="plots" add="${%Add Plot}" minimum="1">
       <div align="left">
         <f:repeatableDeleteButton value="${%Delete Plot}"/>
       </div>
       <input name="csvFileName" type="hidden" value="${plot.csvFileName}" />
-      <table width="100%">
+      <div>
         <f:entry title="${%Plot group}" help="/plugin/plot/help-group.html">
           <f:textbox name="group" value="${plot.group}" clazz="required" />
         </f:entry>
         <f:entry title="${%Plot title}" help="/plugin/plot/help-title.html">
           <f:textbox name="title" value="${plot.title}" clazz="required" />
+        </f:entry>
+        <f:entry title="${%Plot description}" help="/plugin/plot/help-description.html">
+          <f:textbox name="description" value="${plot.description}" />
         </f:entry>
         <f:entry title="${%Number of builds to include}" help="/plugin/plot/help-numbuilds.html">
           <input class="positive-number" type="text" name="numBuilds"
@@ -55,14 +59,13 @@
         <f:entry title="${%Y-axis maximum}" help="/plugin/plot/help-yaxisMaximum.html">
           <f:textbox name="yaxisMaximum" value="${plot.yaxisMaximum}" />
         </f:entry>
-
         <f:entry title="${%Keep records for deleted builds}" help="/plugin/plot/help-keepRecords.html">
           <f:checkbox name="keepRecords" checked="${plot.keepRecords}" />
         </f:entry>
 
         <f:entry title="" description="${%A new data series definition}">
           <f:repeatable var="series" items="${plot.series}" minimum="1">
-            <table width="100%" bgcolor="#EEEEEE">
+            <div>
               <f:entry title="${%Data series file}" help="/plugin/plot/help-series.html">
                 <f:textbox name="file" value="${series.file}"
                            checkUrl="'descriptorByName/hudson.plugins.plot.PlotPublisher/checkSeriesFile?value='+toValue(this)" />
@@ -169,7 +172,7 @@
                   <f:repeatableDeleteButton value="${%Delete Data Series}"/>
                 </div>
               </f:entry>
-            </table>
+            </div>
           </f:repeatable>
         </f:entry>
 
@@ -178,7 +181,7 @@
             <hr/>
           </f:block>
         </f:entry>
-      </table>
+      </div>
     </f:repeatable>
   </f:entry>
 </j:jelly>

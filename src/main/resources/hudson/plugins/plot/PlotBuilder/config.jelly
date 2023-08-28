@@ -10,13 +10,17 @@
     <f:entry>
         <input name="csvFileName" type="hidden" value="${descriptor.csvFileName}" />
 
-        <table width="100%">
+        <div>
             <f:entry title="${%Plot group}" field="group" help="/plugin/plot/help-group.html">
                 <f:textbox name="group" value="${plot.group}" clazz="required"/>
             </f:entry>
 
             <f:entry title="${%Plot title}" field="title" help="/plugin/plot/help-title.html">
                 <f:textbox name="title" value="${plot.title}" clazz="required"/>
+            </f:entry>
+
+            <f:entry title="${%Plot description}" help="/plugin/plot/help-description.html">
+              <f:textbox name="description" value="${plot.description}" />
             </f:entry>
 
             <f:entry title="${%Number of builds to include}" field="numBuilds" help="/plugin/plot/help-numbuilds.html">
@@ -65,7 +69,6 @@
             <f:entry title="${%Y-axis maximum}" field="yaxisMaximum" help="/plugin/plot/help-yaxisMaximum.html">
                 <f:textbox name="yaxisMaximum" value="${plot.yaxisMaximum}"/>
             </f:entry>
-
             <f:entry title="" description="${%A new data series definition}">
                 <f:repeatableProperty field="csvSeries" add="Add CSV series"/>
             </f:entry>
@@ -76,7 +79,7 @@
                 <f:repeatableProperty field="xmlSeries" add="Add XML series"/>
             </f:entry>
 
-        </table>
+        </div>
 
     </f:entry>
 </j:jelly>

@@ -5,6 +5,7 @@
  */
 package hudson.plugins.plot;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.AbstractDescribableImpl;
@@ -50,7 +51,6 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
     protected Series(String file, String label, String fileType) {
         this.file = file;
 
-        // TODO: look into this, what do we do if there is no label?
         if (label == null) {
             label = Messages.Plot_Missing();
         }
@@ -140,12 +140,14 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
 
     @Extension
     public static class DescriptorImpl extends Descriptor<Series> {
+        @NonNull
         public String getDisplayName() {
             return Messages.Plot_Series();
         }
 
         @Override
-        public Series newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData)
+                throws FormException {
             return SeriesFactory.createSeries(formData, req);
         }
     }

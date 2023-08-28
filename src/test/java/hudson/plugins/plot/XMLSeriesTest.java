@@ -1,13 +1,21 @@
 package hudson.plugins.plot;
 
-import hudson.FilePath;
-import java.io.File;
+import org.junit.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+
 
 /**
  * Test an XML series.
@@ -18,23 +26,9 @@ public class XMLSeriesTest extends SeriesTestCase {
     private static final String TEST_XML_FILE = "test.xml";
     private static final String TEST2_XML_FILE = "test2.xml";
     private static final String TEST3_XML_FILE = "test3.xml";
+    private static final String TEST4_XML_FILE = "test4.xml";
 
-    private File workspaceDirFile;
-    private FilePath workspaceRootDir;
-
-    @Before
-    public void setUp() {
-        // first create a FilePath to load the test Properties file.
-        workspaceDirFile = new File("target/test-classes/");
-        workspaceRootDir = new FilePath(workspaceDirFile);
-    }
-
-    @After
-    public void tearDown() {
-        workspaceRootDir = null;
-        workspaceDirFile = null;
-    }
-
+    @Test
     public void testXMLSeries_WhenNodesSharingAParentHaveOneStringAndOneNumericContent_ThenCoalesceNodesToPointLabelledWithStringContent() {
         // Create a new XML series.
         String xpath = "//UIAction/name|//UIAction/numCalls";
@@ -57,6 +51,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 4);
     }
 
+    @Test
     public void testXMLSeries_WhenNodesHaveNoContent_ThenCoalesceForAttributes() {
         // Create a new XML series.
         String xpath =
@@ -77,6 +72,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 3);
     }
 
+    @Test
     public void testXMLSeriesNodeset() {
         // Create a new XML series.
         String xpath = "//testcase";
@@ -98,6 +94,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 4);
     }
 
+    @Test
     public void testXMLSeries_WhenAllNodesAreNumeric_ThenPointsAreLabelledWithNodeName() {
         // Create a new XML series.
         String xpath = "/results/testcase/*";
@@ -116,6 +113,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 2);
     }
 
+    @Test
     public void testXMLSeriesEmptyNodeset() {
         // Create a new XML series.
         String xpath = "/there/is/no/such/element";
@@ -132,6 +130,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 0);
     }
 
+    @Test
     public void testXMLSeriesNode() {
         // Create a new XML series.
         String xpath = "//testcase[@name='testThree']";
@@ -144,10 +143,11 @@ public class XMLSeriesTest extends SeriesTestCase {
         List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
         assertNotNull(points);
         assertEquals(points.size(), 1);
-        assertEquals(Double.parseDouble(points.get(0).getYvalue()), 27d);
+        assertEquals(Double.parseDouble(points.get(0).getYvalue()), 27d, 0);
         testPlotPoints(points, 1);
     }
 
+    @Test
     public void testXMLSeriesString() {
         // Create a new XML series.
         String xpath = "//testcase[@name='testOne']/@time";
@@ -162,6 +162,22 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 1);
     }
 
+    @Test
+    public void testXMLSeriesBoolean() {
+        // Create a new XML series.
+        String xpath = "//testcase[@name='testOne']";
+        XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "BOOLEAN", null);
+
+        // test the basic subclass properties.
+        testSeries(series, TEST_XML_FILE, "", "xml");
+
+        // load the series.
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        assertNotNull(points);
+        testPlotPoints(points, 1);
+    }
+
+    @Test
     public void testXMLSeriesNumber() {
         // Create a new XML series.
         String xpath =
@@ -179,6 +195,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testPlotPoints(points, 1);
     }
 
+    @Test
     public void testXMLSeriesUrl() {
         // Create a new XML series.
         String xpath = "/results/testcase/*";
@@ -197,18 +214,28 @@ public class XMLSeriesTest extends SeriesTestCase {
         assertEquals("http://localhost/42/two/0", points.get(1).getUrl());
     }
 
-    @Ignore
-    public void testXMLSeriesBoolean() {
-        // Create a new XML series.
-        String xpath = "//testcase[@name='testOne']/@time";
-        XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "BOOLEAN", null);
+    @Test
+    public void testXMLSeries_failToReadExternalDTD() throws UnsupportedEncodingException {
+        // Create a new XML series with test file
+        String xpathString = "/results/testcase/*";
+        XMLSeries series = new XMLSeries(TEST4_XML_FILE, xpathString, "NODESET", null);
+        testSeries(series, TEST4_XML_FILE, "", "xml");
 
-        // test the basic subclass properties.
-        testSeries(series, TEST_XML_FILE, "", "xml");
+        //we want to examin the logoutput
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final String utf8 = StandardCharsets.UTF_8.name();
+        PrintStream customOutput = new PrintStream(baos, true, utf8);
 
-        // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
-        assertNotNull(points);
-        testPlotPoints(points, 1);
+        // load the series to see if we have the expected behavior.
+        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, customOutput);
+
+
+        assertNull(points);
+
+        String expectedOutput = "DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true";
+        String customOutputAsString = baos.toString();
+        assertNotNull(customOutputAsString);
+        //depending on the "JRE" (?) the custom output is terminated or not by a \n
+        assertThat(customOutputAsString, containsString(expectedOutput));
     }
 }

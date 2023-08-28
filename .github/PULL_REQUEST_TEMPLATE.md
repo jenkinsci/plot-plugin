@@ -32,6 +32,7 @@ Before | After
 - [ ] Git commits follow [best practices](https://chris.beams.io/posts/git-commit/) <!-- mandatory -->
 - [ ] Build passes in Jenkins <!-- mandatory -->
 - [ ] Appropriate tests or explanation to why this change has no tests <!-- mandatory -->
+- [ ] Pull Request is marked with appropriate label (see `.github/release-drafter.yml`) <!-- mandatory -->
 - [ ] JIRA issue is well described (problem explanation, steps to reproduce, screenshots) <!-- optional -->
 - [ ] For dependency updates: links to external changelogs and, if possible, full diffs
 

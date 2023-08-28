@@ -5,28 +5,33 @@
  */
 package hudson.plugins.plot;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.Descriptor;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents a plot data series configuration from an CSV file.
@@ -37,6 +42,7 @@ public class CSVSeries extends Series {
     private static final transient Logger LOGGER = Logger.getLogger(CSVSeries.class.getName());
     // Debugging hack, so I don't have to change FINE/INFO...
     private static final transient Level DEFAULT_LOG_LEVEL = Level.FINEST;
+    private static final transient Pattern PAT_SEMICOLON_ENCLOSURE = Pattern.compile("\"(.*?)\"");
     private static final transient Pattern PAT_COMMA = Pattern.compile(",");
 
     public enum InclusionFlag {
@@ -64,10 +70,18 @@ public class CSVSeries extends Series {
     private String exclusionValues;
 
     /**
+     * Comma separated list of columns to exclude.
+     */
+    private List<String> exclusionValuesList;
+
+    /**
      * Url to use as a base for mapping points.
      */
     private String url;
 
+    /**
+     * Show table of the single values in charts.
+     */
     private boolean displayTableFlag;
 
     @DataBoundConstructor
@@ -77,14 +91,32 @@ public class CSVSeries extends Series {
 
         this.url = url;
         this.displayTableFlag = displayTableFlag;
+        this.exclusionValues = exclusionValues;
 
-        if (exclusionValues == null) {
+        if (this.exclusionValues == null) {
             this.inclusionFlag = InclusionFlag.OFF;
         } else {
             this.inclusionFlag = InclusionFlag.valueOf(inclusionFlag);
-            this.exclusionValues = exclusionValues;
-            loadExclusionSet();
+            this.exclusionValuesList = new ArrayList<>();
+
+            /**
+             * first: try to handle the regex. The values are enclosed by ""
+             * If there are no values found, use plain splitting by comma
+             */
+            Matcher m = PAT_SEMICOLON_ENCLOSURE.matcher(this.exclusionValues);
+            int results = 0;
+            while (m.find()) {
+                this.exclusionValuesList.add(m.group().replaceAll("\"", ""));
+                results++;
+            }
+
+            if (results == 0) {
+                this.exclusionValuesList = Arrays.asList(
+                        PAT_COMMA.split((String) this.exclusionValues)
+                );
+            }
         }
+        loadExclusionSet();
     }
 
     public String getInclusionFlag() {
@@ -93,6 +125,10 @@ public class CSVSeries extends Series {
 
     public String getExclusionValues() {
         return exclusionValues;
+    }
+
+    public List<String> getExclusionValuesList() {
+        return exclusionValuesList;
     }
 
     public String getUrl() {
@@ -109,6 +145,35 @@ public class CSVSeries extends Series {
     @Override
     public List<PlotPoint> loadSeries(FilePath workspaceRootDir,
                                       int buildNumber, PrintStream logger) {
+        List<PlotPoint> plotPoints = null;
+        FilePath[] seriesFiles;
+        try {
+            seriesFiles = workspaceRootDir.list(getFile());
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Exception trying to retrieve series files", e);
+            return null;
+        }
+
+        if (ArrayUtils.isEmpty(seriesFiles)) {
+            LOGGER.info("No plot data file found: " + workspaceRootDir.getName()
+                    + " " + getFile());
+            return null;
+        }
+
+        for (FilePath seriesFile : seriesFiles) {
+            List<PlotPoint> seriesList = loadSeriesFile(seriesFile, buildNumber);
+            if (seriesList != null) {
+                if (plotPoints != null) {
+                    plotPoints.addAll(seriesList);
+                } else {
+                    plotPoints = seriesList;
+                }
+            }
+        }
+        return plotPoints;
+    }
+
+    private List<PlotPoint> loadSeriesFile(FilePath seriesFile, int buildNumber) {
         CSVReader reader = null;
         InputStream in = null;
         InputStreamReader inputReader = null;
@@ -116,29 +181,15 @@ public class CSVSeries extends Series {
         try {
             List<PlotPoint> ret = new ArrayList<>();
 
-            FilePath[] seriesFiles;
-            try {
-                seriesFiles = workspaceRootDir.list(getFile());
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Exception trying to retrieve series files", e);
-                return null;
-            }
-
-            if (ArrayUtils.isEmpty(seriesFiles)) {
-                LOGGER.info("No plot data file found: " + workspaceRootDir.getName()
-                        + " " + getFile());
-                return null;
-            }
-
             try {
                 if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
                     LOGGER.log(DEFAULT_LOG_LEVEL, "Loading plot series data from: " + getFile());
                 }
 
-                in = seriesFiles[0].read();
+                in = seriesFile.read();
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Exception reading plot series data from "
-                        + seriesFiles[0], e);
+                        + seriesFile, e);
                 return null;
             }
 
@@ -166,11 +217,7 @@ public class CSVSeries extends Series {
                     String yvalue;
                     String label = null;
 
-                    if (index > nextLine.length) {
-                        continue;
-                    }
-
-                    yvalue = nextLine[index];
+                    yvalue = nextLine[index].trim();
 
                     // empty value, caused by e.g. trailing comma in CSV
                     if (yvalue.trim().length() == 0) {
@@ -178,7 +225,7 @@ public class CSVSeries extends Series {
                     }
 
                     if (index < headerLine.length) {
-                        label = headerLine[index];
+                        label = headerLine[index].trim();
                     }
 
                     if (label == null || label.length() <= 0) {
@@ -209,7 +256,7 @@ public class CSVSeries extends Series {
             }
 
             return ret;
-        } catch (IOException ioe) {
+        } catch (CsvValidationException | IOException ioe) {
             LOGGER.log(Level.SEVERE, "Exception loading series", ioe);
         } finally {
             if (reader != null) {
@@ -232,7 +279,7 @@ public class CSVSeries extends Series {
      *
      * @return true if the point should be excluded based on label or column
      */
-    private boolean excludePoint(String label, int index) {
+    private boolean excludePoint(final String label, int index) {
         if (inclusionFlag == null || inclusionFlag == InclusionFlag.OFF) {
             return false;
         }
@@ -241,11 +288,11 @@ public class CSVSeries extends Series {
         switch (inclusionFlag) {
             case INCLUDE_BY_STRING:
                 // if the set contains it, don't exclude it.
-                retVal = !(strExclusionSet.contains(label));
+                retVal = !checkExclusionSet(label);
                 break;
             case EXCLUDE_BY_STRING:
                 // if the set doesn't contain it, exclude it.
-                retVal = strExclusionSet.contains(label);
+                retVal = checkExclusionSet(label);
                 break;
             case INCLUDE_BY_COLUMN:
                 // if the set contains it, don't exclude it.
@@ -265,6 +312,34 @@ public class CSVSeries extends Series {
         }
 
         return retVal;
+    }
+
+    /**
+     * Checks if the current label / header is known in the strExclusionSet (plain text or regex).
+     *
+     * @param label
+     * @return if the label is in the set
+     */
+    private boolean checkExclusionSet(String label) {
+        if (strExclusionSet.contains(label)) {
+            return true;
+        } else {
+            for (String s : strExclusionSet) {
+                if (checkPatternIsValid(s) && label.matches(s)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkPatternIsValid(String pattern) {
+        try {
+            Pattern.compile(pattern);
+        } catch (java.util.regex.PatternSyntaxException e) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -294,7 +369,7 @@ public class CSVSeries extends Series {
                 LOGGER.log(Level.SEVERE, "Failed to initialize columns exclusions set.");
         }
 
-        for (String str : PAT_COMMA.split(exclusionValues)) {
+        for (String str : exclusionValuesList) {
             if (str == null || str.length() <= 0) {
                 continue;
             }
@@ -331,12 +406,14 @@ public class CSVSeries extends Series {
 
     @Extension
     public static class DescriptorImpl extends Descriptor<Series> {
+        @NonNull
         public String getDisplayName() {
             return Messages.Plot_CsvSeries();
         }
 
         @Override
-        public Series newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData)
+                throws FormException {
             return SeriesFactory.createSeries(formData, req);
         }
     }

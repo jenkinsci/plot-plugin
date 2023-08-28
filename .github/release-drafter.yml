@@ -1,0 +1,5 @@
+# see https://github.com/jenkinsci/.github/blob/master/.github/release-drafter.adoc
+_extends: .github
+version-template: $MAJOR.$MINOR.$PATCH
+name-template: $NEXT_PATCH_VERSION
+tag-template: plot-$NEXT_PATCH_VERSION
