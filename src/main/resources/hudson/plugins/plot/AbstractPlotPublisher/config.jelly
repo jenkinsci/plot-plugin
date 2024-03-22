@@ -6,14 +6,14 @@
  -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-  xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:p="/lib/plot">
+  xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <f:entry>
     <f:repeatable var="plot" items="${instance.plots}" name="plots" add="${%Add Plot}" minimum="1">
       <div align="left">
         <f:repeatableDeleteButton value="${%Delete Plot}"/>
       </div>
       <input name="csvFileName" type="hidden" value="${plot.csvFileName}" />
-      <p:blockWrapper>
+      <div>
         <f:entry title="${%Plot group}" help="/plugin/plot/help-group.html">
           <f:textbox name="group" value="${plot.group}" clazz="required" />
         </f:entry>
@@ -73,7 +73,7 @@
 
         <f:entry title="" description="${%A new data series definition}">
           <f:repeatable var="series" items="${plot.series}" minimum="1">
-            <p:blockWrapperBackground>
+            <div>
               <f:entry title="${%Data series file}" help="/plugin/plot/help-series.html">
                 <f:textbox name="file" value="${series.file}"
                            checkUrl="'descriptorByName/hudson.plugins.plot.PlotPublisher/checkSeriesFile?value='+toValue(this)" />
@@ -180,7 +180,7 @@
                   <f:repeatableDeleteButton value="${%Delete Data Series}"/>
                 </div>
               </f:entry>
-            </p:blockWrapperBackground>
+            </div>
           </f:repeatable>
         </f:entry>
 
@@ -189,7 +189,7 @@
             <hr/>
           </f:block>
         </f:entry>
-      </p:blockWrapper>
+      </div>
     </f:repeatable>
   </f:entry>
 </j:jelly>
