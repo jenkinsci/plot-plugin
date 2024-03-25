@@ -1,0 +1,38 @@
+<FindBugsFilter>
+  <Match>
+    <Class name="hudson.plugins.plot.Plot" />
+    <Field name="csvFileName" />
+  </Match>
+  <Match>
+    <Class name="hudson.plugins.plot.Plot" />
+    <Field name="description" />
+  </Match>
+  <Match>
+    <Class name="hudson.plugins.plot.Plot" />
+    <Field name="urlNumBuilds" />
+  </Match>
+  <Match>
+    <Class name="hudson.plugins.plot.Plot" />
+    <Field name="urlStyle" />
+  </Match>
+  <Match>
+    <Class name="hudson.plugins.plot.Plot" />
+    <Field name="urlTitle" />
+  </Match>
+  <Match>
+    <Class name="hudson.plugins.plot.Plot" />
+    <Field name="urlUseDescr" />
+  </Match>
+  <Match>
+    <Class name="hudson.plugins.plot.PlotBuilder" />
+    <Field name="csvSeries" />
+  </Match>
+  <Match>
+    <Class name="hudson.plugins.plot.PlotBuilder" />
+    <Field name="propertiesSeries" />
+  </Match>
+  <Match>
+    <Class name="hudson.plugins.plot.PlotBuilder" />
+    <Field name="xmlSeries" />
+  </Match>
+</FindBugsFilter>
