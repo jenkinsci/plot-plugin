@@ -22,7 +22,7 @@
     <Or>
       <Field name="csvSeries" />
       <Field name="propertiesSeries" />
-    <Field name="xmlSeries" />
+      <Field name="xmlSeries" />
     </Or>
   </Match>
 </FindBugsFilter>
