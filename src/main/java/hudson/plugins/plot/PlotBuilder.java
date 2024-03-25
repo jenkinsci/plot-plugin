@@ -67,11 +67,11 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
      * List of data series.
      */
     @SuppressWarnings("visibilitymodifier")
-    public List<CSVSeries> csvSeries;
+    private List<CSVSeries> csvSeries;
     @SuppressWarnings("visibilitymodifier")
-    public List<PropertiesSeries> propertiesSeries;
+    private List<PropertiesSeries> propertiesSeries;
     @SuppressWarnings("visibilitymodifier")
-    public List<XMLSeries> xmlSeries;
+    private List<XMLSeries> xmlSeries;
 
     // Fields in config.jelly must match the parameter names in the "DataBoundConstructor"
     // Similarly, any optional @DataBoundSetter properties must match

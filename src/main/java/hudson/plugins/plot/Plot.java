@@ -149,25 +149,25 @@ public class Plot implements Comparable<Plot> {
      * Number of builds back to show on this plot from url.
      */
     @SuppressWarnings("visibilitymodifier")
-    public transient String urlNumBuilds;
+    private transient String urlNumBuilds;
 
     /**
      * Title of plot from url.
      */
     @SuppressWarnings("visibilitymodifier")
-    public transient String urlTitle;
+    private transient String urlTitle;
 
     /**
      * Style of plot from url.
      */
     @SuppressWarnings("visibilitymodifier")
-    public transient String urlStyle;
+    private transient String urlStyle;
 
     /**
      * Use description flag from url.
      */
     @SuppressWarnings("visibilitymodifier")
-    public transient Boolean urlUseDescr;
+    private transient Boolean urlUseDescr;
 
     // Configuration values
 
@@ -181,7 +181,7 @@ public class Plot implements Comparable<Plot> {
      * Description of plot. Optional.
      */
     @SuppressWarnings("visibilitymodifier")
-    public String description;
+    private String description;
 
     /**
      * Y-axis label. Optional.
@@ -214,7 +214,7 @@ public class Plot implements Comparable<Plot> {
      * csv file that can be used as a source for the plot.
      */
     @SuppressWarnings("visibilitymodifier")
-    public String csvFileName;
+    private String csvFileName;
 
     /**
      * The date of the last change to the CSV file.
@@ -456,6 +456,10 @@ public class Plot implements Comparable<Plot> {
         return csvFileName;
     }
 
+    public void setCsvFileName(String csvFileName) {
+        this.csvFileName = csvFileName;
+    }
+
     /**
      * Sets the title for the plot from the "title" parameter in the given
      * StaplerRequest.
@@ -466,6 +470,10 @@ public class Plot implements Comparable<Plot> {
 
     private String getURLTitle() {
         return urlTitle != null ? urlTitle : title;
+    }
+
+    public void setUrlTitle(String urlTitle) {
+        this.urlTitle = urlTitle;
     }
 
     public String getTitle() {
@@ -480,6 +488,10 @@ public class Plot implements Comparable<Plot> {
         return urlStyle != null ? urlStyle : (style != null ? style : "");
     }
 
+    public void setUrlStyle(String urlStyle) {
+        this.urlStyle = urlStyle;
+    }
+
     private void setUseDescr(StaplerRequest req) {
         String u = req.getParameter("usedescr");
         if (u == null) {
@@ -491,6 +503,10 @@ public class Plot implements Comparable<Plot> {
 
     private boolean getUrlUseDescr() {
         return urlUseDescr != null ? urlUseDescr : useDescr;
+    }
+
+    public void setUrlUseDescr(Boolean urlUseDescr) {
+        this.urlUseDescr = urlUseDescr;
     }
 
     /**
@@ -529,6 +545,9 @@ public class Plot implements Comparable<Plot> {
         return urlNumBuilds != null ? urlNumBuilds : numBuilds;
     }
 
+    public void setUrlNumBuilds(String urlNumBuilds) {
+        this.urlNumBuilds = urlNumBuilds;
+    }
     public String getNumBuilds() {
         return numBuilds;
     }
@@ -544,6 +563,10 @@ public class Plot implements Comparable<Plot> {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**
