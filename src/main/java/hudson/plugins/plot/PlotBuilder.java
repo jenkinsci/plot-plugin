@@ -59,6 +59,8 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     private boolean exclZero;
     private boolean logarithmic;
     private boolean keepRecords;
+    private String width;
+    private String height;
 
     // Generated?
     @SuppressWarnings("visibilitymodifier")
@@ -213,6 +215,24 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         this.xmlSeries = xmlSeries;
     }
 
+    public String getWidth() {
+        return width;
+    }
+
+    @DataBoundSetter
+    public void setWidth(String width) {
+        this.width = width;
+    }
+
+    public String getHeight() {
+        return height;
+    }
+
+    @DataBoundSetter
+    public void setHeight(String height) {
+        this.height = height;
+    }
+
     @Override
     public void perform(@NonNull Run<?, ?> build, @NonNull FilePath workspace,
                         @NonNull Launcher launcher, @NonNull TaskListener listener) {
@@ -220,6 +240,14 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         Plot plot = new Plot(title, yaxis, group, numBuilds, csvFileName, style,
                 useDescr, keepRecords, exclZero, logarithmic,
                 yaxisMinimum, yaxisMaximum, description);
+
+        // set plot dimensions
+        if (width != null) {
+            plot.setWidth(width);
+        }
+        if (height != null) {
+            plot.setHeight(height);
+        }
 
         List<Series> series = new ArrayList<>();
         if (csvSeries != null) {
