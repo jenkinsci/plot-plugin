@@ -2,9 +2,8 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
     <f:entry>
     <div>
-    <f:entry title="${%Data series file}" help="/plugin/plot/help-series.html">
-        <f:textbox name="file" value="${series.file}"
-                   checkUrl="'descriptorByName/hudson.plugins.plot.PlotPublisher/checkSeriesFile?value='+toValue(this)" />
+    <f:entry title="${%Data series file}" field="seriesFile" help="/plugin/plot/help-series.html">
+        <f:textbox name="file" value="${series.file}"/>
     </f:entry>
         <f:nested>
             <f:entry title="${%Data series legend label}" help="/plugin/plot/help-legend.html">

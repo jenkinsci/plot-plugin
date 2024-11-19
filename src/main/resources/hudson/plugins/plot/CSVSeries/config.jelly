@@ -3,9 +3,8 @@
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
     <f:entry>
         <div>
-            <f:entry title="${%Data series file}" field="file" help="/plugin/plot/help-series.html">
-                <f:textbox name="file" value="${series.file}"
-                           checkUrl="'descriptorByName/hudson.plugins.plot.PlotPublisher/checkSeriesFile?value='+toValue(this)"/>
+            <f:entry title="${%Data series file}" field="seriesFile" help="/plugin/plot/help-series.html">
+                <f:textbox name="file" value="${series.file}"/>
             </f:entry>
             <f:nested>
                 <div>
