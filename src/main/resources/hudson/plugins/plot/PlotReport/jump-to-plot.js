@@ -1,8 +1,6 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     const plotSelector = document.querySelector('.plot-selector');
-    if (plotSelector) {
-        plotSelector.addEventListener('change', function () {
-            window.location.hash = this.value;
-        });
-    }
+    plotSelector.addEventListener('change', function(e) {
+        window.location.hash = e.target.value;
+    });
 });
