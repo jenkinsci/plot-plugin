@@ -70,12 +70,8 @@
     <l:main-panel>
       <h1><l:icon class="icon-graph icon-xlg"/>${it.group}</h1>
       <div>
-        <script>
-          function jump(menu){
-            window.location.hash = menu.value;
-          }
-        </script>
-        ${%Jump to} <select name="choice" onChange="jump(this)">
+        <st:adjunct includes="hudson.plugins.plot.PlotReport.jump-to-plot" />
+        ${%Jump to} <select class="plot-selector" name="choice">
           <j:forEach var="plotJump" items="${it.plots}" varStatus="loopStat">
             <option value="#${plotJump.csvFileName}">${%Plot} ${loopStat.count}: ${plotJump.title}</option>
           </j:forEach>
