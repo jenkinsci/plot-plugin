@@ -24,6 +24,13 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
+      <dependency>
+        <groupId>org.jenkins-ci.main</groupId>
+        <artifactId>jenkins-bom</artifactId>
+        <version>${jenkins.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -51,6 +58,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>commons-lang3-api</artifactId>
     </dependency>
@@ -74,16 +86,6 @@
       <groupId>com.opencsv</groupId>
       <artifactId>opencsv</artifactId>
       <version>5.9</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-lang3</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-text</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
