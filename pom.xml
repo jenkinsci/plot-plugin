@@ -43,22 +43,6 @@
   <version>${revision}${changelist}</version>
   <url>https://github.com/jenkinsci/plot-plugin</url>
 
-  <developers>
-    <developer>
-      <id>nidaley</id>
-      <name>Nigel Daley</name>
-    </developer>
-    <developer>
-      <id>ericbn</id>
-      <name>Eric Nielsen</name>
-    </developer>
-    <developer>
-      <id>vgaidarji</id>
-      <name>Veaceslav Gaidarji</name>
-      <email>veaceslav.gaidarji@gmail.com</email>
-    </developer>
-  </developers>
-
   <dependencies>
     <dependency>
       <groupId>commons-beanutils</groupId>
