@@ -74,9 +74,8 @@
         <f:entry title="" description="${%A new data series definition}">
           <f:repeatable var="series" items="${plot.series}" minimum="1">
             <div>
-              <f:entry title="${%Data series file}" help="/plugin/plot/help-series.html">
-                <f:textbox name="file" value="${series.file}"
-                           checkUrl="'descriptorByName/hudson.plugins.plot.PlotPublisher/checkSeriesFile?value='+toValue(this)" />
+              <f:entry title="${%Data series file}" field="seriesFile" help="/plugin/plot/help-series.html">
+                <f:textbox name="file" value="${series.file}"/>
               </f:entry>
 
               <f:radioBlock name="fileType" value="properties" title="${%Load data from properties file}" help="/plugin/plot/help-properties.html" checked="${series.fileType=='properties' or series.fileType==null}">

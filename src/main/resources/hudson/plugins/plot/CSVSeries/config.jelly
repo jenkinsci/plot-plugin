@@ -5,7 +5,8 @@
         <div>
             <f:entry title="${%Data series file}" field="file" help="/plugin/plot/help-series.html">
                 <f:textbox name="file" value="${series.file}"
-                           checkUrl="'descriptorByName/hudson.plugins.plot.PlotPublisher/checkSeriesFile?value='+toValue(this)"/>
+                           checkUrl="descriptorByName/hudson.plugins.plot.PlotPublisher/checkSeriesFile"
+                           checkDependsOn="" />
             </f:entry>
             <f:nested>
                 <div>
