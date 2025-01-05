@@ -9,7 +9,7 @@
   <l:layout title="${it.project.displayName} plots">
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
-      <h1>${%Plot Groups}</h1>
+      <h1 class="page-headline">${%Plot Groups}</h1>
 
       <j:choose>
         <j:when test="${it.hasPlots()}">
@@ -18,7 +18,7 @@
           </p>
           <table>
             <j:forEach var="group" items="${it.originalGroups}">
-              <t:summary icon="icon-graph icon-md" href="${it.getUrlGroup(group)}/">
+              <t:summary icon="symbol-analytics icon-md" href="${it.getUrlGroup(group)}/">
                 ${group}
               </t:summary>
             </j:forEach>
