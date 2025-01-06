@@ -23,6 +23,8 @@
  */
 package hudson.plugins.plot;
 
+import static org.junit.Assert.assertEquals;
+
 import hudson.Launcher;
 import hudson.matrix.AxisList;
 import hudson.matrix.MatrixConfiguration;
@@ -40,8 +42,6 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
-
-import static org.junit.Assert.assertEquals;
 
 public class PlotTest {
 
@@ -186,8 +186,8 @@ public class PlotTest {
 
     private void plotBuilds(AbstractProject<?, ?> p, String count, boolean keepRecords) {
         final PlotPublisher publisher = new PlotPublisher();
-        final Plot plot = new Plot("Title", "Number", "default", count, null,
-                "line", false, keepRecords, false, false, null, null, null);
+        final Plot plot = new Plot(
+                "Title", "Number", "default", count, null, "line", false, keepRecords, false, false, null, null, null);
         p.getPublishersList().add(publisher);
         publisher.addPlot(plot);
         plot.series = Arrays.<Series>asList(new PropertiesSeries("src.properties", null));
@@ -195,8 +195,8 @@ public class PlotTest {
 
     private void plotMatrixBuilds(AbstractProject<?, ?> p, String count, boolean keepRecords) {
         final MatrixPlotPublisher publisher = new MatrixPlotPublisher();
-        final Plot plot = new Plot("Title", "Number", "default", count, null,
-                "line", false, keepRecords, false, false, null, null, null);
+        final Plot plot = new Plot(
+                "Title", "Number", "default", count, null, "line", false, keepRecords, false, false, null, null, null);
         p.getPublishersList().add(publisher);
         publisher.setPlots(Arrays.asList(plot));
         plot.series = Arrays.<Series>asList(new PropertiesSeries("src.properties", null));
@@ -213,12 +213,9 @@ public class PlotTest {
     private static final class PlotBuildNumber extends Builder {
 
         @Override
-        public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-                               BuildListener listener) throws InterruptedException,
-                IOException {
-            build.getWorkspace()
-                    .child("src.properties")
-                    .write(String.format("YVALUE=%d", build.getNumber()), "UTF-8");
+        public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
+                throws InterruptedException, IOException {
+            build.getWorkspace().child("src.properties").write(String.format("YVALUE=%d", build.getNumber()), "UTF-8");
             return true;
         }
     }

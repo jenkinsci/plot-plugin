@@ -34,16 +34,14 @@ public class PlotDescriptor extends BuildStepDescriptor<Publisher> {
 
     @Override
     public boolean isApplicable(Class<? extends AbstractProject> jobType) {
-        return AbstractProject.class.isAssignableFrom(jobType)
-                && !MatrixProject.class.isAssignableFrom(jobType);
+        return AbstractProject.class.isAssignableFrom(jobType) && !MatrixProject.class.isAssignableFrom(jobType);
     }
 
     /**
      * Called when the user saves the project configuration.
      */
     @Override
-    public Publisher newInstance(StaplerRequest req, JSONObject formData)
-            throws FormException {
+    public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
         PlotPublisher publisher = new PlotPublisher();
         for (Object data : SeriesFactory.getArray(formData.get("plots"))) {
             publisher.addPlot(bindPlot((JSONObject) data, req));
@@ -60,9 +58,8 @@ public class PlotDescriptor extends BuildStepDescriptor<Publisher> {
     /**
      * Checks if the series file is valid.
      */
-    public FormValidation doCheckSeriesFile(
-            @AncestorInPath AbstractProject<?, ?> project,
-            @QueryParameter String value) throws IOException {
+    public FormValidation doCheckSeriesFile(@AncestorInPath AbstractProject<?, ?> project, @QueryParameter String value)
+            throws IOException {
         // we don't have a workspace while in Pipeline editor
         if (project == null || project.getRootDir() == null) {
             return FormValidation.ok();

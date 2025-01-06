@@ -19,8 +19,7 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class SeriesFactory {
 
-    private SeriesFactory() {
-    }
+    private SeriesFactory() {}
 
     /**
      * Using file and label and the Stapler request, create a subclass of series

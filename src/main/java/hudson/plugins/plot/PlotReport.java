@@ -12,8 +12,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.NumberFormat;
 import java.nio.charset.Charset;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,13 +43,11 @@ public class PlotReport {
      */
     private String group;
 
-    public PlotReport(AbstractProject<?, ?> project, String group,
-                      List<Plot> plots) {
+    public PlotReport(AbstractProject<?, ?> project, String group, List<Plot> plots) {
         this((Job) project, group, plots);
     }
 
-    public PlotReport(Job<?, ?> job, String group,
-                      List<Plot> plots) {
+    public PlotReport(Job<?, ?> job, String group, List<Plot> plots) {
         Collections.sort(plots);
         this.plots = plots;
         this.group = group;
@@ -145,8 +143,8 @@ public class PlotReport {
         }
         CSVReader reader = null;
         try {
-            reader = new CSVReader(new InputStreamReader(new FileInputStream(plotFile),
-                    Charset.defaultCharset().name()));
+            reader = new CSVReader(new InputStreamReader(
+                    new FileInputStream(plotFile), Charset.defaultCharset().name()));
             // throw away 2 header lines
             reader.readNext();
             reader.readNext();

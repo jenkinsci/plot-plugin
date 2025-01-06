@@ -27,8 +27,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Allen Reese
  */
 public class PropertiesSeries extends Series {
-    private static final transient Logger LOGGER =
-            Logger.getLogger(PropertiesSeries.class.getName());
+    private static final transient Logger LOGGER = Logger.getLogger(PropertiesSeries.class.getName());
 
     @DataBoundConstructor
     public PropertiesSeries(String file, String label) {
@@ -39,16 +38,14 @@ public class PropertiesSeries extends Series {
      * Load the series from a properties file.
      */
     @Override
-    public List<PlotPoint> loadSeries(FilePath workspaceRootDir, int buildNumber,
-                                      PrintStream logger) {
+    public List<PlotPoint> loadSeries(FilePath workspaceRootDir, int buildNumber, PrintStream logger) {
         InputStream in = null;
         FilePath[] seriesFiles;
 
         try {
             seriesFiles = workspaceRootDir.list(getFile());
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE,
-                    "Exception trying to retrieve series files", e);
+            LOGGER.log(Level.SEVERE, "Exception trying to retrieve series files", e);
             return null;
         }
 
@@ -65,16 +62,15 @@ public class PropertiesSeries extends Series {
             String yvalue = properties.getProperty("YVALUE");
             String url = properties.getProperty("URL", "");
             if (yvalue == null || url == null) {
-                logger.println("Not creating point with null values: y="
-                        + yvalue + " label=" + getLabel() + " url=" + url);
+                logger.println(
+                        "Not creating point with null values: y=" + yvalue + " label=" + getLabel() + " url=" + url);
                 return null;
             }
             List<PlotPoint> series = new ArrayList<PlotPoint>();
             series.add(new PlotPoint(yvalue, url, getLabel()));
             return series;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Exception reading plot series data from "
-                    + seriesFiles[0], e);
+            LOGGER.log(Level.SEVERE, "Exception reading plot series data from " + seriesFiles[0], e);
             return null;
         } finally {
             IOUtils.closeQuietly(in);
@@ -94,8 +90,7 @@ public class PropertiesSeries extends Series {
         }
 
         @Override
-        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData)
-                throws FormException {
+        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData) throws FormException {
             return SeriesFactory.createSeries(formData, req);
         }
     }

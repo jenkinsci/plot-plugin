@@ -121,8 +121,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
      * Returns the list of plots with the given group name. The given group must
      * be the URL friendly form of the group name.
      */
-    public List<Plot> getPlots(String urlGroup,
-                               MatrixConfiguration configuration) {
+    public List<Plot> getPlots(String urlGroup, MatrixConfiguration configuration) {
         List<Plot> groupPlots = new ArrayList<>();
         List<Plot> p = groupMap.get(urlGroup);
         if (p != null) {
@@ -150,9 +149,19 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     public boolean prebuild(AbstractBuild<?, ?> build, BuildListener listener) {
         if (!plotsOfConfigurations.containsKey((MatrixConfiguration) build.getProject())) {
             for (Plot p : plots) {
-                Plot plot = new Plot(p.title, p.yaxis, p.group, p.numBuilds,
-                        p.csvFileName, p.style, p.useDescr, p.getKeepRecords(),
-                        p.getExclZero(), p.isLogarithmic(), p.yaxisMinimum, p.yaxisMaximum,
+                Plot plot = new Plot(
+                        p.title,
+                        p.yaxis,
+                        p.group,
+                        p.numBuilds,
+                        p.csvFileName,
+                        p.style,
+                        p.useDescr,
+                        p.getKeepRecords(),
+                        p.getExclZero(),
+                        p.isLogarithmic(),
+                        p.yaxisMinimum,
+                        p.yaxisMaximum,
                         p.description);
                 plot.series = p.series;
                 plot.setProject((MatrixConfiguration) build.getProject());
@@ -163,16 +172,15 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
     }
 
     @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-                           BuildListener listener) throws IOException, InterruptedException {
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
+            throws IOException, InterruptedException {
         if (!(build instanceof MatrixRun)) {
             return true;
         }
         listener.getLogger().println("Recording plot data");
 
         // add the build to each plot
-        for (Plot plot : plotsOfConfigurations.get(((MatrixRun) build)
-                .getProject())) {
+        for (Plot plot : plotsOfConfigurations.get(((MatrixRun) build).getProject())) {
             plot.addBuild(build, listener.getLogger());
         }
         // misconfigured plots will not fail a build so always return true
@@ -218,8 +226,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
          * Called when the user saves the project configuration.
          */
         @Override
-        public Publisher newInstance(StaplerRequest req, JSONObject formData)
-                throws FormException {
+        public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             MatrixPlotPublisher publisher = new MatrixPlotPublisher();
             List<Plot> plots = new ArrayList<Plot>();
             for (Object data : SeriesFactory.getArray(formData.get("plots"))) {
@@ -238,8 +245,8 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
         /**
          * Checks if the series file is valid.
          */
-        public FormValidation doCheckSeriesFile(@AncestorInPath AbstractProject project,
-                                                @QueryParameter String value) throws IOException {
+        public FormValidation doCheckSeriesFile(@AncestorInPath AbstractProject project, @QueryParameter String value)
+                throws IOException {
             return FilePath.validateFileMask(project.getSomeWorkspace(), value);
         }
     }

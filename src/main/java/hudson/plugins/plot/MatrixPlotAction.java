@@ -42,7 +42,8 @@ public class MatrixPlotAction implements Action, StaplerProxy {
 
     // called from href created in MatrixPlotAction/index.jelly
     public PlotReport getDynamic(String group) throws IOException {
-        return new PlotReport(project,
+        return new PlotReport(
+                project,
                 publisher.urlGroupToOriginalGroup(getUrlGroup(group), project),
                 publisher.getPlots(getUrlGroup(group), project));
     }
@@ -54,8 +55,7 @@ public class MatrixPlotAction implements Action, StaplerProxy {
     public Object getTarget() {
         List<String> groups = getOriginalGroups();
         if (groups != null && groups.size() == 1) {
-            return new PlotReport(project, groups.get(0),
-                    publisher.getPlots(getUrlGroup(groups.get(0)), project));
+            return new PlotReport(project, groups.get(0), publisher.getPlots(getUrlGroup(groups.get(0)), project));
         } else {
             return this;
         }

@@ -5,19 +5,18 @@
 
 package hudson.plugins.plot;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import hudson.FilePath;
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Logger;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 
 /**
  * Test a CSV series.
@@ -27,11 +26,7 @@ import static org.junit.Assert.fail;
 public class CSVReaderTest extends SeriesTestCase {
     private static final Logger LOGGER = Logger.getLogger(CSVReaderTest.class.getName());
 
-    private static final String[] FILES = {
-            "test.csv",
-            "test_trailing_spaces.csv",
-            "test_trailing_semicolon.csv"
-    };
+    private static final String[] FILES = {"test.csv", "test_trailing_spaces.csv", "test_trailing_semicolon.csv"};
     private static final int[] LINES = {2, 3, 2};
     private static final int[] COLUMNS = {8, 3, 9};
 
@@ -47,8 +42,7 @@ public class CSVReaderTest extends SeriesTestCase {
                 seriesFiles = workspaceRootDir.list(FILES[index]);
 
                 if (seriesFiles != null && seriesFiles.length < 1) {
-                    fail("No plot data file found: "
-                            + workspaceRootDir.getName() + " " + FILES[index]);
+                    fail("No plot data file found: " + workspaceRootDir.getName() + " " + FILES[index]);
                 }
 
                 LOGGER.info("Loading plot series data from: " + FILES[index]);
@@ -74,15 +68,18 @@ public class CSVReaderTest extends SeriesTestCase {
                         msg.append(" expected ").append(COLUMNS[index]).append(" at line ");
                         msg.append(lineNum).append(" line: ").append("'");
                         for (String s : nextLine) {
-                            msg.append("\"").append(s).append("\":").append(s.length()).append(",");
+                            msg.append("\"")
+                                    .append(s)
+                                    .append("\":")
+                                    .append(s.length())
+                                    .append(",");
                         }
                         msg.append("' length ").append(nextLine.length);
                         assertEquals(msg.toString(), COLUMNS[index], nextLine.length);
                     }
                     ++lineNum;
                 }
-                assertEquals("Line count is not equal " + lineNum + " expected " + LINES[index],
-                        LINES[index], lineNum);
+                assertEquals("Line count is not equal " + lineNum + " expected " + LINES[index], LINES[index], lineNum);
             } catch (CsvValidationException | IOException | InterruptedException e) {
                 fail("Exception " + e);
             } finally {

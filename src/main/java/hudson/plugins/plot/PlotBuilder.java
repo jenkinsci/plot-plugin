@@ -45,16 +45,22 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     // Optional fields
     @CheckForNull
     private String title;
+
     @CheckForNull
     private String description;
+
     @CheckForNull
     private String numBuilds;
+
     @CheckForNull
     private String yaxis;
+
     @CheckForNull
     private String yaxisMinimum;
+
     @CheckForNull
     private String yaxisMaximum;
+
     private boolean useDescr;
     private boolean exclZero;
     private boolean logarithmic;
@@ -68,8 +74,10 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
      */
     @SuppressWarnings("visibilitymodifier")
     public List<CSVSeries> csvSeries;
+
     @SuppressWarnings("visibilitymodifier")
     public List<PropertiesSeries> propertiesSeries;
+
     @SuppressWarnings("visibilitymodifier")
     public List<XMLSeries> xmlSeries;
 
@@ -214,12 +222,26 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     }
 
     @Override
-    public void perform(@NonNull Run<?, ?> build, @NonNull FilePath workspace,
-                        @NonNull Launcher launcher, @NonNull TaskListener listener) {
+    public void perform(
+            @NonNull Run<?, ?> build,
+            @NonNull FilePath workspace,
+            @NonNull Launcher launcher,
+            @NonNull TaskListener listener) {
         List<Plot> plots = new ArrayList<>();
-        Plot plot = new Plot(title, yaxis, group, numBuilds, csvFileName, style,
-                useDescr, keepRecords, exclZero, logarithmic,
-                yaxisMinimum, yaxisMaximum, description);
+        Plot plot = new Plot(
+                title,
+                yaxis,
+                group,
+                numBuilds,
+                csvFileName,
+                style,
+                useDescr,
+                keepRecords,
+                exclZero,
+                logarithmic,
+                yaxisMinimum,
+                yaxisMaximum,
+                description);
 
         List<Series> series = new ArrayList<>();
         if (csvSeries != null) {
@@ -277,8 +299,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
             return "plot-" + UUID.randomUUID().toString() + ".csv";
         }
 
-        public FormValidation doCheckName(@QueryParameter String value)
-                throws IOException, ServletException {
+        public FormValidation doCheckName(@QueryParameter String value) throws IOException, ServletException {
             if (value == null || value.isEmpty()) {
                 return FormValidation.error("Please set a group");
             }

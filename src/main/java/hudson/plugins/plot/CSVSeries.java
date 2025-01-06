@@ -11,13 +11,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.Descriptor;
-import net.sf.json.JSONObject;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.ObjectUtils;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,6 +25,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.sf.json.JSONObject;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.ObjectUtils;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Represents a plot data series configuration from an CSV file.
@@ -46,7 +45,11 @@ public class CSVSeries extends Series {
     private static final transient Pattern PAT_COMMA = Pattern.compile(",");
 
     public enum InclusionFlag {
-        OFF, INCLUDE_BY_STRING, EXCLUDE_BY_STRING, INCLUDE_BY_COLUMN, EXCLUDE_BY_COLUMN
+        OFF,
+        INCLUDE_BY_STRING,
+        EXCLUDE_BY_STRING,
+        INCLUDE_BY_COLUMN,
+        EXCLUDE_BY_COLUMN
     }
 
     /**
@@ -85,8 +88,7 @@ public class CSVSeries extends Series {
     private boolean displayTableFlag;
 
     @DataBoundConstructor
-    public CSVSeries(String file, String url, String inclusionFlag,
-                     String exclusionValues, boolean displayTableFlag) {
+    public CSVSeries(String file, String url, String inclusionFlag, String exclusionValues, boolean displayTableFlag) {
         super(file, "", "csv");
 
         this.url = url;
@@ -111,9 +113,7 @@ public class CSVSeries extends Series {
             }
 
             if (results == 0) {
-                this.exclusionValuesList = Arrays.asList(
-                        PAT_COMMA.split((String) this.exclusionValues)
-                );
+                this.exclusionValuesList = Arrays.asList(PAT_COMMA.split((String) this.exclusionValues));
             }
         }
         loadExclusionSet();
@@ -143,8 +143,7 @@ public class CSVSeries extends Series {
      * Load the series from a properties file.
      */
     @Override
-    public List<PlotPoint> loadSeries(FilePath workspaceRootDir,
-                                      int buildNumber, PrintStream logger) {
+    public List<PlotPoint> loadSeries(FilePath workspaceRootDir, int buildNumber, PrintStream logger) {
         List<PlotPoint> plotPoints = null;
         FilePath[] seriesFiles;
         try {
@@ -155,8 +154,7 @@ public class CSVSeries extends Series {
         }
 
         if (ArrayUtils.isEmpty(seriesFiles)) {
-            LOGGER.info("No plot data file found: " + workspaceRootDir.getName()
-                    + " " + getFile());
+            LOGGER.info("No plot data file found: " + workspaceRootDir.getName() + " " + getFile());
             return null;
         }
 
@@ -188,8 +186,7 @@ public class CSVSeries extends Series {
 
                 in = seriesFile.read();
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Exception reading plot series data from "
-                        + seriesFile, e);
+                LOGGER.log(Level.SEVERE, "Exception reading plot series data from " + seriesFile, e);
                 return null;
             }
 
@@ -238,17 +235,14 @@ public class CSVSeries extends Series {
                     // create a new point with the yvalue from the csv file and
                     // url from the URL_index in the properties file.
                     if (!excludePoint(label, index)) {
-                        PlotPoint point = new PlotPoint(yvalue, getUrl(url,
-                                label, index, buildNumber), label);
+                        PlotPoint point = new PlotPoint(yvalue, getUrl(url, label, index, buildNumber), label);
                         if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
-                            LOGGER.log(DEFAULT_LOG_LEVEL, "CSV Point: [" + index
-                                    + ":" + lineNum + "]" + point);
+                            LOGGER.log(DEFAULT_LOG_LEVEL, "CSV Point: [" + index + ":" + lineNum + "]" + point);
                         }
                         ret.add(point);
                     } else {
                         if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
-                            LOGGER.log(DEFAULT_LOG_LEVEL, "excluded CSV Column: "
-                                    + index + " : " + label);
+                            LOGGER.log(DEFAULT_LOG_LEVEL, "excluded CSV Column: " + index + " : " + label);
                         }
                     }
                 }
@@ -307,8 +301,7 @@ public class CSVSeries extends Series {
         }
 
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest(((retVal) ? "excluded" : "included")
-                    + " CSV Column: " + index + " : " + label);
+            LOGGER.finest(((retVal) ? "excluded" : "included") + " CSV Column: " + index + " : " + label);
         }
 
         return retVal;
@@ -412,8 +405,7 @@ public class CSVSeries extends Series {
         }
 
         @Override
-        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData)
-                throws FormException {
+        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData) throws FormException {
             return SeriesFactory.createSeries(formData, req);
         }
     }

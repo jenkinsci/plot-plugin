@@ -137,8 +137,8 @@ public class PlotPublisher extends AbstractPlotPublisher {
      * Called by Jenkins when a build is finishing.
      */
     @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-                           BuildListener listener) throws IOException, InterruptedException {
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
+            throws IOException, InterruptedException {
         recordPlotData(build, listener);
         // misconfigured plots will not fail a build so always return true
         return true;

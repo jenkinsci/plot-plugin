@@ -5,9 +5,8 @@
 
 package hudson.plugins.plot;
 
-import org.junit.Test;
-
 import java.util.List;
+import org.junit.Test;
 
 /**
  * Test a Properties file series.
