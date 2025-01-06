@@ -9,7 +9,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.Descriptor;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -23,13 +22,11 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
 import jenkins.util.xml.XMLUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
@@ -55,8 +52,8 @@ public class XMLSeries extends Series {
     private static final transient Map<String, QName> Q_NAME_MAP;
 
     /*
-      Fill out the qName map for easy reference.
-     */
+     Fill out the qName map for easy reference.
+    */
     static {
         HashMap<String, QName> tempMap = new HashMap<String, QName>();
         tempMap.put("BOOLEAN", XPathConstants.BOOLEAN);
@@ -120,8 +117,7 @@ public class XMLSeries extends Series {
      * @return a List of PlotPoints where the label is the element name and the
      * value is the node content.
      */
-    private List<PlotPoint> mapNodeNameAsLabelTextContentAsValueStrategy(NodeList nodeList,
-                                                                         int buildNumber) {
+    private List<PlotPoint> mapNodeNameAsLabelTextContentAsValueStrategy(NodeList nodeList, int buildNumber) {
         List<PlotPoint> retval = new ArrayList<>();
         for (int i = 0; i < nodeList.getLength(); i++) {
             this.addNodeToList(retval, nodeList.item(i), buildNumber);
@@ -159,7 +155,8 @@ public class XMLSeries extends Series {
             String label = null;
 
             for (Node child : parentNodeMap.get(parent)) {
-                if (null == child.getTextContent() || child.getTextContent().trim().isEmpty()) {
+                if (null == child.getTextContent()
+                        || child.getTextContent().trim().isEmpty()) {
                     NamedNodeMap attrmap = child.getAttributes();
                     List<Node> attrs = new ArrayList<>();
                     for (int i = 0; i < attrmap.getLength(); i++) {
@@ -184,8 +181,7 @@ public class XMLSeries extends Series {
      * Load the series from a properties file.
      */
     @Override
-    public List<PlotPoint> loadSeries(FilePath workspaceRootDir, int buildNumber,
-                                      PrintStream logger) {
+    public List<PlotPoint> loadSeries(FilePath workspaceRootDir, int buildNumber, PrintStream logger) {
         InputStream in = null;
         InputSource inputSource;
 
@@ -211,8 +207,7 @@ public class XMLSeries extends Series {
                 }
                 in = seriesFiles[0].read();
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE,
-                        "Exception reading plot series data from " + seriesFiles[0], e);
+                LOGGER.log(Level.SEVERE, "Exception reading plot series data from " + seriesFiles[0], e);
                 return null;
             }
 
@@ -224,10 +219,8 @@ public class XMLSeries extends Series {
                 LOGGER.log(DEFAULT_LOG_LEVEL, "Loaded XML Plot file: " + getFile());
             }
 
-
             XPath xpath = XPathFactory.newInstance().newXPath();
             Object xmlObject = xpath.evaluate(xpathString, XMLUtils.parse(in), nodeType);
-
 
             /*
              * If we have a nodeset, we need multiples, otherwise we just need
@@ -271,7 +264,7 @@ public class XMLSeries extends Series {
             return ret;
         } catch (XPathExpressionException e) {
             LOGGER.log(Level.SEVERE, "XPathExpressionException for XPath '" + getXpath() + "'", e);
-        }  catch (SAXException e) {
+        } catch (SAXException e) {
             if (logger != null) {
                 logger.println(e.getMessage());
             }
@@ -289,8 +282,7 @@ public class XMLSeries extends Series {
         NamedNodeMap nodeMap = n.getAttributes();
 
         if ((null != nodeMap) && (null != nodeMap.getNamedItem("name"))) {
-            addValueToList(ret, nodeMap.getNamedItem("name").getTextContent().trim(),
-                    n, buildNumber);
+            addValueToList(ret, nodeMap.getNamedItem("name").getTextContent().trim(), n, buildNumber);
         } else {
             addValueToList(ret, n.getNodeName().trim(), n, buildNumber);
         }
@@ -313,8 +305,7 @@ public class XMLSeries extends Series {
             return ((Double) obj).toString().trim();
         }
 
-        if (nodeType == XPathConstants.NODE
-                || nodeType == XPathConstants.NODESET) {
+        if (nodeType == XPathConstants.NODE || nodeType == XPathConstants.NODESET) {
             if (obj instanceof String) {
                 ret = ((String) obj).trim();
             } else {
@@ -352,20 +343,17 @@ public class XMLSeries extends Series {
      * Add a given value to the list of results. This encapsulates some
      * otherwise duplicate logic due to nodeset/!nodeset
      */
-    private void addValueToList(List<PlotPoint> list, String label,
-                                Object nodeValue, int buildNumber) {
+    private void addValueToList(List<PlotPoint> list, String label, Object nodeValue, int buildNumber) {
         String value = nodeToString(nodeValue);
 
         if (value != null) {
             if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
                 LOGGER.log(DEFAULT_LOG_LEVEL, "Adding node: " + label + " value: " + value);
             }
-            list.add(new PlotPoint(value, getUrl(url, label, 0, buildNumber),
-                    label));
+            list.add(new PlotPoint(value, getUrl(url, label, 0, buildNumber), label));
         } else {
             if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
-                LOGGER.log(DEFAULT_LOG_LEVEL, "Unable to add node: " + label
-                        + " value: " + nodeValue);
+                LOGGER.log(DEFAULT_LOG_LEVEL, "Unable to add node: " + label + " value: " + nodeValue);
             }
         }
     }
@@ -383,8 +371,7 @@ public class XMLSeries extends Series {
         }
 
         @Override
-        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData)
-                throws FormException {
+        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData) throws FormException {
             return SeriesFactory.createSeries(formData, req);
         }
     }
