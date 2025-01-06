@@ -1,5 +1,7 @@
 package hudson.plugins.plot;
 
+import static org.junit.Assert.fail;
+
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
 import hudson.model.Run;
@@ -19,12 +21,11 @@ import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import static org.junit.Assert.fail;
-
 public class PlotBuildActionTest {
 
     @Rule
     public JenkinsRule r = new JenkinsRule();
+
     private PlotBuildAction plotBuildAction;
 
     @Before
@@ -41,8 +42,7 @@ public class PlotBuildActionTest {
 
     @Issue("JENKINS-48465")
     @Test
-    public void checksNoConcurrentModificationExceptionIsThrownForPlotsListAccess()
-            throws Exception {
+    public void checksNoConcurrentModificationExceptionIsThrownForPlotsListAccess() throws Exception {
         int tasksCount = 10;
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         List<FutureTask<Object>> tasks = new ArrayList<>();
@@ -54,8 +54,11 @@ public class PlotBuildActionTest {
         assertNoConcurrentModificationExceptionThrown(tasks);
     }
 
-    private void simulateConcurrentModificationException(ExecutorService executorService,
-            int tasksCount, List<FutureTask<Object>> tasks, final CountDownLatch latch) {
+    private void simulateConcurrentModificationException(
+            ExecutorService executorService,
+            int tasksCount,
+            List<FutureTask<Object>> tasks,
+            final CountDownLatch latch) {
         for (int i = 0; i < tasksCount; i++) {
             FutureTask<Object> task = new FutureTask<>(new Callable<Object>() {
                 @Override
@@ -65,22 +68,20 @@ public class PlotBuildActionTest {
                         // using PureJavaReflectionProvider just because it's used in Jenkins
                         // close to "real world"
                         PureJavaReflectionProvider provider = new PureJavaReflectionProvider();
-                        provider.visitSerializableFields(plotBuildAction,
-                                new ReflectionProvider.Visitor() {
-                                    @Override
-                                    public void visit(String fieldName, Class fieldType,
-                                            Class definedIn, Object value) {
-                                        if (value != null && value instanceof List) {
-                                            List<Plot> plots = (List<Plot>) value;
-                                            // simulate ConcurrentModificationException
-                                            for (Plot p : plots) {
-                                                if (plots.size() > 0) {
-                                                    plots.remove(p);
-                                                }
-                                            }
+                        provider.visitSerializableFields(plotBuildAction, new ReflectionProvider.Visitor() {
+                            @Override
+                            public void visit(String fieldName, Class fieldType, Class definedIn, Object value) {
+                                if (value != null && value instanceof List) {
+                                    List<Plot> plots = (List<Plot>) value;
+                                    // simulate ConcurrentModificationException
+                                    for (Plot p : plots) {
+                                        if (plots.size() > 0) {
+                                            plots.remove(p);
                                         }
                                     }
-                                });
+                                }
+                            }
+                        });
                     } finally {
                         latch.countDown();
                     }

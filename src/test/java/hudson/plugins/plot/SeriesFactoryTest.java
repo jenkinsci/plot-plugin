@@ -12,7 +12,5 @@ import junit.framework.TestCase;
  * @author Allen Reese
  */
 public class SeriesFactoryTest extends TestCase {
-    public void testSeriesFactory() {
-
-    }
+    public void testSeriesFactory() {}
 }

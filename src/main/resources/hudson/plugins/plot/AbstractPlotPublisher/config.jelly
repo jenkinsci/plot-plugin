@@ -117,6 +117,7 @@
                       </tr>
                     </table>
                   </div>
+                  <br/> <!-- insert line break to adapt to 2.479.x layout change -->
                   <f:entry title="${%CSV Exclusion values}" help="/plugin/plot/help-csv-exclusions.html">
                     <f:textbox name="exclusionValues" value="${series.exclusionValues}" />
                   </f:entry>

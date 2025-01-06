@@ -79,8 +79,7 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
      * @param logger           the logger to use
      * @return a PlotPoint array of points to plot
      */
-    public abstract List<PlotPoint> loadSeries(FilePath workspaceRootDir,
-                                               int buildNumber, PrintStream logger);
+    public abstract List<PlotPoint> loadSeries(FilePath workspaceRootDir, int buildNumber, PrintStream logger);
 
     // Convert data from before version 1.3
     private Object readResolve() {
@@ -125,8 +124,7 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
              */
             Matcher buildNumberMatcher = PAT_BUILD_NUMBER.matcher(resultUrl);
             if (buildNumberMatcher.find()) {
-                resultUrl = buildNumberMatcher.replaceAll(String
-                        .valueOf(buildNumber));
+                resultUrl = buildNumberMatcher.replaceAll(String.valueOf(buildNumber));
             }
         }
 
@@ -146,8 +144,7 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
         }
 
         @Override
-        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData)
-                throws FormException {
+        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData) throws FormException {
             return SeriesFactory.createSeries(formData, req);
         }
     }

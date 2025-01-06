@@ -1,6 +1,10 @@
 package hudson.plugins.plot;
 
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -9,13 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Test;
 
 /**
  * Test an XML series.
@@ -29,7 +27,8 @@ public class XMLSeriesTest extends SeriesTestCase {
     private static final String TEST4_XML_FILE = "test4.xml";
 
     @Test
-    public void testXMLSeries_WhenNodesSharingAParentHaveOneStringAndOneNumericContent_ThenCoalesceNodesToPointLabelledWithStringContent() {
+    public void
+            testXMLSeries_WhenNodesSharingAParentHaveOneStringAndOneNumericContent_ThenCoalesceNodesToPointLabelledWithStringContent() {
         // Create a new XML series.
         String xpath = "//UIAction/name|//UIAction/numCalls";
         XMLSeries series = new XMLSeries(TEST2_XML_FILE, xpath, "NODESET", null);
@@ -54,8 +53,7 @@ public class XMLSeriesTest extends SeriesTestCase {
     @Test
     public void testXMLSeries_WhenNodesHaveNoContent_ThenCoalesceForAttributes() {
         // Create a new XML series.
-        String xpath =
-                "//testcase[@name='testOne'] | //testcase[@name='testTwo'] | //testcase[@name='testThree']";
+        String xpath = "//testcase[@name='testOne'] | //testcase[@name='testTwo'] | //testcase[@name='testThree']";
 
         XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NODESET", null);
 
@@ -180,11 +178,9 @@ public class XMLSeriesTest extends SeriesTestCase {
     @Test
     public void testXMLSeriesNumber() {
         // Create a new XML series.
-        String xpath =
-                "concat(//testcase[@name='testOne']/@name, '=', //testcase[@name='testOne']/@time)";
+        String xpath = "concat(//testcase[@name='testOne']/@name, '=', //testcase[@name='testOne']/@time)";
         xpath = "//testcase[@name='testOne']/@time";
-        XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NUMBER",
-                "splunge");
+        XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NUMBER", "splunge");
 
         // test the basic subclass properties.
         testSeries(series, TEST_XML_FILE, "", "xml");
@@ -200,8 +196,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         // Create a new XML series.
         String xpath = "/results/testcase/*";
 
-        XMLSeries series = new XMLSeries(TEST3_XML_FILE, xpath, "NODESET",
-                "http://localhost/%build%/%name%/%index%");
+        XMLSeries series = new XMLSeries(TEST3_XML_FILE, xpath, "NODESET", "http://localhost/%build%/%name%/%index%");
 
         // test the basic subclass properties.
         testSeries(series, TEST3_XML_FILE, "", "xml");
@@ -221,7 +216,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         XMLSeries series = new XMLSeries(TEST4_XML_FILE, xpathString, "NODESET", null);
         testSeries(series, TEST4_XML_FILE, "", "xml");
 
-        //we want to examin the logoutput
+        // we want to examin the logoutput
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final String utf8 = StandardCharsets.UTF_8.name();
         PrintStream customOutput = new PrintStream(baos, true, utf8);
@@ -229,13 +224,13 @@ public class XMLSeriesTest extends SeriesTestCase {
         // load the series to see if we have the expected behavior.
         List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, customOutput);
 
-
         assertNull(points);
 
-        String expectedOutput = "DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true";
+        String expectedOutput =
+                "DOCTYPE is disallowed when the feature \"http://apache.org/xml/features/disallow-doctype-decl\" set to true";
         String customOutputAsString = baos.toString();
         assertNotNull(customOutputAsString);
-        //depending on the "JRE" (?) the custom output is terminated or not by a \n
+        // depending on the "JRE" (?) the custom output is terminated or not by a \n
         assertThat(customOutputAsString, containsString(expectedOutput));
     }
 }

@@ -78,11 +78,9 @@ public class PlotAction implements Action, StaplerProxy {
     }
 
     // called from href created in PlotAction/index.jelly
-    public PlotReport getDynamic(String group, StaplerRequest req,
-                                 StaplerResponse rsp) throws IOException {
-        return new PlotReport(project,
-                publisher.urlGroupToOriginalGroup(getUrlGroup(group)),
-                publisher.getPlots(getUrlGroup(group)));
+    public PlotReport getDynamic(String group, StaplerRequest req, StaplerResponse rsp) throws IOException {
+        return new PlotReport(
+                project, publisher.urlGroupToOriginalGroup(getUrlGroup(group)), publisher.getPlots(getUrlGroup(group)));
     }
 
     /**
@@ -92,8 +90,7 @@ public class PlotAction implements Action, StaplerProxy {
     public Object getTarget() {
         List<String> groups = getOriginalGroups();
         if (groups != null && groups.size() == 1) {
-            return new PlotReport(project, groups.get(0),
-                    publisher.getPlots(getUrlGroup(groups.get(0))));
+            return new PlotReport(project, groups.get(0), publisher.getPlots(getUrlGroup(groups.get(0))));
         } else {
             return this;
         }

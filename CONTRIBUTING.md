@@ -1,45 +1,61 @@
-# Contributing
+# Contributing to the Plot Plugin
 
-## Master Branch
+Plugin source code is hosted on [GitHub](https://github.com/jenkinsci/plot-plugin).
+New feature proposals and bug fix proposals should be submitted as [GitHub pull requests](https://help.github.com/articles/creating-a-pull-request).
+Your pull request will be evaluated by the [Jenkins job](https://ci.jenkins.io/job/Plugins/job/plot-plugin/).
 
-The master branch is the primary development branch.
+Before submitting your change, please assure that you've added tests that verify the change.
 
-## Contributing to the Plugin
+## Building and running the plugin
 
-New feature proposals and bug fix proposals should be submitted as
-[pull requests](https://help.github.com/articles/creating-a-pull-request).
-Fork the repository, prepare your change on your forked copy, and submit a pull request.
-Your pull request will be evaluated by the [Cloudbees Jenkins job](https://ci.jenkins.io/job/Plugins/job/plot-plugin/).
+The [plugin build process](https://www.jenkins.io/doc/developer/plugin-development/build-process/) is described in detail in the [plugin development chapter](https://www.jenkins.io/doc/developer/plugin-development/) of the [Jenkins developer guide](https://www.jenkins.io/doc/developer/).
 
-Before submitting your pull request, please assure that you've added
-a test which verifies your change. Tests help us assure that we're delivering a reliable
-plugin, and that we've communicated our intent to other developers in
-a way that they can detect when they run tests.
+A development copy of the plugin can be run locally with the command:
 
-
-## Building the Plugin
-
-```bash
-  $ java -version # Need Java 1.8, earlier versions are unsupported for build
-  $ mvn -version # Need a modern maven version; maven 3.2.5 and 3.5.0 are known to work
-  $ mvn clean install
+```
+mvn hpi:run
 ```
 
-```bash
-  $ mvn package # produces target/plot.hpi for manual installation 
-```
+When submitting a pull request, please refer to the [plugin testing guidance](https://www.jenkins.io/doc/developer/plugin-development/plugin-release-tips/) in the Jenkins developer guide.
 
-## Running/testing plugin locally
+## Code formatting
 
-Following command will start fresh Jenkins instance with current plugin installed.
+Source code and pom file formatting is maintained by the `spotless` maven plugin.
+Before submitting a pull request, confirm the formatting is correct with:
 
-```bash
-  $ mvn hpi:run
-```
+* `mvn spotless:apply`
 
-Jenkins will be started on `0.0.0.0:8080` address. Please make sure 8080 port is not in use before running the command.
+## Spotbugs checks
 
-Alternatively, other port can be specified by adding a parameter:
-``` bash
-   $ mvn hpi:run -Djetty.port=8090
-```
+Please don't introduce new spotbugs output.
+
+* `mvn spotbugs:check` analyzes the project using [Spotbugs](https://spotbugs.github.io)
+* `mvn spotbugs:gui` displays the spotbugs report using GUI
+
+## Code coverage
+
+Code coverage reporting is available as a maven target.
+Please try to improve code coverage with tests when you submit pull requests.
+
+* `mvn -P enable-jacoco clean install jacoco:report` reports code coverage
+
+### Reviewing code coverage
+
+The code coverage report shows methods and lines executed.
+The following commands will open the `index.html` file in the browser.
+
+* Windows - `start target\site\jacoco\index.html`
+* Linux - `xdg-open target/site/jacoco/index.html`
+* Gitpod - `cd target/site/jacoco && python -m http.server 8000`
+
+The file will have a list of package names.
+Click on them to find a list of class names.
+
+The lines of the code will be covered in three different colors, red, green, and orange.
+Red lines are not covered in the tests.
+Green lines are covered with tests.
+
+## Reporting Issues
+
+Report issues in the [Jenkins issue tracker](https://www.jenkins.io/participate/report-issue/redirect/#15564).
+Please follow the guidelines in ["How to Report an Issue"](https://www.jenkins.io/participate/report-issue/) when reporting issues.

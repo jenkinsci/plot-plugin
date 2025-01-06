@@ -6,7 +6,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-
 public class PlotBuilderTest {
 
     @Rule
