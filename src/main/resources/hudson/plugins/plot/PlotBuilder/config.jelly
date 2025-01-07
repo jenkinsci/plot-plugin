@@ -28,6 +28,16 @@
                        style="width:20em" value="${plot.numBuilds}"/>
             </f:entry>
 
+            <f:entry title="${%Width of the plot}" field="width" help="/plugin/plot/help-width.html">
+                <input class="positive-number" type="text" name="width"
+                       style="width:20em" value="${plot.width}"/>
+            </f:entry>
+
+            <f:entry title="${%Height of the plot}" field="height" help="/plugin/plot/help-height.html">
+                <input class="positive-number" type="text" name="height"
+                       style="width:20em" value="${plot.height}"/>
+            </f:entry>
+
             <f:entry title="${%Plot y-axis label}" field="yaxis" help="/plugin/plot/help-yaxis.html">
                 <f:textbox name="yaxis" value="${plot.yaxis}"/>
             </f:entry>
