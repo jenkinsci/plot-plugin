@@ -38,11 +38,11 @@ import org.kohsuke.stapler.StaplerRequest2;
  * @author Allen Reese
  */
 public class CSVSeries extends Series {
-    private static final Logger LOGGER = Logger.getLogger(CSVSeries.class.getName());
+    private static final transient Logger LOGGER = Logger.getLogger(CSVSeries.class.getName());
     // Debugging hack, so I don't have to change FINE/INFO...
-    private static final Level DEFAULT_LOG_LEVEL = Level.FINEST;
-    private static final Pattern PAT_SEMICOLON_ENCLOSURE = Pattern.compile("\"(.*?)\"");
-    private static final Pattern PAT_COMMA = Pattern.compile(",");
+    private static final transient Level DEFAULT_LOG_LEVEL = Level.FINEST;
+    private static final transient Pattern PAT_SEMICOLON_ENCLOSURE = Pattern.compile("\"(.*?)\"");
+    private static final transient Pattern PAT_COMMA = Pattern.compile(",");
 
     public enum InclusionFlag {
         OFF,
