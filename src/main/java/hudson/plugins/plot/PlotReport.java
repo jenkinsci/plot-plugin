@@ -21,8 +21,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 
 /**
  * Represents a plot report for a single group of plots.
@@ -98,7 +98,7 @@ public class PlotReport {
     }
 
     // called from PlotReport/index.jelly
-    public void doGetPlot(StaplerRequest req, StaplerResponse rsp) {
+    public void doGetPlot(StaplerRequest2 req, StaplerResponse2 rsp) {
         String i = req.getParameter("index");
         Plot plot = getPlot(i);
         try {
@@ -109,7 +109,7 @@ public class PlotReport {
     }
 
     // called from PlotReport/index.jelly
-    public void doGetPlotMap(StaplerRequest req, StaplerResponse rsp) {
+    public void doGetPlotMap(StaplerRequest2 req, StaplerResponse2 rsp) {
         String i = req.getParameter("index");
         Plot plot = getPlot(i);
         try {
@@ -143,8 +143,7 @@ public class PlotReport {
         }
         CSVReader reader = null;
         try {
-            reader = new CSVReader(new InputStreamReader(
-                    new FileInputStream(plotFile), Charset.defaultCharset().name()));
+            reader = new CSVReader(new InputStreamReader(new FileInputStream(plotFile), Charset.defaultCharset()));
             // throw away 2 header lines
             reader.readNext();
             reader.readNext();

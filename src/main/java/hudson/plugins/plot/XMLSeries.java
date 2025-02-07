@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -45,23 +44,27 @@ import org.xml.sax.SAXException;
  * @author Allen Reese
  */
 public class XMLSeries extends Series {
-    private static final transient Logger LOGGER = Logger.getLogger(XMLSeries.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(XMLSeries.class.getName());
     // Debugging hack, so I don't have to change FINE/INFO...
-    private static final transient Level DEFAULT_LOG_LEVEL = Level.INFO;
+    private static final Level DEFAULT_LOG_LEVEL = Level.INFO;
 
-    private static final transient Map<String, QName> Q_NAME_MAP;
+    private static final Map<String, QName> Q_NAME_MAP;
 
     /*
      Fill out the qName map for easy reference.
     */
     static {
-        HashMap<String, QName> tempMap = new HashMap<String, QName>();
-        tempMap.put("BOOLEAN", XPathConstants.BOOLEAN);
-        tempMap.put("NODE", XPathConstants.NODE);
-        tempMap.put("NODESET", XPathConstants.NODESET);
-        tempMap.put("NUMBER", XPathConstants.NUMBER);
-        tempMap.put("STRING", XPathConstants.STRING);
-        Q_NAME_MAP = Collections.unmodifiableMap(tempMap);
+        Q_NAME_MAP = Map.of(
+                "BOOLEAN",
+                XPathConstants.BOOLEAN,
+                "NODE",
+                XPathConstants.NODE,
+                "NODESET",
+                XPathConstants.NODESET,
+                "NUMBER",
+                XPathConstants.NUMBER,
+                "STRING",
+                XPathConstants.STRING);
     }
 
     /**
@@ -142,7 +145,7 @@ public class XMLSeries extends Series {
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
             if (!parentNodeMap.containsKey(node.getParentNode())) {
-                parentNodeMap.put(node.getParentNode(), new ArrayList<Node>());
+                parentNodeMap.put(node.getParentNode(), new ArrayList<>());
             }
             parentNodeMap.get(node.getParentNode()).add(node);
         }
@@ -243,8 +246,7 @@ public class XMLSeries extends Series {
                 addNodeToList(ret, (Node) xmlObject, buildNumber);
             } else {
                 // otherwise we have a single type and can do a toString on it.
-                if (xmlObject instanceof NodeList) {
-                    NodeList nl = (NodeList) xmlObject;
+                if (xmlObject instanceof NodeList nl) {
 
                     if (LOGGER.isLoggable(DEFAULT_LOG_LEVEL)) {
                         LOGGER.log(DEFAULT_LOG_LEVEL, "Number of nodes: " + nl.getLength());
@@ -371,7 +373,7 @@ public class XMLSeries extends Series {
         }
 
         @Override
-        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData) throws FormException {
+        public Series newInstance(StaplerRequest2 req, @NonNull JSONObject formData) throws FormException {
             return SeriesFactory.createSeries(formData, req);
         }
     }

@@ -21,13 +21,13 @@ import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 /**
  * @author Allen Reese
  */
 public class PropertiesSeries extends Series {
-    private static final transient Logger LOGGER = Logger.getLogger(PropertiesSeries.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PropertiesSeries.class.getName());
 
     @DataBoundConstructor
     public PropertiesSeries(String file, String label) {
@@ -66,7 +66,7 @@ public class PropertiesSeries extends Series {
                         "Not creating point with null values: y=" + yvalue + " label=" + getLabel() + " url=" + url);
                 return null;
             }
-            List<PlotPoint> series = new ArrayList<PlotPoint>();
+            List<PlotPoint> series = new ArrayList<>();
             series.add(new PlotPoint(yvalue, url, getLabel()));
             return series;
         } catch (Exception e) {
@@ -90,7 +90,7 @@ public class PropertiesSeries extends Series {
         }
 
         @Override
-        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData) throws FormException {
+        public Series newInstance(StaplerRequest2 req, @NonNull JSONObject formData) throws FormException {
             return SeriesFactory.createSeries(formData, req);
         }
     }

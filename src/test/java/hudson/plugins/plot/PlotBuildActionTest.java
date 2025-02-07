@@ -3,13 +3,11 @@ package hudson.plugins.plot;
 import static org.junit.Assert.fail;
 
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
-import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
 import hudson.model.Run;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -60,33 +58,27 @@ public class PlotBuildActionTest {
             List<FutureTask<Object>> tasks,
             final CountDownLatch latch) {
         for (int i = 0; i < tasksCount; i++) {
-            FutureTask<Object> task = new FutureTask<>(new Callable<Object>() {
-                @Override
-                public Object call() throws Exception {
-                    try {
-                        Thread.sleep(new Random().nextInt(100));
-                        // using PureJavaReflectionProvider just because it's used in Jenkins
-                        // close to "real world"
-                        PureJavaReflectionProvider provider = new PureJavaReflectionProvider();
-                        provider.visitSerializableFields(plotBuildAction, new ReflectionProvider.Visitor() {
-                            @Override
-                            public void visit(String fieldName, Class fieldType, Class definedIn, Object value) {
-                                if (value != null && value instanceof List) {
-                                    List<Plot> plots = (List<Plot>) value;
-                                    // simulate ConcurrentModificationException
-                                    for (Plot p : plots) {
-                                        if (plots.size() > 0) {
-                                            plots.remove(p);
-                                        }
-                                    }
+            FutureTask<Object> task = new FutureTask<>(() -> {
+                try {
+                    Thread.sleep(new Random().nextInt(100));
+                    // using PureJavaReflectionProvider just because it's used in Jenkins
+                    // close to "real world"
+                    PureJavaReflectionProvider provider = new PureJavaReflectionProvider();
+                    provider.visitSerializableFields(plotBuildAction, (fieldName, fieldType, definedIn, value) -> {
+                        if (value != null && value instanceof List) {
+                            List<Plot> plots = (List<Plot>) value;
+                            // simulate ConcurrentModificationException
+                            for (Plot p : plots) {
+                                if (!plots.isEmpty()) {
+                                    plots.remove(p);
                                 }
                             }
-                        });
-                    } finally {
-                        latch.countDown();
-                    }
-                    return null;
+                        }
+                    });
+                } finally {
+                    latch.countDown();
                 }
+                return null;
             });
             tasks.add(task);
             executorService.submit(task);

@@ -63,10 +63,10 @@ public class XMLSeriesTest extends SeriesTestCase {
         // load the series.
         List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
         assertNotNull(points);
-        assertEquals(points.size(), 3);
-        assertEquals(points.get(0).getLabel(), "testOne");
-        assertEquals(points.get(1).getLabel(), "testTwo");
-        assertEquals(points.get(2).getLabel(), "testThree");
+        assertEquals(3, points.size());
+        assertEquals("testOne", points.get(0).getLabel());
+        assertEquals("testTwo", points.get(1).getLabel());
+        assertEquals("testThree", points.get(2).getLabel());
         testPlotPoints(points, 3);
     }
 
@@ -84,11 +84,11 @@ public class XMLSeriesTest extends SeriesTestCase {
         List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
         assertNotNull(points);
         assertEquals(4, points.size());
-        assertEquals(points.get(0).getLabel(), "testOne");
-        assertEquals(points.get(1).getLabel(), "testTwo");
-        assertEquals(points.get(2).getLabel(), "testThree");
-        assertEquals(points.get(3).getLabel(), "testFour");
-        assertEquals(points.get(3).getYvalue(), "1234.56");
+        assertEquals("testOne", points.get(0).getLabel());
+        assertEquals("testTwo", points.get(1).getLabel());
+        assertEquals("testThree", points.get(2).getLabel());
+        assertEquals("testFour", points.get(3).getLabel());
+        assertEquals("1234.56", points.get(3).getYvalue());
         testPlotPoints(points, 4);
     }
 
@@ -106,8 +106,8 @@ public class XMLSeriesTest extends SeriesTestCase {
         List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
         assertNotNull(points);
         assertEquals(2, points.size());
-        assertEquals(points.get(0).getLabel(), "one");
-        assertEquals(points.get(0).getYvalue(), "0.521");
+        assertEquals("one", points.get(0).getLabel());
+        assertEquals("0.521", points.get(0).getYvalue());
         testPlotPoints(points, 2);
     }
 
@@ -140,8 +140,8 @@ public class XMLSeriesTest extends SeriesTestCase {
         // load the series.
         List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
         assertNotNull(points);
-        assertEquals(points.size(), 1);
-        assertEquals(Double.parseDouble(points.get(0).getYvalue()), 27d, 0);
+        assertEquals(1, points.size());
+        assertEquals(27d, Double.parseDouble(points.get(0).getYvalue()), 0);
         testPlotPoints(points, 1);
     }
 
