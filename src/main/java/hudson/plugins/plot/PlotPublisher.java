@@ -68,7 +68,7 @@ public class PlotPublisher extends AbstractPlotPublisher {
      * Returns all group names as the original user specified strings.
      */
     public List<String> getOriginalGroups() {
-        List<String> originalGroups = new ArrayList<String>();
+        List<String> originalGroups = new ArrayList<>();
         for (String urlGroup : groupMap.keySet()) {
             originalGroups.add(urlGroupToOriginalGroup(urlGroup));
         }
@@ -130,7 +130,7 @@ public class PlotPublisher extends AbstractPlotPublisher {
      */
     public List<Plot> getPlots(String urlGroup) {
         List<Plot> p = groupMap.get(urlGroup);
-        return (p != null) ? p : new ArrayList<Plot>();
+        return (p != null) ? p : new ArrayList<>();
     }
 
     /**

@@ -30,7 +30,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 /**
  * Represents a plot data series configuration from an CSV file.
@@ -113,7 +113,7 @@ public class CSVSeries extends Series {
             }
 
             if (results == 0) {
-                this.exclusionValuesList = Arrays.asList(PAT_COMMA.split((String) this.exclusionValues));
+                this.exclusionValuesList = Arrays.asList(PAT_COMMA.split(this.exclusionValues));
             }
         }
         loadExclusionSet();
@@ -195,7 +195,7 @@ public class CSVSeries extends Series {
             }
 
             // load existing plot file
-            inputReader = new InputStreamReader(in, Charset.defaultCharset().name());
+            inputReader = new InputStreamReader(in, Charset.defaultCharset());
             reader = new CSVReader(inputReader);
             String[] nextLine;
 
@@ -206,7 +206,7 @@ public class CSVSeries extends Series {
             int lineNum = 0;
             while ((nextLine = reader.readNext()) != null) {
                 // skip empty lines
-                if (nextLine.length == 1 && nextLine[0].length() == 0) {
+                if (nextLine.length == 1 && nextLine[0].isEmpty()) {
                     continue;
                 }
 
@@ -217,7 +217,7 @@ public class CSVSeries extends Series {
                     yvalue = nextLine[index].trim();
 
                     // empty value, caused by e.g. trailing comma in CSV
-                    if (yvalue.trim().length() == 0) {
+                    if (yvalue.trim().isEmpty()) {
                         continue;
                     }
 
@@ -278,27 +278,22 @@ public class CSVSeries extends Series {
             return false;
         }
 
-        boolean retVal;
-        switch (inclusionFlag) {
-            case INCLUDE_BY_STRING:
-                // if the set contains it, don't exclude it.
-                retVal = !checkExclusionSet(label);
-                break;
-            case EXCLUDE_BY_STRING:
-                // if the set doesn't contain it, exclude it.
-                retVal = checkExclusionSet(label);
-                break;
-            case INCLUDE_BY_COLUMN:
-                // if the set contains it, don't exclude it.
-                retVal = !(colExclusionSet.contains(Integer.valueOf(index)));
-                break;
-            case EXCLUDE_BY_COLUMN:
-                // if the set doesn't contain it, don't exclude it.
-                retVal = colExclusionSet.contains(Integer.valueOf(index));
-                break;
-            default:
-                retVal = false;
-        }
+        boolean retVal =
+                switch (inclusionFlag) {
+                    case INCLUDE_BY_STRING ->
+                    // if the set contains it, don't exclude it.
+                    !checkExclusionSet(label);
+                    case EXCLUDE_BY_STRING ->
+                    // if the set doesn't contain it, exclude it.
+                    checkExclusionSet(label);
+                    case INCLUDE_BY_COLUMN ->
+                    // if the set contains it, don't exclude it.
+                    !(colExclusionSet.contains(index));
+                    case EXCLUDE_BY_COLUMN ->
+                    // if the set doesn't contain it, don't exclude it.
+                    colExclusionSet.contains(index);
+                    default -> false;
+                };
 
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest(((retVal) ? "excluded" : "included") + " CSV Column: " + index + " : " + label);
@@ -405,7 +400,7 @@ public class CSVSeries extends Series {
         }
 
         @Override
-        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData) throws FormException {
+        public Series newInstance(StaplerRequest2 req, @NonNull JSONObject formData) throws FormException {
             return SeriesFactory.createSeries(formData, req);
         }
     }

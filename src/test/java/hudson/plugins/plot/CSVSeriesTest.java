@@ -40,8 +40,8 @@ public class CSVSeriesTest extends SeriesTestCase {
     @Test
     public void testCSVSeriesWithNullExclusionValuesSetsDisplayTableFlag() {
         CSVSeries series;
-        for (int index = 0; index < FILES.length; index++) {
-            series = new CSVSeries(FILES[index], null, null, null, true);
+        for (String file : FILES) {
+            series = new CSVSeries(file, null, null, null, true);
             assertTrue(series.getDisplayTableFlag());
         }
     }
@@ -55,7 +55,7 @@ public class CSVSeriesTest extends SeriesTestCase {
             try {
                 columns = getNumColumns(workspaceRootDir, FILES[index]);
             } catch (IOException | InterruptedException e) {
-                fail("Exception " + e.toString());
+                fail("Exception " + e);
             }
 
             assertEquals(COLUMNS[index], columns);
@@ -63,7 +63,7 @@ public class CSVSeriesTest extends SeriesTestCase {
             // Create a new CSV series.
             CSVSeries series = new CSVSeries(FILES[index], "http://localhost:8080/%name%/%index%/", "OFF", "", false);
 
-            LOGGER.info("Created series " + series.toString());
+            LOGGER.info("Created series " + series);
             // test the basic subclass properties.
             testSeries(series, FILES[index], "", "csv");
 
@@ -94,7 +94,7 @@ public class CSVSeriesTest extends SeriesTestCase {
                     LAST_COLUMN_NAME[index],
                     false);
 
-            LOGGER.info("Created series " + series.toString());
+            LOGGER.info("Created series " + series);
 
             // load the series.
             List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
@@ -113,7 +113,7 @@ public class CSVSeriesTest extends SeriesTestCase {
         // Create a new CSV series.
         CSVSeries series = new CSVSeries(file, "http://localhost:8080/%name%/%index%/", "OFF", "", false);
 
-        LOGGER.info("Created series " + series.toString());
+        LOGGER.info("Created series " + series);
         // test the basic subclass properties.
         testSeries(series, file, "", "csv");
 

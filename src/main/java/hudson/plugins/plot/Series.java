@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 /**
  * Represents a plot data series configuration.
@@ -144,7 +144,7 @@ public abstract class Series extends AbstractDescribableImpl<Series> {
         }
 
         @Override
-        public Series newInstance(StaplerRequest req, @NonNull JSONObject formData) throws FormException {
+        public Series newInstance(StaplerRequest2 req, @NonNull JSONObject formData) throws FormException {
             return SeriesFactory.createSeries(formData, req);
         }
     }

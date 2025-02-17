@@ -58,7 +58,7 @@ public class CSVReaderTest extends SeriesTestCase {
                 int lineNum = 0;
                 while ((nextLine = csvReader.readNext()) != null) {
                     // for some reason csv reader returns an empty line sometimes.
-                    if (nextLine.length == 1 && nextLine[0].length() == 0) {
+                    if (nextLine.length == 1 && nextLine[0].isEmpty()) {
                         break;
                     }
 

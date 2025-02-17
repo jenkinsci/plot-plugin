@@ -12,24 +12,24 @@ import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
+import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.ServletException;
 import jenkins.tasks.SimpleBuildStep;
 import net.sf.json.JSONObject;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 /**
  * Plot {@link Builder} class for pipeline.
  * <p>
  * When the user configures the project and enables this builder,
- * {@link DescriptorImpl#newInstance(StaplerRequest)} is invoked
+ * {@link DescriptorImpl#newInstance(StaplerRequest2, JSONObject)} is invoked
  * and a new {@link PlotBuilder} is created.
  * The created instance is persisted to the project configuration XML by using XStream,
  * so this allows you to use instance fields (like {@link #group}) to remember the configuration.
@@ -296,7 +296,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         }
 
         public String getCsvFileName() {
-            return "plot-" + UUID.randomUUID().toString() + ".csv";
+            return "plot-" + UUID.randomUUID() + ".csv";
         }
 
         public FormValidation doCheckName(@QueryParameter String value) throws IOException, ServletException {
@@ -323,7 +323,7 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         }
 
         @Override
-        public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+        public boolean configure(StaplerRequest2 req, JSONObject formData) throws FormException {
             save();
             return super.configure(req, formData);
         }

@@ -71,7 +71,7 @@ public class SeriesTestCase {
             } catch (NumberFormatException nfe) {
                 fail("loadSeries returned invalid yvalue "
                         + points.get(i).getYvalue() + " at index " + i
-                        + " Exception " + nfe.toString());
+                        + " Exception " + nfe);
             }
         }
     }

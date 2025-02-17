@@ -24,7 +24,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.ObjectUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 /**
  * @author lucinka
@@ -33,12 +33,12 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
 
     private transient Map<MatrixConfiguration, List<Plot>> plotsOfConfigurations = new HashMap<>();
 
-    private transient Map<String, List<Plot>> groupMap = new HashMap<String, List<Plot>>();
+    private transient Map<String, List<Plot>> groupMap = new HashMap<>();
 
     /**
      * Configured plots.
      */
-    private List<Plot> plots = new ArrayList<Plot>();
+    private List<Plot> plots = new ArrayList<>();
 
     public String urlGroupToOriginalGroup(String urlGroup, MatrixConfiguration c) {
         if (urlGroup == null || "nogroup".equals(urlGroup)) {
@@ -51,7 +51,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
                     plotList.add(plot);
                 }
             }
-            if (plotList.size() > 0) {
+            if (!plotList.isEmpty()) {
                 return plotList.get(0).group;
             }
         }
@@ -110,7 +110,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
      */
     public List<Plot> getPlots(MatrixConfiguration configuration) {
         List<Plot> p = plotsOfConfigurations.get(configuration);
-        return (p != null) ? p : new ArrayList<Plot>();
+        return (p != null) ? p : new ArrayList<>();
     }
 
     public List<Plot> getPlots() {
@@ -164,7 +164,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
                         p.yaxisMaximum,
                         p.description);
                 plot.series = p.series;
-                plot.setProject((MatrixConfiguration) build.getProject());
+                plot.setProject(build.getProject());
                 addPlot(plot);
             }
         }
@@ -226,9 +226,9 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
          * Called when the user saves the project configuration.
          */
         @Override
-        public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+        public Publisher newInstance(StaplerRequest2 req, JSONObject formData) throws FormException {
             MatrixPlotPublisher publisher = new MatrixPlotPublisher();
-            List<Plot> plots = new ArrayList<Plot>();
+            List<Plot> plots = new ArrayList<>();
             for (Object data : SeriesFactory.getArray(formData.get("plots"))) {
                 plots.add(bindPlot((JSONObject) data, req));
             }
@@ -236,7 +236,7 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
             return publisher;
         }
 
-        private static Plot bindPlot(JSONObject data, StaplerRequest req) {
+        private static Plot bindPlot(JSONObject data, StaplerRequest2 req) {
             Plot p = req.bindJSON(Plot.class, data);
             p.series = SeriesFactory.createSeriesList(data.get("series"), req);
             return p;

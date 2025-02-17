@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 /**
  * This class creates a Series class based on the data source
@@ -27,7 +27,7 @@ public class SeriesFactory {
      *
      * @param formData JSON data for series
      */
-    public static Series createSeries(JSONObject formData, StaplerRequest req) {
+    public static Series createSeries(JSONObject formData, StaplerRequest2 req) {
         String file = formData.getString("file");
         formData = formData.getJSONObject("fileType");
         formData.put("file", file);
@@ -45,7 +45,7 @@ public class SeriesFactory {
         return typeClass != null ? req.bindJSON(typeClass, formData) : null;
     }
 
-    public static List<Series> createSeriesList(Object data, StaplerRequest req) {
+    public static List<Series> createSeriesList(Object data, StaplerRequest2 req) {
         JSONArray list = getArray(data);
         List<Series> result = new ArrayList<>();
         for (Object series : list) {

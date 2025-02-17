@@ -5,6 +5,7 @@
  */
 package hudson.plugins.plot;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.jfree.data.general.AbstractDataset;
  * @author Nigel Daley
  */
 public class PlotCategoryDataset extends AbstractDataset implements CategoryDataset {
+    @Serial
     private static final long serialVersionUID = 9215482265757674967L;
 
     private static class DataElement {
@@ -171,7 +173,7 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
         if (rowIndex == -1 || data.get(rowIndex) == null) {
             return null;
         }
-        DataElement element = (DataElement) data.get(rowIndex).get(columnKey);
+        DataElement element = data.get(rowIndex).get(columnKey);
         if (element == null) {
             return null;
         }
@@ -217,7 +219,7 @@ public class PlotCategoryDataset extends AbstractDataset implements CategoryData
         if (rowIndex == -1) {
             rowKeys.add(rowKey);
             rowIndex = rowKeys.size() - 1;
-            data.add(new HashMap<Comparable, DataElement>());
+            data.add(new HashMap<>());
         }
         if (!columnKeys.contains(columnKey)) {
             boolean added = false;

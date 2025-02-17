@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.kohsuke.stapler.StaplerProxy;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 
 /**
  * Project action to display plots.
@@ -78,7 +78,7 @@ public class PlotAction implements Action, StaplerProxy {
     }
 
     // called from href created in PlotAction/index.jelly
-    public PlotReport getDynamic(String group, StaplerRequest req, StaplerResponse rsp) throws IOException {
+    public PlotReport getDynamic(String group, StaplerRequest2 req, StaplerResponse2 rsp) throws IOException {
         return new PlotReport(
                 project, publisher.urlGroupToOriginalGroup(getUrlGroup(group)), publisher.getPlots(getUrlGroup(group)));
     }

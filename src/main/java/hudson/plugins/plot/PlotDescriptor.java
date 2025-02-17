@@ -12,7 +12,7 @@ import java.io.IOException;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 /**
  * The Descriptor for the plot configuration Extension
@@ -41,7 +41,7 @@ public class PlotDescriptor extends BuildStepDescriptor<Publisher> {
      * Called when the user saves the project configuration.
      */
     @Override
-    public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+    public Publisher newInstance(StaplerRequest2 req, JSONObject formData) throws FormException {
         PlotPublisher publisher = new PlotPublisher();
         for (Object data : SeriesFactory.getArray(formData.get("plots"))) {
             publisher.addPlot(bindPlot((JSONObject) data, req));
@@ -49,7 +49,7 @@ public class PlotDescriptor extends BuildStepDescriptor<Publisher> {
         return publisher;
     }
 
-    private static Plot bindPlot(JSONObject data, StaplerRequest req) {
+    private static Plot bindPlot(JSONObject data, StaplerRequest2 req) {
         Plot p = req.bindJSON(Plot.class, data);
         p.series = SeriesFactory.createSeriesList(data.get("series"), req);
         return p;
