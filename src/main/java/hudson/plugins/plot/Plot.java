@@ -425,6 +425,12 @@ public class Plot implements Comparable<Plot> {
     }
 
     public int compareTo(Plot o) {
+        if (title == null) {
+            return o == null || o.getTitle() == null ? 0 : -1;
+        }
+        if (o == null || o.getTitle() == null) {
+            return 1;
+        }
         return title.compareTo(o.getTitle());
     }
 
