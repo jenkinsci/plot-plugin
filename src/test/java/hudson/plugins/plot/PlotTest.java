@@ -23,7 +23,7 @@
  */
 package hudson.plugins.plot;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import hudson.Launcher;
 import hudson.matrix.AxisList;
@@ -37,20 +37,17 @@ import hudson.model.FreeStyleProject;
 import hudson.tasks.Builder;
 import hudson.tasks.LogRotator;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class PlotTest {
-
-    @Rule
-    public JenkinsRule j = new JenkinsRule();
+@WithJenkins
+class PlotTest {
 
     @Test
-    public void discardPlotSamplesForOldBuilds() throws Exception {
-        FreeStyleProject p = jobArchivingBuilds(1);
+    void discardPlotSamplesForOldBuilds(JenkinsRule j) throws Exception {
+        FreeStyleProject p = jobArchivingBuilds(j, 1);
 
         plotBuilds(p, "2", false);
 
@@ -65,8 +62,8 @@ public class PlotTest {
     }
 
     @Test
-    public void discardPlotSamplesForDeletedBuilds() throws Exception {
-        FreeStyleProject p = jobArchivingBuilds(10);
+    void discardPlotSamplesForDeletedBuilds(JenkinsRule j) throws Exception {
+        FreeStyleProject p = jobArchivingBuilds(j, 10);
 
         plotBuilds(p, "", false);
 
@@ -84,8 +81,8 @@ public class PlotTest {
     }
 
     @Test
-    public void keepPlotSamplesForOldBuilds() throws Exception {
-        FreeStyleProject p = jobArchivingBuilds(1);
+    void keepPlotSamplesForOldBuilds(JenkinsRule j) throws Exception {
+        FreeStyleProject p = jobArchivingBuilds(j, 1);
 
         plotBuilds(p, "2", true);
 
@@ -103,8 +100,8 @@ public class PlotTest {
     }
 
     @Test
-    public void keepPlotSamplesForDeletedBuilds() throws Exception {
-        FreeStyleProject p = jobArchivingBuilds(10);
+    void keepPlotSamplesForDeletedBuilds(JenkinsRule j) throws Exception {
+        FreeStyleProject p = jobArchivingBuilds(j, 10);
 
         plotBuilds(p, "", true);
 
@@ -122,8 +119,8 @@ public class PlotTest {
     }
 
     @Test
-    public void discardPlotSamplesForDeletedMatrixBuilds() throws Exception {
-        MatrixProject p = matrixJobArchivingBuilds(10);
+    void discardPlotSamplesForDeletedMatrixBuilds(JenkinsRule j) throws Exception {
+        MatrixProject p = matrixJobArchivingBuilds(j, 10);
         p.setAxes(new AxisList(new TextAxis("a", "a")));
 
         MatrixConfiguration c = p.getItem("a=a");
@@ -144,8 +141,8 @@ public class PlotTest {
     }
 
     @Test
-    public void keepPlotSamplesForDeletedMatrixBuilds() throws Exception {
-        MatrixProject p = matrixJobArchivingBuilds(10);
+    void keepPlotSamplesForDeletedMatrixBuilds(JenkinsRule j) throws Exception {
+        MatrixProject p = matrixJobArchivingBuilds(j, 10);
         p.setAxes(new AxisList(new TextAxis("a", "a")));
 
         MatrixConfiguration c = p.getItem("a=a");
@@ -167,7 +164,7 @@ public class PlotTest {
         assertSampleCount(c, 3); // Data should be kept
     }
 
-    private FreeStyleProject jobArchivingBuilds(int count) throws Exception {
+    private static FreeStyleProject jobArchivingBuilds(JenkinsRule j, int count) throws Exception {
         FreeStyleProject p = j.createFreeStyleProject();
         p.getBuildersList().add(new PlotBuildNumber());
         p.setBuildDiscarder(new LogRotator(-1, count, -1, -1));
@@ -175,7 +172,7 @@ public class PlotTest {
         return p;
     }
 
-    private MatrixProject matrixJobArchivingBuilds(int count) throws Exception {
+    private static MatrixProject matrixJobArchivingBuilds(JenkinsRule j, int count) throws Exception {
         MatrixProject p = j.createProject(MatrixProject.class);
 
         p.getBuildersList().add(new PlotBuildNumber());
@@ -184,30 +181,30 @@ public class PlotTest {
         return p;
     }
 
-    private void plotBuilds(AbstractProject<?, ?> p, String count, boolean keepRecords) {
+    private static void plotBuilds(AbstractProject<?, ?> p, String count, boolean keepRecords) {
         final PlotPublisher publisher = new PlotPublisher();
         final Plot plot = new Plot(
                 "Title", "Number", "default", count, null, "line", false, keepRecords, false, false, null, null, null);
         p.getPublishersList().add(publisher);
         publisher.addPlot(plot);
-        plot.series = Arrays.<Series>asList(new PropertiesSeries("src.properties", null));
+        plot.series = List.of(new PropertiesSeries("src.properties", null));
     }
 
-    private void plotMatrixBuilds(AbstractProject<?, ?> p, String count, boolean keepRecords) {
+    private static void plotMatrixBuilds(AbstractProject<?, ?> p, String count, boolean keepRecords) {
         final MatrixPlotPublisher publisher = new MatrixPlotPublisher();
         final Plot plot = new Plot(
                 "Title", "Number", "default", count, null, "line", false, keepRecords, false, false, null, null, null);
         p.getPublishersList().add(publisher);
-        publisher.setPlots(Arrays.asList(plot));
-        plot.series = Arrays.<Series>asList(new PropertiesSeries("src.properties", null));
+        publisher.setPlots(List.of(plot));
+        plot.series = List.of(new PropertiesSeries("src.properties", null));
     }
 
-    private void assertSampleCount(AbstractProject<?, ?> p, int count) throws Exception {
+    private static void assertSampleCount(AbstractProject<?, ?> p, int count) throws Exception {
         PlotReport pr = p instanceof MatrixConfiguration
                 ? p.getAction(MatrixPlotAction.class).getDynamic("default")
                 : p.getAction(PlotAction.class).getDynamic("default", null, null);
         List<List<String>> table = pr.getTable(0);
-        assertEquals("Plot sample count", count, table.size() - 1);
+        assertEquals(count, table.size() - 1, "Plot sample count");
     }
 
     private static final class PlotBuildNumber extends Builder {

@@ -5,25 +5,23 @@
 
 package hudson.plugins.plot;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static hudson.plugins.plot.SeriesTestUtils.WORKSPACE_ROOT_DIR;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvValidationException;
 import hudson.FilePath;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Logger;
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test a CSV series.
  *
  * @author Allen Reese
  */
-public class CSVReaderTest extends SeriesTestCase {
+class CSVReaderTest {
     private static final Logger LOGGER = Logger.getLogger(CSVReaderTest.class.getName());
 
     private static final String[] FILES = {"test.csv", "test_trailing_spaces.csv", "test_trailing_semicolon.csv"};
@@ -31,26 +29,18 @@ public class CSVReaderTest extends SeriesTestCase {
     private static final int[] COLUMNS = {8, 3, 9};
 
     @Test
-    public void testCSVReader() {
+    void testCSVReader() throws Exception {
         for (int index = 0; index < FILES.length; index++) {
-            CSVReader csvReader = null;
-            InputStream inputStream = null;
-            InputStreamReader inputReader = null;
 
-            FilePath[] seriesFiles;
-            try {
-                seriesFiles = workspaceRootDir.list(FILES[index]);
+            FilePath[] seriesFiles = WORKSPACE_ROOT_DIR.list(FILES[index]);
+            assertFalse(
+                    seriesFiles.length < 1,
+                    "No plot data file found: " + WORKSPACE_ROOT_DIR.getName() + " " + FILES[index]);
 
-                if (seriesFiles != null && seriesFiles.length < 1) {
-                    fail("No plot data file found: " + workspaceRootDir.getName() + " " + FILES[index]);
-                }
-
-                LOGGER.info("Loading plot series data from: " + FILES[index]);
-
-                inputStream = seriesFiles[0].read();
-
-                inputReader = new InputStreamReader(inputStream);
-                csvReader = new CSVReader(inputReader);
+            LOGGER.info("Loading plot series data from: " + FILES[index]);
+            try (InputStream inputStream = seriesFiles[0].read();
+                    InputStreamReader inputReader = new InputStreamReader(inputStream);
+                    CSVReader csvReader = new CSVReader(inputReader)) {
 
                 // save the header line to use it for the plot labels.
                 String[] nextLine;
@@ -75,23 +65,11 @@ public class CSVReaderTest extends SeriesTestCase {
                                     .append(",");
                         }
                         msg.append("' length ").append(nextLine.length);
-                        assertEquals(msg.toString(), COLUMNS[index], nextLine.length);
+                        assertEquals(COLUMNS[index], nextLine.length, msg.toString());
                     }
                     ++lineNum;
                 }
-                assertEquals("Line count is not equal " + lineNum + " expected " + LINES[index], LINES[index], lineNum);
-            } catch (CsvValidationException | IOException | InterruptedException e) {
-                fail("Exception " + e);
-            } finally {
-                try {
-                    if (csvReader != null) {
-                        csvReader.close();
-                    }
-                } catch (IOException e) {
-                    fail("Exception " + e);
-                }
-                IOUtils.closeQuietly(inputReader);
-                IOUtils.closeQuietly(inputStream);
+                assertEquals(LINES[index], lineNum, "Line count is not equal " + lineNum + " expected " + LINES[index]);
             }
         }
     }

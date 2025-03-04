@@ -1,10 +1,13 @@
 package hudson.plugins.plot;
 
+import static hudson.plugins.plot.SeriesTestUtils.WORKSPACE_ROOT_DIR;
+import static hudson.plugins.plot.SeriesTestUtils.testPlotPoints;
+import static hudson.plugins.plot.SeriesTestUtils.testSeries;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -13,21 +16,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test an XML series.
  *
  * @author Brian Roe
  */
-public class XMLSeriesTest extends SeriesTestCase {
+class XMLSeriesTest {
     private static final String TEST_XML_FILE = "test.xml";
     private static final String TEST2_XML_FILE = "test2.xml";
     private static final String TEST3_XML_FILE = "test3.xml";
     private static final String TEST4_XML_FILE = "test4.xml";
 
     @Test
-    public void
+    void
             testXMLSeries_WhenNodesSharingAParentHaveOneStringAndOneNumericContent_ThenCoalesceNodesToPointLabelledWithStringContent() {
         // Create a new XML series.
         String xpath = "//UIAction/name|//UIAction/numCalls";
@@ -37,7 +40,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testSeries(series, TEST2_XML_FILE, "", "xml");
 
         // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(WORKSPACE_ROOT_DIR, 0, System.out);
         assertNotNull(points);
         assertEquals(4, points.size());
         Map<String, Double> map = new HashMap<>();
@@ -51,7 +54,7 @@ public class XMLSeriesTest extends SeriesTestCase {
     }
 
     @Test
-    public void testXMLSeries_WhenNodesHaveNoContent_ThenCoalesceForAttributes() {
+    void testXMLSeries_WhenNodesHaveNoContent_ThenCoalesceForAttributes() {
         // Create a new XML series.
         String xpath = "//testcase[@name='testOne'] | //testcase[@name='testTwo'] | //testcase[@name='testThree']";
 
@@ -61,7 +64,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testSeries(series, TEST_XML_FILE, "", "xml");
 
         // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(WORKSPACE_ROOT_DIR, 0, System.out);
         assertNotNull(points);
         assertEquals(3, points.size());
         assertEquals("testOne", points.get(0).getLabel());
@@ -71,7 +74,7 @@ public class XMLSeriesTest extends SeriesTestCase {
     }
 
     @Test
-    public void testXMLSeriesNodeset() {
+    void testXMLSeriesNodeset() {
         // Create a new XML series.
         String xpath = "//testcase";
 
@@ -81,7 +84,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testSeries(series, TEST_XML_FILE, "", "xml");
 
         // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(WORKSPACE_ROOT_DIR, 0, System.out);
         assertNotNull(points);
         assertEquals(4, points.size());
         assertEquals("testOne", points.get(0).getLabel());
@@ -93,7 +96,7 @@ public class XMLSeriesTest extends SeriesTestCase {
     }
 
     @Test
-    public void testXMLSeries_WhenAllNodesAreNumeric_ThenPointsAreLabelledWithNodeName() {
+    void testXMLSeries_WhenAllNodesAreNumeric_ThenPointsAreLabelledWithNodeName() {
         // Create a new XML series.
         String xpath = "/results/testcase/*";
 
@@ -103,7 +106,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testSeries(series, TEST3_XML_FILE, "", "xml");
 
         // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(WORKSPACE_ROOT_DIR, 0, System.out);
         assertNotNull(points);
         assertEquals(2, points.size());
         assertEquals("one", points.get(0).getLabel());
@@ -112,7 +115,7 @@ public class XMLSeriesTest extends SeriesTestCase {
     }
 
     @Test
-    public void testXMLSeriesEmptyNodeset() {
+    void testXMLSeriesEmptyNodeset() {
         // Create a new XML series.
         String xpath = "/there/is/no/such/element";
 
@@ -122,14 +125,14 @@ public class XMLSeriesTest extends SeriesTestCase {
         testSeries(series, TEST3_XML_FILE, "", "xml");
 
         // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(WORKSPACE_ROOT_DIR, 0, System.out);
         assertNotNull(points);
         assertEquals(0, points.size());
         testPlotPoints(points, 0);
     }
 
     @Test
-    public void testXMLSeriesNode() {
+    void testXMLSeriesNode() {
         // Create a new XML series.
         String xpath = "//testcase[@name='testThree']";
         XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "NODE", null);
@@ -138,7 +141,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testSeries(series, TEST_XML_FILE, "", "xml");
 
         // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(WORKSPACE_ROOT_DIR, 0, System.out);
         assertNotNull(points);
         assertEquals(1, points.size());
         assertEquals(27d, Double.parseDouble(points.get(0).getYvalue()), 0);
@@ -146,7 +149,7 @@ public class XMLSeriesTest extends SeriesTestCase {
     }
 
     @Test
-    public void testXMLSeriesString() {
+    void testXMLSeriesString() {
         // Create a new XML series.
         String xpath = "//testcase[@name='testOne']/@time";
         XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "STRING", null);
@@ -155,13 +158,13 @@ public class XMLSeriesTest extends SeriesTestCase {
         testSeries(series, TEST_XML_FILE, "", "xml");
 
         // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(WORKSPACE_ROOT_DIR, 0, System.out);
         assertNotNull(points);
         testPlotPoints(points, 1);
     }
 
     @Test
-    public void testXMLSeriesBoolean() {
+    void testXMLSeriesBoolean() {
         // Create a new XML series.
         String xpath = "//testcase[@name='testOne']";
         XMLSeries series = new XMLSeries(TEST_XML_FILE, xpath, "BOOLEAN", null);
@@ -170,13 +173,13 @@ public class XMLSeriesTest extends SeriesTestCase {
         testSeries(series, TEST_XML_FILE, "", "xml");
 
         // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(WORKSPACE_ROOT_DIR, 0, System.out);
         assertNotNull(points);
         testPlotPoints(points, 1);
     }
 
     @Test
-    public void testXMLSeriesNumber() {
+    void testXMLSeriesNumber() {
         // Create a new XML series.
         String xpath = "concat(//testcase[@name='testOne']/@name, '=', //testcase[@name='testOne']/@time)";
         xpath = "//testcase[@name='testOne']/@time";
@@ -186,13 +189,13 @@ public class XMLSeriesTest extends SeriesTestCase {
         testSeries(series, TEST_XML_FILE, "", "xml");
 
         // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, System.out);
+        List<PlotPoint> points = series.loadSeries(WORKSPACE_ROOT_DIR, 0, System.out);
         assertNotNull(points);
         testPlotPoints(points, 1);
     }
 
     @Test
-    public void testXMLSeriesUrl() {
+    void testXMLSeriesUrl() {
         // Create a new XML series.
         String xpath = "/results/testcase/*";
 
@@ -202,7 +205,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         testSeries(series, TEST3_XML_FILE, "", "xml");
 
         // load the series.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 42, System.out);
+        List<PlotPoint> points = series.loadSeries(WORKSPACE_ROOT_DIR, 42, System.out);
         assertNotNull(points);
         testPlotPoints(points, 2);
         assertEquals("http://localhost/42/one/0", points.get(0).getUrl());
@@ -210,7 +213,7 @@ public class XMLSeriesTest extends SeriesTestCase {
     }
 
     @Test
-    public void testXMLSeries_failToReadExternalDTD() throws UnsupportedEncodingException {
+    void testXMLSeries_failToReadExternalDTD() throws UnsupportedEncodingException {
         // Create a new XML series with test file
         String xpathString = "/results/testcase/*";
         XMLSeries series = new XMLSeries(TEST4_XML_FILE, xpathString, "NODESET", null);
@@ -222,7 +225,7 @@ public class XMLSeriesTest extends SeriesTestCase {
         PrintStream customOutput = new PrintStream(baos, true, utf8);
 
         // load the series to see if we have the expected behavior.
-        List<PlotPoint> points = series.loadSeries(workspaceRootDir, 0, customOutput);
+        List<PlotPoint> points = series.loadSeries(WORKSPACE_ROOT_DIR, 0, customOutput);
 
         assertNull(points);
 
