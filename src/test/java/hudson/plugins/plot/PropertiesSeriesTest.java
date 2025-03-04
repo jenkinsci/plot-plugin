@@ -5,20 +5,24 @@
 
 package hudson.plugins.plot;
 
+import static hudson.plugins.plot.SeriesTestUtils.WORKSPACE_ROOT_DIR;
+import static hudson.plugins.plot.SeriesTestUtils.testPlotPoints;
+import static hudson.plugins.plot.SeriesTestUtils.testSeries;
+
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test a Properties file series.
  *
  * @author Allen Reese
  */
-public class PropertiesSeriesTest extends SeriesTestCase {
+class PropertiesSeriesTest {
     private static final String[] FILES = {"test.properties"};
     private static final String[] LABELS = {"testLabel"};
 
     @Test
-    public void testPropertiesSeries() {
+    void testPropertiesSeries() {
         // Create a new properties series.
         PropertiesSeries propSeries = new PropertiesSeries(FILES[0], LABELS[0]);
 
@@ -26,7 +30,7 @@ public class PropertiesSeriesTest extends SeriesTestCase {
         testSeries(propSeries, FILES[0], LABELS[0], "properties");
 
         // load the series.
-        List<PlotPoint> points = propSeries.loadSeries(workspaceRootDir, 0, System.err);
+        List<PlotPoint> points = propSeries.loadSeries(WORKSPACE_ROOT_DIR, 0, System.err);
         testPlotPoints(points, 1);
     }
 }
