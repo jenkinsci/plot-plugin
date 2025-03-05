@@ -1,33 +1,29 @@
 package hudson.plugins.plot;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import hudson.model.Run;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class PlotBuildActionTest {
-
-    @Rule
-    public JenkinsRule r = new JenkinsRule();
+@WithJenkins
+class PlotBuildActionTest {
 
     private PlotBuildAction plotBuildAction;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp(JenkinsRule r) throws Exception {
         final Run<?, ?> run = r.buildAndAssertSuccess(r.createFreeStyleProject());
         final List<Plot> plots = new ArrayList<>();
         for (int i = 0; i < 30; i++) {
@@ -40,7 +36,7 @@ public class PlotBuildActionTest {
 
     @Issue("JENKINS-48465")
     @Test
-    public void checksNoConcurrentModificationExceptionIsThrownForPlotsListAccess() throws Exception {
+    void checksNoConcurrentModificationExceptionIsThrownForPlotsListAccess() throws Exception {
         int tasksCount = 10;
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         List<FutureTask<Object>> tasks = new ArrayList<>();
@@ -65,7 +61,7 @@ public class PlotBuildActionTest {
                     // close to "real world"
                     PureJavaReflectionProvider provider = new PureJavaReflectionProvider();
                     provider.visitSerializableFields(plotBuildAction, (fieldName, fieldType, definedIn, value) -> {
-                        if (value != null && value instanceof List) {
+                        if (value instanceof List) {
                             List<Plot> plots = (List<Plot>) value;
                             // simulate ConcurrentModificationException
                             for (Plot p : plots) {
@@ -85,25 +81,21 @@ public class PlotBuildActionTest {
         }
     }
 
-    private void waitForAllThreadsToFinish(ExecutorService executorService, CountDownLatch latch) {
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    private static void waitForAllThreadsToFinish(ExecutorService executorService, CountDownLatch latch)
+            throws Exception {
+        latch.await();
         executorService.shutdown();
     }
 
-    private void assertNoConcurrentModificationExceptionThrown(List<FutureTask<Object>> tasks)
-            throws InterruptedException {
-        try {
-            // we expect here no ConcurrentModificationException
-            // otherwise access to plots list is not synchronized
-            for (FutureTask task : tasks) {
-                task.get();
-            }
-        } catch (ExecutionException | ConcurrentModificationException e) {
-            fail("Access to PlotBuildAction#plots list is not synchronized");
-        }
+    private static void assertNoConcurrentModificationExceptionThrown(List<FutureTask<Object>> tasks) {
+        assertDoesNotThrow(
+                () -> {
+                    // we expect here no ConcurrentModificationException
+                    // otherwise access to plots list is not synchronized
+                    for (FutureTask<?> task : tasks) {
+                        task.get();
+                    }
+                },
+                "Access to PlotBuildAction#plots list is not synchronized");
     }
 }
