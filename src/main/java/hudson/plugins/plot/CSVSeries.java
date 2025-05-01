@@ -280,18 +280,12 @@ public class CSVSeries extends Series {
 
         boolean retVal =
                 switch (inclusionFlag) {
-                    case INCLUDE_BY_STRING ->
-                    // if the set contains it, don't exclude it.
-                    !checkExclusionSet(label);
-                    case EXCLUDE_BY_STRING ->
-                    // if the set doesn't contain it, exclude it.
-                    checkExclusionSet(label);
+                    case INCLUDE_BY_STRING -> !checkExclusionSet(label); // if the set contains it, don't exclude it.
+                    case EXCLUDE_BY_STRING -> checkExclusionSet(label); // if the set doesn't contain it, exclude it.
                     case INCLUDE_BY_COLUMN ->
-                    // if the set contains it, don't exclude it.
-                    !(colExclusionSet.contains(index));
+                        !(colExclusionSet.contains(index)); // if the set contains it, don't exclude it.
                     case EXCLUDE_BY_COLUMN ->
-                    // if the set doesn't contain it, don't exclude it.
-                    colExclusionSet.contains(index);
+                        colExclusionSet.contains(index); // if the set doesn't contain it, don't exclude it.
                     default -> false;
                 };
 
