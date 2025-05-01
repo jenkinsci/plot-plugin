@@ -896,26 +896,36 @@ public class Plot implements Comparable<Plot> {
      */
     private JFreeChart createChart(PlotCategoryDataset dataset) {
         return switch (ChartStyle.forName(getUrlStyle())) {
-            case AREA -> ChartFactory.createAreaChart(
-                    getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-            case BAR -> ChartFactory.createBarChart(
-                    getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-            case BAR_3D -> ChartFactory.createBarChart3D(
-                    getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-            case LINE_3D -> ChartFactory.createLineChart3D(
-                    getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-            case LINE_SIMPLE -> ChartFactory.createLineChart(
-                    getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-            case STACKED_AREA -> ChartFactory.createStackedAreaChart(
-                    getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-            case STACKED_BAR -> ChartFactory.createStackedBarChart(
-                    getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-            case STACKED_BAR_3D -> ChartFactory.createStackedBarChart3D(
-                    getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-            case WATERFALL -> ChartFactory.createWaterfallChart(
-                    getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
-            default -> ChartFactory.createLineChart(
-                    getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case AREA ->
+                ChartFactory.createAreaChart(
+                        getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case BAR ->
+                ChartFactory.createBarChart(
+                        getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case BAR_3D ->
+                ChartFactory.createBarChart3D(
+                        getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case LINE_3D ->
+                ChartFactory.createLineChart3D(
+                        getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case LINE_SIMPLE ->
+                ChartFactory.createLineChart(
+                        getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case STACKED_AREA ->
+                ChartFactory.createStackedAreaChart(
+                        getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case STACKED_BAR ->
+                ChartFactory.createStackedBarChart(
+                        getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case STACKED_BAR_3D ->
+                ChartFactory.createStackedBarChart3D(
+                        getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            case WATERFALL ->
+                ChartFactory.createWaterfallChart(
+                        getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
+            default ->
+                ChartFactory.createLineChart(
+                        getURLTitle(), null, getYaxis(), dataset, PlotOrientation.VERTICAL, hasLegend(), true, false);
         };
     }
 
