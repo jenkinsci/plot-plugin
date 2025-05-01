@@ -895,6 +895,7 @@ public class Plot implements Comparable<Plot> {
      * Creates a Chart of the style indicated by getUrlStyle() using the given
      * dataset. Defaults to using createLineChart.
      */
+    // spotless:off
     private JFreeChart createChart(PlotCategoryDataset dataset) {
         return switch (ChartStyle.forName(getUrlStyle())) {
             case AREA ->
@@ -929,6 +930,7 @@ public class Plot implements Comparable<Plot> {
                         getURLTitle(), null, getYaxis(), dataset, VERTICAL, hasLegend(), true, false);
         };
     }
+    // spotless:on
 
     /**
      * Returns a trimmed description string for the build specified by the given

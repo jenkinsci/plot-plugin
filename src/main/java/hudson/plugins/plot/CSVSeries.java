@@ -279,6 +279,7 @@ public class CSVSeries extends Series {
         }
 
         boolean retVal =
+                // spotless:off
                 switch (inclusionFlag) {
                     case INCLUDE_BY_STRING -> !checkExclusionSet(label); // if the set contains it, don't exclude it.
                     case EXCLUDE_BY_STRING -> checkExclusionSet(label); // if the set doesn't contain it, exclude it.
@@ -288,6 +289,7 @@ public class CSVSeries extends Series {
                         colExclusionSet.contains(index); // if the set doesn't contain it, don't exclude it.
                     default -> false;
                 };
+                // spotless:on
 
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest(((retVal) ? "excluded" : "included") + " CSV Column: " + index + " : " + label);
