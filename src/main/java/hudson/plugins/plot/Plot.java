@@ -417,7 +417,7 @@ public class Plot implements Comparable<Plot> {
             } catch (NumberFormatException nfe) {
                 LOGGER.log(
                         Level.INFO,
-                        "Failed to parse Double value from String." + " Not a problem, result already set",
+                        "Failed to parse double from '" + input + "'. Not a problem, result already set",
                         nfe);
             }
         }
