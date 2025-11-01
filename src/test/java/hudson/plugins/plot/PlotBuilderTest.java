@@ -12,22 +12,19 @@ class PlotBuilderTest {
     @Test
     void testWithMinimalPipelineArgs(JenkinsRule r) throws Exception {
         WorkflowJob p = r.createProject(WorkflowJob.class, "projectUnderTest");
-        p.setDefinition(new CpsFlowDefinition(
-                """
+        p.setDefinition(new CpsFlowDefinition("""
                         node { \s
                             plot csvFileName: 'plot-minimal.csv',
                                group: 'My Data',
                                style: 'line'
-                        }""",
-                true));
+                        }""", true));
         r.buildAndAssertSuccess(p);
     }
 
     @Test
     void testWithXML(JenkinsRule r) throws Exception {
         WorkflowJob p = r.createProject(WorkflowJob.class, "projectUnderTest");
-        p.setDefinition(new CpsFlowDefinition(
-                """
+        p.setDefinition(new CpsFlowDefinition("""
                         node { \s
                             def content = '<my_data>'
                             content += '<test value1="123.456"/>'
@@ -44,16 +41,14 @@ class PlotBuilderTest {
                                   nodeType: 'NODESET',
                                   xpath: 'my_data/test/@*']
                                ]
-                        }""",
-                true));
+                        }""", true));
         r.buildAndAssertSuccess(p);
     }
 
     @Test
     void testWithCSV(JenkinsRule r) throws Exception {
         WorkflowJob p = r.createProject(WorkflowJob.class, "projectUnderTest");
-        p.setDefinition(new CpsFlowDefinition(
-                """
+        p.setDefinition(new CpsFlowDefinition("""
                         node { \s
                             def content = 'Avg,Median,90,min,max,samples,errors,error %'
                             content += '515.33,196,1117,2,16550,97560,360,0.37'
@@ -64,16 +59,14 @@ class PlotBuilderTest {
                                style: 'line',
                                yaxis: 'arbitrary',
                                csvSeries: [[file: 'data.csv']]
-                        }""",
-                true));
+                        }""", true));
         r.buildAndAssertSuccess(p);
     }
 
     @Test
     void testWithProperties(JenkinsRule r) throws Exception {
         WorkflowJob p = r.createProject(WorkflowJob.class, "projectUnderTest");
-        p.setDefinition(new CpsFlowDefinition(
-                """
+        p.setDefinition(new CpsFlowDefinition("""
                         node { \s
                             def content = 'YVALUE=1'
                             writeFile file: 'data.properties', text: content
@@ -86,8 +79,7 @@ class PlotBuilderTest {
                                  [file: 'data.properties',
                                   label: 'My Label']
                                ]
-                        }""",
-                true));
+                        }""", true));
         r.buildAndAssertSuccess(p);
     }
 }
