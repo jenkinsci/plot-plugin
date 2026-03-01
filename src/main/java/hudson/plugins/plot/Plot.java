@@ -58,6 +58,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.StaplerResponse2;
+import java.text.DecimalFormat;
 
 /**
  * Represents the configuration for a single plot. A plot can have one or more
@@ -260,6 +261,30 @@ public class Plot implements Comparable<Plot> {
     @SuppressWarnings("visibilitymodifier")
     public String yaxisMaximum;
 
+    /**
+     * Custom chart width. When empty or null, DEFAULT_WIDTH (750) is used.
+     */
+    @SuppressWarnings("visibilitymodifier")
+    public String chartWidth;
+
+    /**
+     * Custom chart height. When empty or null, DEFAULT_HEIGHT (450) is used.
+     */
+    @SuppressWarnings("visibilitymodifier")
+    public String chartHeight;
+
+    /**
+     * Whether to skip data points with zero or NaN Y values.
+     */
+    @SuppressWarnings("visibilitymodifier")
+    public boolean skipZeroValues;
+
+    /**
+     * Whether to use decimal format on Y-axis to avoid scientific notation.
+     */
+    @SuppressWarnings("visibilitymodifier")
+    public boolean useDecimalFormat;
+
     static class Label implements Comparable<Label> {
         private final Integer buildNum;
         private final String buildDate;
@@ -348,7 +373,11 @@ public class Plot implements Comparable<Plot> {
             boolean logarithmic,
             String yaxisMinimum,
             String yaxisMaximum,
-            String description) {
+            String description,
+            String chartWidth,
+            String chartHeight,
+            boolean skipZeroValues,
+            boolean useDecimalFormat) {
         this.title = title;
         this.yaxis = yaxis;
         this.group = group;
@@ -362,6 +391,10 @@ public class Plot implements Comparable<Plot> {
         this.yaxisMinimum = yaxisMinimum;
         this.yaxisMaximum = yaxisMaximum;
         this.description = description;
+        this.chartWidth = chartWidth;
+        this.chartHeight = chartHeight;
+        this.skipZeroValues = skipZeroValues;
+        this.useDecimalFormat = useDecimalFormat;
     }
 
     /**
@@ -376,7 +409,8 @@ public class Plot implements Comparable<Plot> {
             String csvFileName,
             String style,
             boolean useDescr) {
-        this(title, yaxis, group, numBuilds, csvFileName, style, useDescr, false, false, false, null, null, null);
+        this(title, yaxis, group, numBuilds, csvFileName, style, useDescr,
+                false, false, false, null, null, null, null, null, false, false);
     }
 
     // needed for serialization
@@ -408,6 +442,44 @@ public class Plot implements Comparable<Plot> {
 
     public Double getYaxisMaximum() {
         return getDoubleFromString(yaxisMaximum);
+    }
+
+    public String getChartWidth() {
+        return chartWidth;
+    }
+
+    public String getChartHeight() {
+        return chartHeight;
+    }
+
+    public boolean getSkipZeroValues() {
+        return skipZeroValues;
+    }
+
+    public boolean getUseDecimalFormat() {
+        return useDecimalFormat;
+    }
+
+    public int getEffectiveWidth() {
+        if (!StringUtils.isEmpty(chartWidth)) {
+            try {
+                int w = Integer.parseInt(chartWidth.trim());
+                if (w > 0) return w;
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return DEFAULT_WIDTH;
+    }
+
+    public int getEffectiveHeight() {
+        if (!StringUtils.isEmpty(chartHeight)) {
+            try {
+                int h = Integer.parseInt(chartHeight.trim());
+                if (h > 0) return h;
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return DEFAULT_HEIGHT;
     }
 
     public Double getDoubleFromString(String input) {
@@ -601,13 +673,13 @@ public class Plot implements Comparable<Plot> {
     private void setWidth(StaplerRequest2 req) {
         String w = req.getParameter("width");
         if (w == null) {
-            width = DEFAULT_WIDTH;
+            width = getEffectiveWidth();
         } else {
             try {
                 width = Integer.parseInt(w);
             } catch (NumberFormatException nfe) {
                 LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
-                width = DEFAULT_WIDTH;
+                width = getEffectiveWidth();
             }
         }
     }
@@ -624,13 +696,13 @@ public class Plot implements Comparable<Plot> {
     private void setHeight(StaplerRequest2 req) {
         String h = req.getParameter("height");
         if (h == null) {
-            height = DEFAULT_HEIGHT;
+            height = getEffectiveHeight();
         } else {
             try {
                 height = Integer.parseInt(h);
             } catch (NumberFormatException nfe) {
                 LOGGER.log(Level.SEVERE, "Exception converting to integer", nfe);
-                height = DEFAULT_HEIGHT;
+                height = getEffectiveHeight();
             }
         }
     }
@@ -751,6 +823,15 @@ public class Plot implements Comparable<Plot> {
                 for (PlotPoint point : seriesData) {
                     if (point == null) {
                         continue;
+                    }
+
+                    if (skipZeroValues) {
+                        try {
+                            double y = Double.parseDouble(point.getYvalue());
+                            if (y == 0.0 || Double.isNaN(y)) continue;
+                        } catch (NumberFormatException ignored) {
+                            continue;
+                        }
                     }
 
                     rawPlotData.add(new String[] {
@@ -874,6 +955,10 @@ public class Plot implements Comparable<Plot> {
                 rangeAxis.setUpperBound(getYaxisMaximum());
             }
             ((NumberAxis) rangeAxis).setAutoRangeIncludesZero(!getExclZero());
+
+            if (useDecimalFormat) {
+                ((NumberAxis) rangeAxis).setNumberFormatOverride(new DecimalFormat("#.##"));
+            }
         }
 
         AbstractCategoryItemRenderer renderer = (AbstractCategoryItemRenderer) categoryPlot.getRenderer();
