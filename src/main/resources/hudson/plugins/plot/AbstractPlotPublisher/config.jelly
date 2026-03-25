@@ -62,6 +62,18 @@
         <f:entry title="${%Keep records for deleted builds}" help="/plugin/plot/help-keepRecords.html">
           <f:checkbox name="keepRecords" checked="${plot.keepRecords}" />
         </f:entry>
+        <f:entry title="${%Chart width}" help="/plugin/plot/help-chartWidth.html">
+          <f:textbox name="chartWidth" value="${plot.chartWidth}" />
+        </f:entry>
+        <f:entry title="${%Chart height}" help="/plugin/plot/help-chartHeight.html">
+          <f:textbox name="chartHeight" value="${plot.chartHeight}" />
+        </f:entry>
+        <f:entry title="${%Skip zero and NaN values}" help="/plugin/plot/help-skipZeroValues.html">
+          <f:checkbox name="skipZeroValues" checked="${plot.skipZeroValues}" />
+        </f:entry>
+        <f:entry title="${%Use decimal format on Y-axis}" help="/plugin/plot/help-useDecimalFormat.html">
+          <f:checkbox name="useDecimalFormat" checked="${plot.useDecimalFormat}" />
+        </f:entry>
 
         <f:entry title="" description="${%A new data series definition}">
           <f:repeatable var="series" items="${plot.series}" minimum="1">
