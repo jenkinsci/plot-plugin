@@ -409,8 +409,24 @@ public class Plot implements Comparable<Plot> {
             String csvFileName,
             String style,
             boolean useDescr) {
-        this(title, yaxis, group, numBuilds, csvFileName, style, useDescr,
-                false, false, false, null, null, null, null, null, false, false);
+        this(
+                title,
+                yaxis,
+                group,
+                numBuilds,
+                csvFileName,
+                style,
+                useDescr,
+                false,
+                false,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false,
+                false);
     }
 
     // needed for serialization
