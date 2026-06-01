@@ -98,6 +98,16 @@ public class PlotReport {
     }
 
     // called from PlotReport/index.jelly
+    public int getPlotWidth(int i) {
+        return getPlot(i).getEffectiveWidth();
+    }
+
+    // called from PlotReport/index.jelly
+    public int getPlotHeight(int i) {
+        return getPlot(i).getEffectiveHeight();
+    }
+
+    // called from PlotReport/index.jelly
     public void doGetPlot(StaplerRequest2 req, StaplerResponse2 rsp) {
         String i = req.getParameter("index");
         Plot plot = getPlot(i);

@@ -24,7 +24,7 @@
 
   <properties>
     <revision>2.4.1</revision>
-    <changelist>-SNAPSHOT</changelist>
+    <changelist>-SNAPSHOT-20260302</changelist>
     <gitHubRepo>jenkinsci/plot-plugin</gitHubRepo>
     <hpi.bundledArtifacts>commons-collections4,opencsv</hpi.bundledArtifacts>
     <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>

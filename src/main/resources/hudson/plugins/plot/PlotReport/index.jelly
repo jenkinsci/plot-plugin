@@ -26,8 +26,10 @@
         padding:.2em;
       }
       </style>
+      <j:set var="plotW" value="${it.getPlotWidth(index)}"/>
+      <j:set var="plotH" value="${it.getPlotHeight(index)}"/>
       <div id="${id}" style="margin-top: 2em">
-        <div align="right" style="width:750px">
+        <div align="right" style="width:${plotW}px">
           <a href="#top"><l:icon class="icon-up icon-md"/>${%top}</a>
         </div>
         <j:if test="${it.getDisplayTableFlag(index)}">
@@ -50,8 +52,15 @@
           </p>
           </div>
         </j:if>
-        <img src="getPlot?index=${index}&amp;width=750&amp;height=450" width="750" height="450" lazymap="getPlotMap?index=${index}" />
-        <div style="width:750px">
+        <div class="plot-img-placeholder"
+             data-plot-src="getPlot?index=${index}&amp;width=${plotW}&amp;height=${plotH}"
+             data-plot-width="${plotW}"
+             data-plot-height="${plotH}"
+             data-plot-lazymap="getPlotMap?index=${index}"
+             style="width:${plotW}px;height:${plotH}px;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;color:#999;background:#fafafa;">
+          Loading plot...
+        </div>
+        <div style="width:${plotW}px">
           <j:if test="${it.getPlotDescription(index) != null}">
             <j:if test="${!it.getPlotDescription(index).isEmpty()}">
               <b>Description</b>: <span>${it.getPlotDescription(index)}</span>
@@ -81,6 +90,53 @@
       <j:forEach var="plot" items="${it.plots}" varStatus="loopStat2">
         <c:individualChart id="${plot.csvFileName}" index="${loopStat2.index}" />
       </j:forEach>
+
+      <script type="text/javascript">
+        (function() {
+          function loadPlotsSequentially() {
+            var placeholders = document.querySelectorAll('.plot-img-placeholder');
+            var index = 0;
+
+            function loadNext() {
+              if (index >= placeholders.length) return;
+              var ph = placeholders[index];
+              var img = document.createElement('img');
+              img.setAttribute('width', ph.getAttribute('data-plot-width'));
+              img.setAttribute('height', ph.getAttribute('data-plot-height'));
+              img.setAttribute('lazymap', ph.getAttribute('data-plot-lazymap'));
+
+              img.onload = function() {
+                index++;
+                loadNext();
+              };
+              img.onerror = function() {
+                img.alt = 'Failed to load plot. Right-click to reload.';
+                img.style.cursor = 'pointer';
+                img.title = 'Click to retry';
+                img.onclick = function() {
+                  img.onclick = null;
+                  img.alt = '';
+                  img.title = '';
+                  img.src = ph.getAttribute('data-plot-src') + '&amp;_t=' + Date.now();
+                };
+                index++;
+                loadNext();
+              };
+
+              ph.parentNode.replaceChild(img, ph);
+              img.src = ph.getAttribute('data-plot-src');
+            }
+
+            loadNext();
+          }
+
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadPlotsSequentially);
+          } else {
+            loadPlotsSequentially();
+          }
+        })();
+      </script>
     </l:main-panel>
   </l:layout>
 </j:jelly>
