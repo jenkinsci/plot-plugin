@@ -162,7 +162,11 @@ public class MatrixPlotPublisher extends AbstractPlotPublisher {
                         p.isLogarithmic(),
                         p.yaxisMinimum,
                         p.yaxisMaximum,
-                        p.description);
+                        p.description,
+                        p.chartWidth,
+                        p.chartHeight,
+                        p.skipZeroValues,
+                        p.useDecimalFormat);
                 plot.series = p.series;
                 plot.setProject(build.getProject());
                 addPlot(plot);

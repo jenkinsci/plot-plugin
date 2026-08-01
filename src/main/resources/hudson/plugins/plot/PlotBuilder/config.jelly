@@ -69,6 +69,18 @@
             <f:entry title="${%Y-axis maximum}" field="yaxisMaximum" help="/plugin/plot/help-yaxisMaximum.html">
                 <f:textbox name="yaxisMaximum" value="${plot.yaxisMaximum}"/>
             </f:entry>
+            <f:entry title="${%Chart width}" field="chartWidth" help="/plugin/plot/help-chartWidth.html">
+                <f:textbox name="chartWidth" value="${plot.chartWidth}"/>
+            </f:entry>
+            <f:entry title="${%Chart height}" field="chartHeight" help="/plugin/plot/help-chartHeight.html">
+                <f:textbox name="chartHeight" value="${plot.chartHeight}"/>
+            </f:entry>
+            <f:entry title="${%Skip zero and NaN values}" field="skipZeroValues" help="/plugin/plot/help-skipZeroValues.html">
+                <f:checkbox name="skipZeroValues" checked="${plot.skipZeroValues}"/>
+            </f:entry>
+            <f:entry title="${%Use decimal format on Y-axis}" field="useDecimalFormat" help="/plugin/plot/help-useDecimalFormat.html">
+                <f:checkbox name="useDecimalFormat" checked="${plot.useDecimalFormat}"/>
+            </f:entry>
             <f:entry title="" description="${%A new data series definition}">
                 <f:repeatableProperty field="csvSeries" add="Add CSV series"/>
             </f:entry>

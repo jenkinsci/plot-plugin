@@ -66,6 +66,15 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
     private boolean logarithmic;
     private boolean keepRecords;
 
+    @CheckForNull
+    private String chartWidth;
+
+    @CheckForNull
+    private String chartHeight;
+
+    private boolean skipZeroValues;
+    private boolean useDecimalFormat;
+
     // Generated?
     @SuppressWarnings("visibilitymodifier")
     public String csvFileName;
@@ -194,6 +203,44 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
         this.description = Util.fixEmptyAndTrim(description);
     }
 
+    @CheckForNull
+    public String getChartWidth() {
+        return chartWidth;
+    }
+
+    @DataBoundSetter
+    public final void setChartWidth(@CheckForNull String chartWidth) {
+        this.chartWidth = Util.fixEmptyAndTrim(chartWidth);
+    }
+
+    @CheckForNull
+    public String getChartHeight() {
+        return chartHeight;
+    }
+
+    @DataBoundSetter
+    public final void setChartHeight(@CheckForNull String chartHeight) {
+        this.chartHeight = Util.fixEmptyAndTrim(chartHeight);
+    }
+
+    public boolean getSkipZeroValues() {
+        return skipZeroValues;
+    }
+
+    @DataBoundSetter
+    public void setSkipZeroValues(boolean skipZeroValues) {
+        this.skipZeroValues = skipZeroValues;
+    }
+
+    public boolean getUseDecimalFormat() {
+        return useDecimalFormat;
+    }
+
+    @DataBoundSetter
+    public void setUseDecimalFormat(boolean useDecimalFormat) {
+        this.useDecimalFormat = useDecimalFormat;
+    }
+
     public List<CSVSeries> getCsvSeries() {
         return csvSeries;
     }
@@ -241,7 +288,11 @@ public class PlotBuilder extends Builder implements SimpleBuildStep {
                 logarithmic,
                 yaxisMinimum,
                 yaxisMaximum,
-                description);
+                description,
+                chartWidth,
+                chartHeight,
+                skipZeroValues,
+                useDecimalFormat);
 
         List<Series> series = new ArrayList<>();
         if (csvSeries != null) {
