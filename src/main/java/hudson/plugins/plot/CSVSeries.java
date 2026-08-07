@@ -27,8 +27,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest2;
 

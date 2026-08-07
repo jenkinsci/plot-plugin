@@ -29,7 +29,7 @@ import javax.xml.xpath.XPathFactory;
 import jenkins.util.xml.XMLUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest2;
 import org.w3c.dom.NamedNodeMap;

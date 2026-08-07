@@ -3,7 +3,7 @@ package hudson.plugins.plot;
 import hudson.Util;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Recorder;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author lucinka
