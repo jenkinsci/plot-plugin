@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>plot</artifactId>
-  <version>${revision}${changelist}</version>
+  <version>${changelist}</version>
   <packaging>hpi</packaging>
   <name>Plot plugin</name>
   <url>https://github.com/jenkinsci/plot-plugin</url>
@@ -23,8 +23,7 @@
   </scm>
 
   <properties>
-    <revision>2.4.1</revision>
-    <changelist>-SNAPSHOT</changelist>
+    <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/plot-plugin</gitHubRepo>
     <hpi.bundledArtifacts>commons-collections4,opencsv</hpi.bundledArtifacts>
     <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
